@@ -111,6 +111,23 @@ npm run dev
 ```
 访问 `http://localhost:5173` 即可开始使用。
 
+### 5. Docker 部署 (可选)
+
+#### 方式一：使用 Docker Hub 镜像
+```bash
+docker run -d -p 8080:80 youngv/all-model-chat
+```
+访问 `http://localhost:8080` 即可使用。
+
+#### 方式二：本地构建镜像
+```bash
+# 构建镜像
+docker build -t all-model-chat .
+
+# 运行容器
+docker run -d -p 8080:80 all-model-chat
+```
+
 ---
 
 ## 🛠️ 技术栈
