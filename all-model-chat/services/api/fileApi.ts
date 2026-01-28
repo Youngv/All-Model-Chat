@@ -2,6 +2,7 @@
 import { File as GeminiFile } from "@google/genai";
 import { getConfiguredApiClient } from './baseApi';
 import { logService } from "../logService";
+import { isNetworkError, createNetworkError } from "../../utils/errorUtils";
 
 /**
  * Uploads a file using the official SDK.
@@ -53,6 +54,14 @@ export const uploadFileApi = async (
             throw abortError;
         }
         
+        // Enhanced error handling for network failures
+        if (isNetworkError(error)) {
+            throw createNetworkError(
+                "File upload failed due to network error. Please check your connection and API settings.",
+                error
+            );
+        }
+        
         throw error;
     }
 };
@@ -72,6 +81,15 @@ export const getFileMetadataApi = async (apiKey: string, fileApiName: string): P
         if (error instanceof Error && (error.message.includes('NOT_FOUND') || error.message.includes('404'))) {
             return null; // File not found is a valid outcome we want to handle
         }
+        
+        // Enhanced error handling for network failures
+        if (isNetworkError(error)) {
+            throw createNetworkError(
+                "Failed to retrieve file metadata due to network error. Please check your connection and API settings.",
+                error
+            );
+        }
+        
         throw error; // Re-throw other errors
     }
 };

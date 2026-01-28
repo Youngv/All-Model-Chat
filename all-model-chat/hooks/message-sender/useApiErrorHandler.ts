@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { logService } from '../../utils/appUtils';
+import { isNetworkError } from '../../utils/errorUtils';
 import { SavedChatSession } from '../../types';
 
 type SessionsUpdater = (updater: (prev: SavedChatSession[]) => SavedChatSession[]) => void;
@@ -18,9 +19,21 @@ export const useApiErrorHandler = (updateAndPersistSessions: SessionsUpdater) =>
 
         let errorMessage = "An unknown error occurred.";
         if (error instanceof Error) {
-            errorMessage = error.name === 'SilentError'
-                ? "API key is not configured in settings."
-                : `${errorPrefix}: ${error.message}`;
+            if (error.name === 'SilentError') {
+                errorMessage = "API key is not configured in settings.";
+            } else if (isNetworkError(error)) {
+                // Network request failed - provide more helpful error message
+                // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
+                errorMessage = `${errorPrefix}: Network request failed. Please check:
+• Your internet connection
+• Your API key is valid
+• API proxy settings (if enabled)
+• CORS/network restrictions
+
+Technical details: ${error.message}`;
+            } else {
+                errorMessage = `${errorPrefix}: ${error.message}`;
+            }
         } else {
             errorMessage = `${errorPrefix}: ${String(error)}`;
         }
