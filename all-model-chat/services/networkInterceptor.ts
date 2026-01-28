@@ -28,7 +28,22 @@ export const networkInterceptor = {
         currentProxyUrl = proxyUrl ? proxyUrl.replace(/\/$/, '') : null;
         
         if (isInterceptorEnabled && currentProxyUrl) {
-            logService.debug(`[NetworkInterceptor] Configured. Target: ${currentProxyUrl}`, { category: 'NETWORK' });
+            // Validate proxy URL format
+            try {
+                const url = new URL(currentProxyUrl);
+                if (!url.protocol.startsWith('http')) {
+                    logService.warn(`[NetworkInterceptor] Invalid proxy URL protocol: ${url.protocol}. Expected http: or https:`, { category: 'NETWORK' });
+                }
+                logService.debug(`[NetworkInterceptor] Configured. Target: ${currentProxyUrl}`, { category: 'NETWORK' });
+            } catch (e) {
+                logService.error(`[NetworkInterceptor] Invalid proxy URL format: ${currentProxyUrl}`, { 
+                    error: e, 
+                    category: 'NETWORK' 
+                });
+                // Disable interceptor if URL is invalid
+                isInterceptorEnabled = false;
+                currentProxyUrl = null;
+            }
         }
     },
 
@@ -110,17 +125,43 @@ export const networkInterceptor = {
 
                     // logService.debug(`[NetworkInterceptor] Rerouting: ${urlStr} -> ${newUrl}`, { category: 'NETWORK' });
 
-                    if (originalRequest) {
-                        // Clone the original request with the new URL
-                        // We pass the original request as the second argument to preserve body/headers/signals
-                        const newReq = new Request(newUrl, originalRequest);
-                        return originalFetch(newReq, init);
+                    try {
+                        if (originalRequest) {
+                            // Clone the original request with the new URL
+                            // We pass the original request as the second argument to preserve body/headers/signals
+                            const newReq = new Request(newUrl, originalRequest);
+                            return await originalFetch(newReq, init);
+                        }
+                        
+                        return await originalFetch(newUrl, init);
+                    } catch (fetchError) {
+                        // Enhanced error logging for fetch failures
+                        logService.error("[NetworkInterceptor] Fetch request failed after URL rewrite.", {
+                            error: fetchError,
+                            originalUrl: urlStr,
+                            rewrittenUrl: newUrl,
+                            proxyUrl: currentProxyUrl,
+                            category: 'NETWORK'
+                        });
+                        // Re-throw the error with additional context
+                        const enhancedError = new Error(
+                            `Network request failed. Check proxy configuration. Original error: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`
+                        );
+                        enhancedError.name = 'NetworkError';
+                        throw enhancedError;
                     }
-                    
-                    return originalFetch(newUrl, init);
                 } catch (e) {
-                    console.error("[NetworkInterceptor] Failed to rewrite URL", e);
-                    // Fallback to original
+                    // This catches URL rewriting errors, not fetch errors (those are caught above)
+                    if (e instanceof Error && e.name === 'NetworkError') {
+                        // Re-throw network errors from the inner catch
+                        throw e;
+                    }
+                    logService.error("[NetworkInterceptor] Failed to rewrite URL. Falling back to original URL.", { 
+                        error: e, 
+                        originalUrl: urlStr,
+                        category: 'NETWORK' 
+                    });
+                    // Fallback to original URL - this might still fail if proxy is misconfigured
                 }
             }
 

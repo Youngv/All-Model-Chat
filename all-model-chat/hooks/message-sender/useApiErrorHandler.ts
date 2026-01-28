@@ -18,9 +18,19 @@ export const useApiErrorHandler = (updateAndPersistSessions: SessionsUpdater) =>
 
         let errorMessage = "An unknown error occurred.";
         if (error instanceof Error) {
-            errorMessage = error.name === 'SilentError'
-                ? "API key is not configured in settings."
-                : `${errorPrefix}: ${error.message}`;
+            if (error.name === 'SilentError') {
+                errorMessage = "API key is not configured in settings.";
+            } else if (error instanceof TypeError && error.message.includes('Load failed')) {
+                // Network request failed - provide more helpful error message
+                errorMessage = `${errorPrefix}: Network request failed. Please check:\n` +
+                    `• Your internet connection\n` +
+                    `• Your API key is valid\n` +
+                    `• API proxy settings (if enabled)\n` +
+                    `• CORS/network restrictions\n\n` +
+                    `Technical details: ${error.message}`;
+            } else {
+                errorMessage = `${errorPrefix}: ${error.message}`;
+            }
         } else {
             errorMessage = `${errorPrefix}: ${String(error)}`;
         }

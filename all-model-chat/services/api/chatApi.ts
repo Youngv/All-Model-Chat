@@ -142,8 +142,25 @@ export const sendStatelessMessageStreamApi = async (
             }
         }
     } catch (error) {
-        logService.error("Error sending message (stream):", error);
-        onError(error instanceof Error ? error : new Error(String(error) || "Unknown error during streaming."));
+        // Enhanced error logging for network failures
+        let enhancedError: Error;
+        if (error instanceof TypeError && error.message.includes('Load failed')) {
+            logService.error("Network request failed during streaming. Possible causes: CORS, network timeout, invalid proxy configuration.", { 
+                error,
+                category: 'NETWORK'
+            });
+            enhancedError = new Error(
+                "Network request failed. Please check your internet connection, API configuration, and proxy settings."
+            );
+            enhancedError.name = 'NetworkError';
+        } else if (error instanceof Error) {
+            enhancedError = error;
+        } else {
+            enhancedError = new Error(String(error) || "Unknown error during streaming.");
+        }
+        
+        logService.error("Error sending message (stream):", enhancedError);
+        onError(enhancedError);
     } finally {
         logService.info("Streaming complete.", { usage: finalUsageMetadata, hasGrounding: !!finalGroundingMetadata });
         onComplete(finalUsageMetadata, finalGroundingMetadata, finalUrlContextMetadata);
@@ -180,7 +197,24 @@ export const sendStatelessMessageNonStreamApi = async (
         logService.info(`Stateless non-stream complete for ${modelId}.`, { usage, hasGrounding: !!grounding, hasUrlContext: !!urlContext });
         onComplete(responseParts, thoughts, usage, grounding, urlContext);
     } catch (error) {
-        logService.error(`Error in stateless non-stream for ${modelId}:`, error);
-        onError(error instanceof Error ? error : new Error(String(error) || "Unknown error during stateless non-streaming call."));
+        // Enhanced error logging for network failures
+        let enhancedError: Error;
+        if (error instanceof TypeError && error.message.includes('Load failed')) {
+            logService.error(`Network request failed for ${modelId}. Possible causes: CORS, network timeout, invalid proxy configuration.`, { 
+                error,
+                category: 'NETWORK'
+            });
+            enhancedError = new Error(
+                "Network request failed. Please check your internet connection, API configuration, and proxy settings."
+            );
+            enhancedError.name = 'NetworkError';
+        } else if (error instanceof Error) {
+            enhancedError = error;
+        } else {
+            enhancedError = new Error(String(error) || "Unknown error during stateless non-streaming call.");
+        }
+        
+        logService.error(`Error in stateless non-stream for ${modelId}:`, enhancedError);
+        onError(enhancedError);
     }
 };
