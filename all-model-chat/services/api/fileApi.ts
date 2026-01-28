@@ -53,6 +53,15 @@ export const uploadFileApi = async (
             throw abortError;
         }
         
+        // Enhanced error handling for network failures
+        if (error instanceof TypeError && error.message.includes('Load failed')) {
+            const networkError = new Error(
+                "File upload failed due to network error. Please check your connection and API settings."
+            );
+            networkError.name = 'NetworkError';
+            throw networkError;
+        }
+        
         throw error;
     }
 };
@@ -72,6 +81,16 @@ export const getFileMetadataApi = async (apiKey: string, fileApiName: string): P
         if (error instanceof Error && (error.message.includes('NOT_FOUND') || error.message.includes('404'))) {
             return null; // File not found is a valid outcome we want to handle
         }
+        
+        // Enhanced error handling for network failures
+        if (error instanceof TypeError && error.message.includes('Load failed')) {
+            const networkError = new Error(
+                "Failed to retrieve file metadata due to network error. Please check your connection and API settings."
+            );
+            networkError.name = 'NetworkError';
+            throw networkError;
+        }
+        
         throw error; // Re-throw other errors
     }
 };
