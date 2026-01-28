@@ -3,6 +3,7 @@ import { GenerateContentResponse, Part, UsageMetadata, ChatHistoryItem } from "@
 import { ThoughtSupportingPart } from '../../types';
 import { logService } from "../logService";
 import { getConfiguredApiClient } from "./baseApi";
+import { isNetworkError, createNetworkError } from "../../utils/errorUtils";
 
 /**
  * Shared helper to parse GenAI responses.
@@ -144,16 +145,16 @@ export const sendStatelessMessageStreamApi = async (
     } catch (error) {
         // Enhanced error logging for network failures
         let enhancedError: Error;
-        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
+        if (isNetworkError(error)) {
             // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
             logService.error("Network request failed during streaming. Possible causes: CORS, network timeout, invalid proxy configuration.", { 
                 error,
                 category: 'NETWORK'
             });
-            enhancedError = new Error(
-                "Network request failed. Please check your internet connection, API configuration, and proxy settings."
+            enhancedError = createNetworkError(
+                "Network request failed. Please check your internet connection, API configuration, and proxy settings.",
+                error
             );
-            enhancedError.name = 'NetworkError';
         } else if (error instanceof Error) {
             enhancedError = error;
         } else {
@@ -200,16 +201,16 @@ export const sendStatelessMessageNonStreamApi = async (
     } catch (error) {
         // Enhanced error logging for network failures
         let enhancedError: Error;
-        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
+        if (isNetworkError(error)) {
             // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
             logService.error(`Network request failed for ${modelId}. Possible causes: CORS, network timeout, invalid proxy configuration.`, { 
                 error,
                 category: 'NETWORK'
             });
-            enhancedError = new Error(
-                "Network request failed. Please check your internet connection, API configuration, and proxy settings."
+            enhancedError = createNetworkError(
+                "Network request failed. Please check your internet connection, API configuration, and proxy settings.",
+                error
             );
-            enhancedError.name = 'NetworkError';
         } else if (error instanceof Error) {
             enhancedError = error;
         } else {

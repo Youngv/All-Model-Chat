@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { logService } from '../../utils/appUtils';
+import { isNetworkError } from '../../utils/errorUtils';
 import { SavedChatSession } from '../../types';
 
 type SessionsUpdater = (updater: (prev: SavedChatSession[]) => SavedChatSession[]) => void;
@@ -20,15 +21,16 @@ export const useApiErrorHandler = (updateAndPersistSessions: SessionsUpdater) =>
         if (error instanceof Error) {
             if (error.name === 'SilentError') {
                 errorMessage = "API key is not configured in settings.";
-            } else if (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed'))) {
+            } else if (isNetworkError(error)) {
                 // Network request failed - provide more helpful error message
                 // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
-                errorMessage = `${errorPrefix}: Network request failed. Please check:\n` +
-                    `• Your internet connection\n` +
-                    `• Your API key is valid\n` +
-                    `• API proxy settings (if enabled)\n` +
-                    `• CORS/network restrictions\n\n` +
-                    `Technical details: ${error.message}`;
+                errorMessage = `${errorPrefix}: Network request failed. Please check:
+• Your internet connection
+• Your API key is valid
+• API proxy settings (if enabled)
+• CORS/network restrictions
+
+Technical details: ${error.message}`;
             } else {
                 errorMessage = `${errorPrefix}: ${error.message}`;
             }

@@ -32,7 +32,11 @@ export const networkInterceptor = {
             try {
                 const url = new URL(currentProxyUrl);
                 if (!url.protocol.startsWith('http')) {
-                    logService.warn(`[NetworkInterceptor] Invalid proxy URL protocol: ${url.protocol}. Expected http: or https:`, { category: 'NETWORK' });
+                    logService.warn(`[NetworkInterceptor] Invalid proxy URL protocol: ${url.protocol}. Expected http: or https:. Disabling interceptor.`, { category: 'NETWORK' });
+                    // Disable interceptor if protocol is invalid
+                    isInterceptorEnabled = false;
+                    currentProxyUrl = null;
+                    return;
                 }
                 logService.debug(`[NetworkInterceptor] Configured. Target: ${currentProxyUrl}`, { category: 'NETWORK' });
             } catch (e) {

@@ -2,6 +2,7 @@
 import { File as GeminiFile } from "@google/genai";
 import { getConfiguredApiClient } from './baseApi';
 import { logService } from "../logService";
+import { isNetworkError, createNetworkError } from "../../utils/errorUtils";
 
 /**
  * Uploads a file using the official SDK.
@@ -54,13 +55,11 @@ export const uploadFileApi = async (
         }
         
         // Enhanced error handling for network failures
-        // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
-        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
-            const networkError = new Error(
-                "File upload failed due to network error. Please check your connection and API settings."
+        if (isNetworkError(error)) {
+            throw createNetworkError(
+                "File upload failed due to network error. Please check your connection and API settings.",
+                error
             );
-            networkError.name = 'NetworkError';
-            throw networkError;
         }
         
         throw error;
@@ -84,13 +83,11 @@ export const getFileMetadataApi = async (apiKey: string, fileApiName: string): P
         }
         
         // Enhanced error handling for network failures
-        // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
-        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
-            const networkError = new Error(
-                "Failed to retrieve file metadata due to network error. Please check your connection and API settings."
+        if (isNetworkError(error)) {
+            throw createNetworkError(
+                "Failed to retrieve file metadata due to network error. Please check your connection and API settings.",
+                error
             );
-            networkError.name = 'NetworkError';
-            throw networkError;
         }
         
         throw error; // Re-throw other errors
