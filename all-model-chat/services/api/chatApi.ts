@@ -144,7 +144,8 @@ export const sendStatelessMessageStreamApi = async (
     } catch (error) {
         // Enhanced error logging for network failures
         let enhancedError: Error;
-        if (error instanceof TypeError && error.message.includes('Load failed')) {
+        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
+            // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
             logService.error("Network request failed during streaming. Possible causes: CORS, network timeout, invalid proxy configuration.", { 
                 error,
                 category: 'NETWORK'
@@ -199,7 +200,8 @@ export const sendStatelessMessageNonStreamApi = async (
     } catch (error) {
         // Enhanced error logging for network failures
         let enhancedError: Error;
-        if (error instanceof TypeError && error.message.includes('Load failed')) {
+        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
+            // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
             logService.error(`Network request failed for ${modelId}. Possible causes: CORS, network timeout, invalid proxy configuration.`, { 
                 error,
                 category: 'NETWORK'

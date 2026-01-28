@@ -20,8 +20,9 @@ export const useApiErrorHandler = (updateAndPersistSessions: SessionsUpdater) =>
         if (error instanceof Error) {
             if (error.name === 'SilentError') {
                 errorMessage = "API key is not configured in settings.";
-            } else if (error instanceof TypeError && error.message.includes('Load failed')) {
+            } else if (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed'))) {
                 // Network request failed - provide more helpful error message
+                // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
                 errorMessage = `${errorPrefix}: Network request failed. Please check:\n` +
                     `• Your internet connection\n` +
                     `• Your API key is valid\n` +

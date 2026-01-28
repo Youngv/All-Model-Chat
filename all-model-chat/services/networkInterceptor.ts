@@ -40,6 +40,7 @@ export const networkInterceptor = {
                     error: e, 
                     category: 'NETWORK' 
                 });
+                logService.warn('[NetworkInterceptor] Proxy interceptor disabled due to invalid URL configuration.', { category: 'NETWORK' });
                 // Disable interceptor if URL is invalid
                 isInterceptorEnabled = false;
                 currentProxyUrl = null;

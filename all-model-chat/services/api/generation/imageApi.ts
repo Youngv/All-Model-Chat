@@ -49,7 +49,8 @@ export const generateImagesApi = async (apiKey: string, modelId: string, prompt:
         logService.error(`Failed to generate images with model ${modelId}:`, error);
         
         // Enhanced error handling for network failures
-        if (error instanceof TypeError && error.message.includes('Load failed')) {
+        // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
+        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
             const networkError = new Error(
                 "Image generation failed due to network error. Please check your connection and API settings."
             );

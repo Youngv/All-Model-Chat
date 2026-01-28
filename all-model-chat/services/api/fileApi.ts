@@ -54,7 +54,8 @@ export const uploadFileApi = async (
         }
         
         // Enhanced error handling for network failures
-        if (error instanceof TypeError && error.message.includes('Load failed')) {
+        // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
+        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
             const networkError = new Error(
                 "File upload failed due to network error. Please check your connection and API settings."
             );
@@ -83,7 +84,8 @@ export const getFileMetadataApi = async (apiKey: string, fileApiName: string): P
         }
         
         // Enhanced error handling for network failures
-        if (error instanceof TypeError && error.message.includes('Load failed')) {
+        // Handles both wrapped NetworkError from interceptor and raw TypeError from fetch
+        if (error instanceof Error && (error.name === 'NetworkError' || (error instanceof TypeError && error.message.includes('Load failed')))) {
             const networkError = new Error(
                 "Failed to retrieve file metadata due to network error. Please check your connection and API settings."
             );
