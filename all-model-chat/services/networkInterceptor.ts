@@ -28,28 +28,27 @@ const sanitizeUrlForDisplay = (url: string): string => {
         const params = new URLSearchParams(urlObj.search);
         let hasSensitiveParams = false;
         
-        for (const param of sensitiveParams) {
-            if (params.has(param)) {
-                params.delete(param);
+        // Use case-insensitive matching for query parameters
+        for (const [paramName, paramValue] of params.entries()) {
+            const lowerParamName = paramName.toLowerCase();
+            if (sensitiveParams.includes(lowerParamName)) {
+                params.delete(paramName);
                 hasSensitiveParams = true;
             }
         }
         
+        urlObj.search = params.toString();
+        
+        // Add indicator as URL fragment if sensitive params were removed
         if (hasSensitiveParams) {
-            urlObj.search = params.toString();
-            // Add indicator that params were removed
-            if (urlObj.search) {
-                urlObj.search += '&[sensitive_params_removed]';
-            } else {
-                urlObj.search = '[sensitive_params_removed]';
-            }
+            urlObj.hash = '#sensitive_params_removed';
         }
         
         return urlObj.toString();
     } catch {
-        // If URL parsing fails, just return the original
-        // but mask potential API keys in query string
-        return url.replace(/([?&])(key|apikey|api_key|token|access_token|auth|authorization)=[^&]*/gi, '$1$2=[REDACTED]');
+        // If URL parsing fails, don't risk exposing any sensitive data
+        // Return a safe placeholder instead of attempting partial sanitization
+        return '[malformed URL - unable to sanitize safely]';
     }
 };
 
@@ -198,7 +197,7 @@ export const networkInterceptor = {
                         
                         // Create detailed error message with troubleshooting info
                         // Sanitize URLs to avoid exposing credentials or API keys
-                        const sanitizedProxyUrl = sanitizeUrlForDisplay(currentProxyUrl || '');
+                        const sanitizedProxyUrl = currentProxyUrl ? sanitizeUrlForDisplay(currentProxyUrl) : '[not configured]';
                         const sanitizedTargetUrl = sanitizeUrlForDisplay(newUrl);
                         const originalError = fetchError instanceof Error ? fetchError.message : String(fetchError);
                         
