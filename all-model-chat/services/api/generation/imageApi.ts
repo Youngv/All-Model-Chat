@@ -1,5 +1,6 @@
 import { getConfiguredApiClient } from '../baseApi';
 import { logService } from "../../logService";
+import { isNetworkError, createNetworkError } from "../../../utils/errorUtils";
 
 export const generateImagesApi = async (apiKey: string, modelId: string, prompt: string, aspectRatio: string, imageSize: string | undefined, abortSignal: AbortSignal): Promise<string[]> => {
     logService.info(`Generating image with model ${modelId}`, { prompt, aspectRatio, imageSize });
@@ -47,6 +48,15 @@ export const generateImagesApi = async (apiKey: string, modelId: string, prompt:
 
     } catch (error) {
         logService.error(`Failed to generate images with model ${modelId}:`, error);
+        
+        // Enhanced error handling for network failures
+        if (isNetworkError(error)) {
+            throw createNetworkError(
+                "Image generation failed due to network error. Please check your connection and API settings.",
+                error
+            );
+        }
+        
         throw error;
     }
 };
