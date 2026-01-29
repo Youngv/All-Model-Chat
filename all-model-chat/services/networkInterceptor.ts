@@ -148,10 +148,25 @@ export const networkInterceptor = {
                             proxyUrl: currentProxyUrl,
                             category: 'NETWORK'
                         });
-                        // Re-throw the error with additional context
-                        const enhancedError = new Error(
-                            `Network request failed. Check proxy configuration. Original error: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`
-                        );
+                        
+                        // Create detailed error message with troubleshooting info
+                        const originalError = fetchError instanceof Error ? fetchError.message : String(fetchError);
+                        const errorDetails = [
+                            `Network request failed. Original error: ${originalError}`,
+                            ``,
+                            `Proxy Configuration:`,
+                            `  Proxy URL: ${currentProxyUrl}`,
+                            `  Target URL: ${newUrl}`,
+                            ``,
+                            `Troubleshooting:`,
+                            `  1. Verify proxy server is running and accessible`,
+                            `  2. Check proxy URL format is correct (include protocol: http:// or https://)`,
+                            `  3. Ensure proxy endpoint path matches your configuration`,
+                            `  4. Check network connectivity and firewall settings`,
+                            `  5. Verify CORS headers if using browser-based proxy`
+                        ].join('\n');
+                        
+                        const enhancedError = new Error(errorDetails);
                         enhancedError.name = 'NetworkError';
                         throw enhancedError;
                     }
