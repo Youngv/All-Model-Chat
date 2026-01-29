@@ -6,52 +6,6 @@ import { logService } from './logService';
 
 const TARGET_HOST = 'generativelanguage.googleapis.com';
 
-/**
- * Sanitize URL to remove sensitive information before displaying in error messages.
- * Removes:
- * - User credentials (username:password)
- * - API keys in query parameters
- * - Sensitive query parameters
- */
-const sanitizeUrlForDisplay = (url: string): string => {
-    try {
-        const urlObj = new URL(url);
-        
-        // Remove user credentials if present
-        if (urlObj.username || urlObj.password) {
-            urlObj.username = '';
-            urlObj.password = '';
-        }
-        
-        // Remove sensitive query parameters (API keys, tokens, etc.)
-        const sensitiveParams = ['key', 'apikey', 'api_key', 'token', 'access_token', 'auth', 'authorization'];
-        const params = new URLSearchParams(urlObj.search);
-        let hasSensitiveParams = false;
-        
-        // Use case-insensitive matching for query parameters
-        for (const [paramName, paramValue] of params.entries()) {
-            const lowerParamName = paramName.toLowerCase();
-            if (sensitiveParams.includes(lowerParamName)) {
-                params.delete(paramName);
-                hasSensitiveParams = true;
-            }
-        }
-        
-        urlObj.search = params.toString();
-        
-        // Add indicator as URL fragment if sensitive params were removed
-        if (hasSensitiveParams) {
-            urlObj.hash = '#sensitive_params_removed';
-        }
-        
-        return urlObj.toString();
-    } catch {
-        // If URL parsing fails, don't risk exposing any sensitive data
-        // Return a safe placeholder instead of attempting partial sanitization
-        return '[malformed URL - unable to sanitize safely]';
-    }
-};
-
 // Capture the original fetch immediately when the module loads.
 // We handle potential HMR re-runs or pre-existing patches by checking the flag.
 let originalFetch: typeof window.fetch = window.fetch;
@@ -194,29 +148,10 @@ export const networkInterceptor = {
                             proxyUrl: currentProxyUrl,
                             category: 'NETWORK'
                         });
-                        
-                        // Create detailed error message with troubleshooting info
-                        // Sanitize URLs to avoid exposing credentials or API keys
-                        const sanitizedProxyUrl = currentProxyUrl ? sanitizeUrlForDisplay(currentProxyUrl) : '[not configured]';
-                        const sanitizedTargetUrl = sanitizeUrlForDisplay(newUrl);
-                        const originalError = fetchError instanceof Error ? fetchError.message : String(fetchError);
-                        
-                        const errorDetails = [
-                            `Network request failed. Original error: ${originalError}`,
-                            ``,
-                            `Proxy Configuration:`,
-                            `  Proxy URL: ${sanitizedProxyUrl}`,
-                            `  Target URL: ${sanitizedTargetUrl}`,
-                            ``,
-                            `Troubleshooting:`,
-                            `  1. Verify proxy server is running and accessible`,
-                            `  2. Check proxy URL format is correct (include protocol: http:// or https://)`,
-                            `  3. Ensure proxy endpoint path matches your configuration`,
-                            `  4. Check network connectivity and firewall settings`,
-                            `  5. Verify CORS headers if using browser-based proxy`
-                        ].join('\n');
-                        
-                        const enhancedError = new Error(errorDetails);
+                        // Re-throw the error with additional context
+                        const enhancedError = new Error(
+                            `Network request failed. Check proxy configuration. Original error: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`
+                        );
                         enhancedError.name = 'NetworkError';
                         throw enhancedError;
                     }
