@@ -78,11 +78,12 @@ export const useMessageSender = (props: MessageSenderProps) => {
     });
 
     // Main Entry Point
-    const handleSendMessage = useCallback(async (overrideOptions?: { text?: string; files?: UploadedFile[]; editingId?: string; isContinueMode?: boolean }) => {
+    const handleSendMessage = useCallback(async (overrideOptions?: { text?: string; files?: UploadedFile[]; editingId?: string; isContinueMode?: boolean; isFastMode?: boolean }) => {
         const textToUse = overrideOptions?.text ?? '';
         const filesToUse = overrideOptions?.files ?? selectedFiles;
         const effectiveEditingId = overrideOptions?.editingId ?? editingMessageId;
         const isContinueMode = overrideOptions?.isContinueMode ?? false;
+        const isFastMode = overrideOptions?.isFastMode ?? false;
         
         const sessionToUpdate = currentChatSettings;
         const activeModelId = sessionToUpdate.modelId;
@@ -93,7 +94,7 @@ export const useMessageSender = (props: MessageSenderProps) => {
         const isImageEditModel = (activeModelId.includes('image-preview') || activeModelId.includes('gemini-2.5-flash-image')) && !activeModelId.includes('gemini-3-pro');
         const isGemini3Image = activeModelId === 'gemini-3-pro-image-preview';
 
-        logService.info(`Sending message with model ${activeModelId}`, { textLength: textToUse.length, fileCount: filesToUse.length, editingId: effectiveEditingId, sessionId: activeSessionId, isContinueMode });
+        logService.info(`Sending message with model ${activeModelId}`, { textLength: textToUse.length, fileCount: filesToUse.length, editingId: effectiveEditingId, sessionId: activeSessionId, isContinueMode, isFastMode });
 
         // Basic Validation
         // Allow empty text if continuing generation (it uses existing model content)
@@ -157,7 +158,7 @@ export const useMessageSender = (props: MessageSenderProps) => {
         }
         
         // Standard Chat Flow
-        await sendStandardMessage(textToUse, filesToUse, effectiveEditingId, activeModelId, isContinueMode);
+        await sendStandardMessage(textToUse, filesToUse, effectiveEditingId, activeModelId, isContinueMode, isFastMode);
 
     }, [
         appSettings, currentChatSettings, messages, selectedFiles, setSelectedFiles,
