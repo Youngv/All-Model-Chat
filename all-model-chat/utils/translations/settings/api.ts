@@ -12,4 +12,9 @@ export const apiSettings = {
     apiConfig_testFailed: { en: 'Connection Failed', zh: '连接失败' },
     apiConfig_vertexExpress: { en: 'Use Vertex AI Express Endpoint', zh: '使用 Vertex AI Express 端点' },
     apiConfig_vertexExpress_btn: { en: 'Vertex Express', zh: 'Vertex Express' },
+    apiConfig_customEndpoint: { en: 'Custom API Endpoint', zh: '自定义 API 端点' },
+    apiConfig_customEndpoint_help: { en: 'Modify the Gemini API request address. Enable this to use alternative endpoints, proxy servers, or regional mirrors.', zh: '修改 Gemini API 请求地址。启用此选项可使用替代端点、代理服务器或区域镜像。' },
+    apiConfig_endpoint_examples: { en: 'Examples', zh: '示例' },
+    apiConfig_endpoint_default: { en: 'Default (Google)', zh: '默认（Google）' },
+    apiConfig_endpoint_proxy: { en: 'Proxy Server', zh: '代理服务器' },
 };

@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { AlertCircle, ArrowRight, Sparkles, RotateCcw } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertCircle, ArrowRight, Sparkles, RotateCcw, ChevronDown, Info } from 'lucide-react';
 import { Toggle } from '../../../shared/Toggle';
 import { SETTINGS_INPUT_CLASS } from '../../../../constants/appConstants';
 
@@ -12,6 +12,28 @@ interface ApiProxySettingsProps {
     t: (key: string) => string;
 }
 
+// Preset endpoints for common use cases
+const PRESET_ENDPOINTS = [
+    {
+        id: 'default',
+        name: { en: 'Google Default', zh: 'Google 默认' },
+        url: 'https://generativelanguage.googleapis.com/v1beta',
+        description: { en: 'Official Google Gemini API endpoint', zh: 'Google Gemini 官方 API 端点' }
+    },
+    {
+        id: 'vertex',
+        name: { en: 'Vertex AI', zh: 'Vertex AI' },
+        url: 'https://aiplatform.googleapis.com/v1',
+        description: { en: 'Google Cloud Vertex AI endpoint', zh: 'Google Cloud Vertex AI 端点' }
+    },
+    {
+        id: 'proxy',
+        name: { en: 'Example Proxy', zh: '示例代理' },
+        url: 'https://api-proxy.de/gemini/v1beta',
+        description: { en: 'Example third-party proxy server', zh: '示例第三方代理服务器' }
+    }
+];
+
 export const ApiProxySettings: React.FC<ApiProxySettingsProps> = ({
     useApiProxy,
     setUseApiProxy,
@@ -19,6 +41,7 @@ export const ApiProxySettings: React.FC<ApiProxySettingsProps> = ({
     setApiProxyUrl,
     t
 }) => {
+    const [showPresets, setShowPresets] = useState(false);
     const inputBaseClasses = "w-full p-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-offset-0 text-sm custom-scrollbar font-mono";
     
     const defaultBaseUrl = 'https://generativelanguage.googleapis.com/v1beta';
@@ -41,21 +64,37 @@ export const ApiProxySettings: React.FC<ApiProxySettingsProps> = ({
         setApiProxyUrl(defaultProxyUrl);
     };
 
+    const handleSelectPreset = (url: string) => {
+        setApiProxyUrl(url);
+        if (!useApiProxy) {
+            setUseApiProxy(true);
+        }
+        setShowPresets(false);
+    };
+
     const getProxyPlaceholder = () => {
-        if (!useApiProxy) return 'Enable proxy URL to set value';
+        if (!useApiProxy) return 'Enable custom endpoint to set value';
         return 'e.g., https://api-proxy.de/gemini/v1beta';
     };
 
     const currentBaseUrl = apiProxyUrl?.trim() || defaultBaseUrl;
     const cleanBaseUrl = currentBaseUrl.replace(/\/+$/, '');
     const previewUrl = `${cleanBaseUrl}/models/gemini-2.5-flash:generateContent`;
+    
+    // Get current language for preset labels
+    const getCurrentLanguage = (): 'en' | 'zh' => {
+        const lang = t('settingsApiConfig');
+        return lang.includes('配置') ? 'zh' : 'en';
+    };
+    
+    const language = getCurrentLanguage();
 
     return (
         <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-2">
                     <label htmlFor="use-api-proxy-toggle" className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-tertiary)] cursor-pointer">
-                        API Proxy
+                        {t('apiConfig_customEndpoint')}
                     </label>
                     <button
                         type="button"
@@ -89,16 +128,60 @@ export const ApiProxySettings: React.FC<ApiProxySettingsProps> = ({
                 />
             </div>
             
+            {/* Help text explaining the feature */}
+            <div className="flex gap-2 text-xs text-[var(--theme-text-tertiary)] bg-[var(--theme-bg-tertiary)]/30 p-2.5 rounded-lg border border-[var(--theme-border-secondary)]">
+                <Info size={14} className="flex-shrink-0 mt-0.5" strokeWidth={1.5} />
+                <span>{t('apiConfig_customEndpoint_help')}</span>
+            </div>
+            
             <div className={`transition-all duration-200 ${useApiProxy ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
-                <input
-                    id="api-proxy-url-input"
-                    type="text"
-                    value={apiProxyUrl || ''}
-                    onChange={(e) => setApiProxyUrl(e.target.value)}
-                    className={`${inputBaseClasses} ${SETTINGS_INPUT_CLASS}`}
-                    placeholder={getProxyPlaceholder()}
-                    aria-label="API Proxy URL"
-                />
+                <div className="space-y-2">
+                    {/* Preset endpoints dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => setShowPresets(!showPresets)}
+                            className="w-full flex items-center justify-between p-2 text-xs bg-[var(--theme-bg-tertiary)]/50 hover:bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-secondary)] rounded-lg transition-colors"
+                        >
+                            <span className="text-[var(--theme-text-secondary)]">{t('apiConfig_endpoint_examples')}</span>
+                            <ChevronDown size={14} className={`text-[var(--theme-text-tertiary)] transition-transform ${showPresets ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        {showPresets && (
+                            <div className="absolute z-10 w-full mt-1 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border-secondary)] rounded-lg shadow-lg overflow-hidden">
+                                {PRESET_ENDPOINTS.map((preset) => (
+                                    <button
+                                        key={preset.id}
+                                        type="button"
+                                        onClick={() => handleSelectPreset(preset.url)}
+                                        className="w-full text-left p-3 hover:bg-[var(--theme-bg-tertiary)] transition-colors border-b border-[var(--theme-border-secondary)] last:border-b-0"
+                                    >
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm font-medium text-[var(--theme-text-primary)]">{preset.name[language]}</span>
+                                            {apiProxyUrl === preset.url && (
+                                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--theme-bg-accent)]/20 text-[var(--theme-text-accent)]">
+                                                    {language === 'zh' ? '当前' : 'Active'}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="text-[10px] text-[var(--theme-text-tertiary)] mb-1">{preset.description[language]}</div>
+                                        <code className="text-[10px] font-mono text-[var(--theme-text-secondary)] break-all">{preset.url}</code>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    
+                    <input
+                        id="api-proxy-url-input"
+                        type="text"
+                        value={apiProxyUrl || ''}
+                        onChange={(e) => setApiProxyUrl(e.target.value)}
+                        className={`${inputBaseClasses} ${SETTINGS_INPUT_CLASS}`}
+                        placeholder={getProxyPlaceholder()}
+                        aria-label="API Proxy URL"
+                    />
+                </div>
                 
                 <div className="mt-3 p-3 rounded-lg bg-[var(--theme-bg-tertiary)]/30 border border-[var(--theme-border-secondary)]">
                     <div className="flex gap-2 text-xs text-[var(--theme-text-tertiary)] mb-1.5">
