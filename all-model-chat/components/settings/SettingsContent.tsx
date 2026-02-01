@@ -153,6 +153,7 @@ export const SettingsContent: React.FC<SettingsContentProps> = ({
                         useApiProxy={currentSettings.useApiProxy ?? false}
                         setUseApiProxy={(val) => updateSetting('useApiProxy', val)}
                         t={t as any}
+                        language={currentSettings.language}
                     />
                 </div>
             )}

@@ -10,6 +10,7 @@ interface ApiProxySettingsProps {
     apiProxyUrl: string | null;
     setApiProxyUrl: (value: string | null) => void;
     t: (key: string) => string;
+    language?: 'en' | 'zh' | 'system';
 }
 
 // Preset endpoints for common use cases
@@ -39,7 +40,8 @@ export const ApiProxySettings: React.FC<ApiProxySettingsProps> = ({
     setUseApiProxy,
     apiProxyUrl,
     setApiProxyUrl,
-    t
+    t,
+    language = 'en'
 }) => {
     const [showPresets, setShowPresets] = useState(false);
     const inputBaseClasses = "w-full p-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-offset-0 text-sm custom-scrollbar font-mono";
@@ -81,13 +83,8 @@ export const ApiProxySettings: React.FC<ApiProxySettingsProps> = ({
     const cleanBaseUrl = currentBaseUrl.replace(/\/+$/, '');
     const previewUrl = `${cleanBaseUrl}/models/gemini-2.5-flash:generateContent`;
     
-    // Get current language for preset labels
-    const getCurrentLanguage = (): 'en' | 'zh' => {
-        const lang = t('settingsApiConfig');
-        return lang.includes('配置') ? 'zh' : 'en';
-    };
-    
-    const language = getCurrentLanguage();
+    // Normalize language for preset labels: both 'system' and 'en' default to 'en'
+    const displayLanguage: 'en' | 'zh' = language === 'zh' ? 'zh' : 'en';
 
     return (
         <div className="space-y-3 pt-2">
@@ -157,14 +154,14 @@ export const ApiProxySettings: React.FC<ApiProxySettingsProps> = ({
                                         className="w-full text-left p-3 hover:bg-[var(--theme-bg-tertiary)] transition-colors border-b border-[var(--theme-border-secondary)] last:border-b-0"
                                     >
                                         <div className="flex items-center justify-between mb-1">
-                                            <span className="text-sm font-medium text-[var(--theme-text-primary)]">{preset.name[language]}</span>
+                                            <span className="text-sm font-medium text-[var(--theme-text-primary)]">{preset.name[displayLanguage]}</span>
                                             {apiProxyUrl === preset.url && (
                                                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--theme-bg-accent)]/20 text-[var(--theme-text-accent)]">
-                                                    {language === 'zh' ? '当前' : 'Active'}
+                                                    {displayLanguage === 'zh' ? '当前' : 'Active'}
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="text-[10px] text-[var(--theme-text-tertiary)] mb-1">{preset.description[language]}</div>
+                                        <div className="text-[10px] text-[var(--theme-text-tertiary)] mb-1">{preset.description[displayLanguage]}</div>
                                         <code className="text-[10px] font-mono text-[var(--theme-text-secondary)] break-all">{preset.url}</code>
                                     </button>
                                 ))}
