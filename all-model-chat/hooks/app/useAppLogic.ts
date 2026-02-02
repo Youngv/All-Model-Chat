@@ -9,22 +9,12 @@ import { useAppEvents } from '../core/useAppEvents';
 import { usePictureInPicture } from '../core/usePictureInPicture';
 import { useDataManagement } from '../useDataManagement';
 import { getTranslator, logService, applyThemeToDocument } from '../../utils/appUtils';
-import { networkInterceptor } from '../../services/networkInterceptor';
 
 export const useAppLogic = () => {
   const { appSettings, setAppSettings, currentTheme, language } = useAppSettings();
   const t = useMemo(() => getTranslator(language), [language]);
 
-  // Initialize Network Interceptor
-  useEffect(() => {
-      networkInterceptor.mount();
-  }, []);
-
-  // Update Interceptor Configuration when settings change
-  useEffect(() => {
-      const shouldUseProxy = appSettings.useCustomApiConfig && appSettings.useApiProxy;
-      networkInterceptor.configure(!!shouldUseProxy, appSettings.apiProxyUrl);
-  }, [appSettings.useCustomApiConfig, appSettings.useApiProxy, appSettings.apiProxyUrl]);
+  // Network interceptor is no longer used - base URL is hardcoded in SDK configuration
 
   const chatState = useChat(appSettings, setAppSettings, language);
   

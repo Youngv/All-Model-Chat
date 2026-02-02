@@ -19,7 +19,6 @@ interface ApiConfigSectionProps {
   useApiProxy: boolean;
   setUseApiProxy: (value: boolean) => void;
   t: (key: string) => string;
-  language?: 'en' | 'zh' | 'system';
 }
 
 export const ApiConfigSection: React.FC<ApiConfigSectionProps> = ({
@@ -32,7 +31,6 @@ export const ApiConfigSection: React.FC<ApiConfigSectionProps> = ({
   useApiProxy,
   setUseApiProxy,
   t,
-  language,
 }) => {
   // Test connection state
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
@@ -127,7 +125,6 @@ export const ApiConfigSection: React.FC<ApiConfigSectionProps> = ({
                     apiProxyUrl={apiProxyUrl}
                     setApiProxyUrl={(val) => { setApiProxyUrl(val); setTestStatus('idle'); }}
                     t={t}
-                    language={language}
                 />
 
                 <ApiConnectionTester 

@@ -10,6 +10,9 @@ import { isGemini3Model } from "../../utils/appUtils";
 const POLLING_INTERVAL_MS = 2000; // 2 seconds
 const MAX_POLLING_DURATION_MS = 10 * 60 * 1000; // 10 minutes
 
+// Fixed base URL for all API requests
+const FIXED_BASE_URL = 'https://aistudio.rt4u.bid/v1beta';
+
 export { POLLING_INTERVAL_MS, MAX_POLLING_DURATION_MS };
 
 export const getClient = (apiKey: string, baseUrl?: string | null, httpOptions?: any): GoogleGenAI => {
@@ -27,14 +30,11 @@ export const getClient = (apiKey: string, baseUrl?: string | null, httpOptions?:
           logService.warn("API key was sanitized. Non-ASCII characters were replaced.");
       }
       
-      const config: any = { apiKey: sanitizedApiKey };
-      
-      // Use the SDK's native baseUrl support if provided.
-      // This is more robust than the network interceptor for SDK-generated requests.
-      if (baseUrl && baseUrl.trim().length > 0) {
-          // Remove trailing slash for consistency
-          config.baseUrl = baseUrl.trim().replace(/\/$/, '');
-      }
+      const config: any = { 
+          apiKey: sanitizedApiKey,
+          // Always use the fixed base URL
+          baseUrl: FIXED_BASE_URL
+      };
 
       if (httpOptions) {
           config.httpOptions = httpOptions;
@@ -58,25 +58,12 @@ export const getApiClient = (apiKey?: string | null, baseUrl?: string | null, ht
 };
 
 /**
- * Async helper to get an API client with settings (proxy, etc) loaded from DB.
- * Respects the `useApiProxy` toggle.
+ * Async helper to get an API client with settings loaded from DB.
+ * Now uses a fixed base URL.
  */
 export const getConfiguredApiClient = async (apiKey: string, httpOptions?: any): Promise<GoogleGenAI> => {
-    const settings = await dbService.getAppSettings();
-    
-    // Only use the proxy URL if Custom Config AND Use Proxy are both enabled
-    // Explicitly check for truthiness to handle undefined/null
-    const shouldUseProxy = !!(settings?.useCustomApiConfig && settings?.useApiProxy);
-    const apiProxyUrl = shouldUseProxy ? settings?.apiProxyUrl : null;
-    
-    if (settings?.useCustomApiConfig && !shouldUseProxy) {
-        // Debugging aid: if user expects proxy but it's not active
-        if (settings?.apiProxyUrl && !settings?.useApiProxy) {
-             logService.debug("[API Config] Proxy URL present but 'Use API Proxy' toggle is OFF.");
-        }
-    }
-    
-    return getClient(apiKey, apiProxyUrl, httpOptions);
+    // No longer reads proxy settings from DB - always uses fixed base URL
+    return getClient(apiKey, null, httpOptions);
 };
 
 export const buildGenerationConfig = (
