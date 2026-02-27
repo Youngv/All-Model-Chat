@@ -1,12 +1,14 @@
 
+
 import React, { Dispatch, SetStateAction, useCallback } from 'react';
 import { AppSettings, SavedChatSession, ChatMessage, ChatSettings as IndividualChatSettings } from '../../types';
 import { Part, UsageMetadata } from '@google/genai';
 import { useApiErrorHandler } from './useApiErrorHandler';
 import { logService, showNotification, calculateTokenStats, playCompletionSound } from '../../utils/appUtils';
 import { APP_LOGO_SVG_DATA_URI } from '../../constants/appConstants';
-import { finalizeMessages, updateMessagesWithBatch } from '../chat-stream/processors';
+import { finalizeMessages, updateMessagesWithBatch, appendApiPart } from '../chat-stream/processors';
 import { streamingStore } from '../../services/streamingStore';
+import { SUPPORTED_GENERATED_MIME_TYPES } from '../../constants/fileConstants';
 
 type SessionsUpdater = (updater: (prev: SavedChatSession[]) => SavedChatSession[], options?: { persist?: boolean }) => void;
 
@@ -38,6 +40,7 @@ export const useChatStreamHandler = ({
         let firstTokenTime: Date | null = null; // Track first token (thought or content) for TTFT
         let accumulatedText = "";
         let accumulatedThoughts = "";
+        let accumulatedApiParts: any[] = [];
 
         // Reset store for this new generation
         streamingStore.clear(generationId);
@@ -102,25 +105,19 @@ export const useChatStreamHandler = ({
                 const newSessions = [...prev];
                 const sessionToUpdate = { ...newSessions[sessionIndex] };
                 
-                // Construct a virtual "final" part containing the full text from the store
-                // We use updateMessagesWithBatch but we manually inject the accumulated text
-                // because the state messages haven't been updating with text during the stream.
-                
-                // 1. First, make sure the message exists and has basic structure (it was created at start)
-                // 2. Update its content with accumulatedText and accumulatedThoughts
-                
                 let updatedMessages = sessionToUpdate.messages.map(msg => {
                     if (msg.id === generationId) {
                         return {
                             ...msg,
                             content: (msg.content || '') + accumulatedText,
-                            thoughts: (msg.thoughts || '') + accumulatedThoughts
+                            thoughts: (msg.thoughts || '') + accumulatedThoughts,
+                            apiParts: msg.apiParts ? [...msg.apiParts, ...accumulatedApiParts] : accumulatedApiParts
                         };
                     }
                     return msg;
                 });
                 
-                // 3. Finalize (mark loading false, set stats)
+                // Finalize (mark loading false, set stats)
                 const finalizationResult = finalizeMessages(
                     updatedMessages,
                     generationStartTime,
@@ -169,6 +166,8 @@ export const useChatStreamHandler = ({
         const streamOnPart = (part: Part) => {
             recordFirstToken(); // Capture TTFT
             
+            accumulatedApiParts = appendApiPart(accumulatedApiParts, part);
+            
             const anyPart = part as any;
             
             // 1. Accumulate plain text
@@ -182,7 +181,7 @@ export const useChatStreamHandler = ({
             // 2. Handle Tools / Code (Convert to text representation for the store)
             if (anyPart.executableCode) {
                 const codePart = anyPart.executableCode as { language: string, code: string };
-                const toolContent = `\`\`\`${codePart.language.toLowerCase() || 'python'}\n${codePart.code}\n\`\`\``;
+                const toolContent = `\n\n\`\`\`${codePart.language.toLowerCase() || 'python'}\n${codePart.code}\n\`\`\`\n\n`;
                 accumulatedText += toolContent;
                 streamingStore.updateContent(generationId, toolContent);
             } else if (anyPart.codeExecutionResult) {
@@ -191,34 +190,42 @@ export const useChatStreamHandler = ({
                     if (typeof unsafe !== 'string') return '';
                     return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
                 };
-                let toolContent = `<div class="tool-result outcome-${resultPart.outcome.toLowerCase()}"><strong>Execution Result (${resultPart.outcome}):</strong>`;
+                let toolContent = `\n\n<div class="tool-result outcome-${resultPart.outcome.toLowerCase()}"><strong>Execution Result (${resultPart.outcome}):</strong>`;
                 if (resultPart.output) {
                     toolContent += `<pre><code class="language-text">${escapeHtml(resultPart.output)}</code></pre>`;
                 }
-                toolContent += '</div>';
+                toolContent += '</div>\n\n';
                 accumulatedText += toolContent;
                 streamingStore.updateContent(generationId, toolContent);
             } else if (anyPart.inlineData) {
-                // For files, we still MUST update the session state because they are objects, not just text string.
-                // We use a simplified update that ONLY targets the file array for this message.
-                // This will trigger a React update, but it's infrequent (once per image generation usually).
-                updateAndPersistSessions(prev => {
-                     const sessionIndex = prev.findIndex(s => s.id === currentSessionId);
-                     if (sessionIndex === -1) return prev;
-                     const newSessions = [...prev];
-                     const sessionToUpdate = { ...newSessions[sessionIndex] };
-                     // Only apply parts to messages, assume no thought here
-                     sessionToUpdate.messages = updateMessagesWithBatch(
-                         sessionToUpdate.messages,
-                         [part], 
-                         "", 
-                         generationStartTime, 
-                         newModelMessageIds, 
-                         firstContentPartTime
-                     );
-                     newSessions[sessionIndex] = sessionToUpdate;
-                     return newSessions;
-                }, { persist: false });
+                const { mimeType } = anyPart.inlineData;
+                
+                const isSupportedFile = 
+                    mimeType.startsWith('image/') || 
+                    mimeType.startsWith('audio/') ||
+                    mimeType.startsWith('video/') ||
+                    SUPPORTED_GENERATED_MIME_TYPES.has(mimeType);
+
+                if (isSupportedFile) {
+                    // Save to files array instead of hardcoding base64 into text to prevent critical performance issues
+                    updateAndPersistSessions(prev => {
+                         const sessionIndex = prev.findIndex(s => s.id === currentSessionId);
+                         if (sessionIndex === -1) return prev;
+                         const newSessions = [...prev];
+                         const sessionToUpdate = { ...newSessions[sessionIndex] };
+                         
+                         sessionToUpdate.messages = updateMessagesWithBatch(
+                             sessionToUpdate.messages,
+                             [part], 
+                             "", 
+                             generationStartTime, 
+                             newModelMessageIds, 
+                             firstContentPartTime
+                         );
+                         newSessions[sessionIndex] = sessionToUpdate;
+                         return newSessions;
+                    }, { persist: false });
+                }
             }
 
             const hasMeaningfulContent = 

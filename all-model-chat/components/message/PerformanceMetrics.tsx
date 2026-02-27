@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Zap } from 'lucide-react';
 import { ChatMessage } from '../../types';
@@ -48,6 +47,15 @@ export const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ message,
     let generationDuration = elapsedTime;
     if (firstTokenTimeMs !== undefined) {
         generationDuration = Math.max(0, elapsedTime - (firstTokenTimeMs / 1000));
+    }
+
+    // FIX: Prevent division by extremely small numbers which causes astronomical t/s values (Issue #24).
+    // This commonly happens in non-streaming mode where TTFT and EndTime are nearly identical,
+    // or when dealing with highly cached/fast responses under heavy JS thread load.
+    if (generationDuration < 0.2) {
+        // Fallback to total elapsed time if sensible, otherwise clamp to a minimum 0.2s 
+        // to ensure we don't calculate millions of tokens per second.
+        generationDuration = Math.max(0.2, elapsedTime);
     }
 
     const tokensPerSecond = (generatedTokens > 0 && generationDuration > 0) 

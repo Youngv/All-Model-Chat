@@ -1,5 +1,3 @@
-
-
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { CodeBlock } from './blocks/CodeBlock';
@@ -26,6 +24,7 @@ interface MarkdownRendererProps {
   themeId: string;
   onOpenSidePanel: (content: SideViewContent) => void;
   hideThinkingInContext?: boolean;
+  files?: UploadedFile[];
 }
 
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({
@@ -40,7 +39,8 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({
   t,
   themeId,
   onOpenSidePanel,
-  hideThinkingInContext
+  hideThinkingInContext,
+  files
 }) => {
 
   const rehypePlugins = useMemo(() => getRehypePlugins(allowHtml), [allowHtml]);
@@ -48,6 +48,42 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({
   const components = useMemo(() => ({
     code: (props: any) => {
         return <InlineCode {...props} />;
+    },
+    img: (props: any) => {
+        const { src, alt, className, ...rest } = props;
+        return (
+            <img 
+                src={src} 
+                alt={alt} 
+                className={`${className || ''} cursor-pointer hover:opacity-90 transition-opacity`} 
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (src && src.startsWith('data:image/')) {
+                        const mimeType = src.split(';')[0].split(':')[1];
+                        const file: UploadedFile = {
+                            id: `inline-img-${Date.now()}`,
+                            name: alt || 'generated-plot.png',
+                            type: mimeType,
+                            size: 0,
+                            dataUrl: src,
+                            uploadState: 'active'
+                        };
+                        onImageClick(file);
+                    } else if (src) {
+                        const file: UploadedFile = {
+                            id: `inline-img-${Date.now()}`,
+                            name: alt || 'image',
+                            type: 'image/jpeg',
+                            size: 0,
+                            dataUrl: src,
+                            uploadState: 'active'
+                        };
+                        onImageClick(file);
+                    }
+                }}
+                {...rest} 
+            />
+        );
     },
     table: (props: any) => <TableBlock {...props} t={t} />,
     a: (props: any) => {
@@ -68,7 +104,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({
     div: (props: any) => {
       const { className, children, ...rest } = props;
       if (className?.includes('tool-result')) {
-        return <ToolResultBlock className={className} {...rest}>{children}</ToolResultBlock>;
+        return <ToolResultBlock className={className} files={files} onImageClick={onImageClick} {...rest}>{children}</ToolResultBlock>;
       }
       return <div className={className} {...rest}>{children}</div>;
     },
@@ -85,11 +121,9 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({
         }
       ) as React.ReactElement | undefined;
 
-      // Safe property access with optional chaining and type casting
       const codeClassName = (codeElement?.props as any)?.className || '';
       const codeContent = (codeElement?.props as any)?.children;
       
-      // Extract text reliably from potential React Element tree (from highlighting)
       const rawCode = extractTextFromNode(codeContent);
       
       const langMatch = codeClassName.match(/language-(\S+)/);
@@ -125,18 +159,14 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({
         </CodeBlock>
       );
     }
-  }), [onOpenHtmlPreview, expandCodeBlocksByDefault, onImageClick, isMermaidRenderingEnabled, isGraphvizRenderingEnabled, isLoading, t, themeId, onOpenSidePanel]);
+  }), [onOpenHtmlPreview, expandCodeBlocksByDefault, onImageClick, isMermaidRenderingEnabled, isGraphvizRenderingEnabled, isLoading, t, themeId, onOpenSidePanel, files]);
 
   const processedContent = useMemo(() => {
     if (!content) return '';
     
-    // 1. Handle folding for <thinking> blocks if enabled
     let text = content;
     if (hideThinkingInContext) {
-        // If loading, enforce 'open' state. If done, remove 'open' (auto-collapse).
         const openAttr = isLoading ? 'open' : '';
-        
-        // Template for the details block
         const createDetailsBlock = (innerContent: string) => 
             `<details ${openAttr} class="group rounded-xl bg-[var(--theme-bg-tertiary)]/20 overflow-hidden transition-all duration-200 open:bg-[var(--theme-bg-tertiary)]/30 open:shadow-sm my-2">
                 <summary class="list-none flex select-none items-center justify-between gap-2 px-3 py-2 cursor-pointer transition-colors hover:bg-[var(--theme-bg-tertiary)]/40 focus:outline-none">
@@ -162,30 +192,35 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({
                 </div>
             </details>`;
 
-        // A. Replace complete blocks: <thinking> ... </any-tag>
         text = text.replace(/<thinking>([\s\S]*?)<\/[^>]+>/gi, (_, content) => createDetailsBlock(content));
 
-        // B. If still loading, handle incomplete block at the end (Open <thinking> without closing tag)
-        // This ensures the box appears immediately while streaming.
         if (isLoading) {
              text = text.replace(/<thinking>([\s\S]*?)$/i, (_, content) => createDetailsBlock(content));
         }
     }
 
-    // 2. Split by code blocks to avoid replacing content inside them
-    // Capture both complete code blocks AND unclosed code blocks at the end of the string
-    // This ensures that streaming code isn't treated as normal text which would trigger LaTeX replacement
     const parts = text.split(/(```[\s\S]*?```|```[\s\S]*$)/g);
     return parts.map(part => {
       if (part.startsWith('```')) {
         return part;
       }
       
-      // Replace \[ ... \] with $$ ... $$
-      let processedPart = part.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+      // Replace $$ ... $$ with $$ ... $$
+      // Exclude purely numeric or simple word content (e.g. $$1$$, $$id$$) which are likely escaped citations/indices
+      let processedPart = part.replace(/\\$$([\s\S]*?)\\$$/g, (match, p1) => {
+          if (/^\s*[\w\d\s,.]+\s*$/.test(p1) && !p1.includes('_') && !p1.includes('^')) {
+              return `[${p1.trim()}]`; // Restore without backslashes
+          }
+          return `$$$${p1}$$$`;
+      });
       
-      // Replace \( ... \) with $ ... $
-      processedPart = processedPart.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+      // Replace $ ... $ with $ ... $
+      processedPart = processedPart.replace(/\\$([\s\S]*?)\\$/g, (match, p1) => {
+          if (/^\s*[\w\d\s,.]+\s*$/.test(p1) && !p1.includes('_') && !p1.includes('^')) {
+              return `(${p1.trim()})`; // Restore without backslashes
+          }
+          return `$$${p1}$$`;
+      });
 
       return processedPart;
     }).join('');
@@ -197,8 +232,6 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(({
         remarkPlugins={remarkPlugins as any}
         rehypePlugins={rehypePlugins as any}
         components={components}
-        // Explicitly allow all URLs (including data:) because we use rehype-sanitize to filter unsafe protocols.
-        // Default react-markdown URL transform blocks 'data:' which breaks base64 images.
         urlTransform={(url) => url}
       >
         {processedContent}
