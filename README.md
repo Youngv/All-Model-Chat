@@ -153,6 +153,14 @@ npm run build    # 构建生产版本
 npm run preview  # 本地预览构建结果
 ```
 
+### 容器镜像
+
+镜像会发布到 GHCR：`ghcr.io/youngv/all-model-chat:latest`。运行：
+
+```bash
+docker run -p 4173:80 ghcr.io/youngv/all-model-chat:latest
+```
+
 ---
 
 ## 技术架构
