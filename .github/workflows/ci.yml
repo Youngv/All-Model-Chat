@@ -70,7 +70,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --legacy-peer-deps
-      - run: npx playwright install --with-deps chromium
+      - run: google-chrome --version
       - run: npm run test:e2e
 
   docker-build:
