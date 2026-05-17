@@ -10,7 +10,7 @@ import { logService } from '@/services/logService';
 import { getApiKeyErrorTranslationKey, getGeminiKeyForRequest } from '@/utils/apiUtils';
 import { generateUniqueId } from '@/utils/chat/ids';
 import { getFileMetadataApi } from '@/services/api/fileApi';
-import { createProcessingPlaceholderFile, getUploadLifecycleForGeminiState } from './utils';
+import { createProcessingPlaceholderFile, getUploadLifecycleForGeminiState } from './fileUploadPolicy';
 import { useI18n } from '@/contexts/I18nContext';
 import { isVideoMimeType } from '@/utils/fileTypeUtils';
 import { isOpenAICompatibleApiActive } from '@/utils/openaiCompatibleMode';
@@ -51,7 +51,7 @@ export const useFileIdAdder = ({
         setAppFileError(t('fileIdAdder_invalidFileId'));
         return;
       }
-      if (selectedFiles.some((f) => f.fileApiName === fileApiId)) {
+      if (selectedFiles.some((selectedFile) => selectedFile.fileApiName === fileApiId)) {
         logService.warn(`File with ID ${fileApiId} is already added.`);
         setAppFileError(t('fileIdAdder_duplicateFile').replace('{id}', fileApiId));
         return;
@@ -105,10 +105,10 @@ export const useFileIdAdder = ({
           if (!isValidType) {
             logService.warn(`Unsupported file type for file ID ${fileApiId}`, { type: mimeType });
             setSelectedFiles((prev) =>
-              prev.map((f) =>
-                f.id === tempId
+              prev.map((selectedFile) =>
+                selectedFile.id === tempId
                   ? {
-                      ...f,
+                      ...selectedFile,
                       name: fileMetadata.displayName || fileApiId,
                       type: mimeType,
                       size: Number(fileMetadata.sizeBytes) || 0,
@@ -116,7 +116,7 @@ export const useFileIdAdder = ({
                       error: t('fileIdAdder_unsupportedType').replace('{type}', mimeType),
                       uploadState: 'failed',
                     }
-                  : f,
+                  : selectedFile,
               ),
             );
             return;
@@ -136,21 +136,21 @@ export const useFileIdAdder = ({
             error: uploadState === 'failed' ? t('fileIdAdder_processingFailed') : undefined,
             mediaResolution: defaultResolution,
           };
-          setSelectedFiles((prev) => prev.map((f) => (f.id === tempId ? newFile : f)));
+          setSelectedFiles((prev) => prev.map((selectedFile) => (selectedFile.id === tempId ? newFile : selectedFile)));
         } else {
           logService.error(`File with ID ${fileApiId} not found or inaccessible.`);
           setAppFileError(t('fileIdAdder_notFound').replace('{id}', fileApiId));
           setSelectedFiles((prev) =>
-            prev.map((f) =>
-              f.id === tempId
+            prev.map((selectedFile) =>
+              selectedFile.id === tempId
                 ? {
-                    ...f,
+                    ...selectedFile,
                     name: t('fileIdAdder_notFoundLabel').replace('{id}', fileApiId),
                     isProcessing: false,
                     error: t('fileIdAdder_notFoundShort'),
                     uploadState: 'failed',
                   }
-                : f,
+                : selectedFile,
             ),
           );
         }
@@ -160,16 +160,16 @@ export const useFileIdAdder = ({
           const translatedApiError = t('apiRuntime_keyNotConfigured');
           setAppFileError(translatedApiError);
           setSelectedFiles((prev) =>
-            prev.map((f) =>
-              f.id === tempId
+            prev.map((selectedFile) =>
+              selectedFile.id === tempId
                 ? {
-                    ...f,
+                    ...selectedFile,
                     name: t('fileIdAdder_configErrorLabel').replace('{id}', fileApiId),
                     isProcessing: false,
                     error: translatedApiError,
                     uploadState: 'failed',
                   }
-                : f,
+                : selectedFile,
             ),
           );
           return;
@@ -179,16 +179,16 @@ export const useFileIdAdder = ({
           t('fileIdAdder_fetchError').replace('{message}', error instanceof Error ? error.message : String(error)),
         );
         setSelectedFiles((prev) =>
-          prev.map((f) =>
-            f.id === tempId
+          prev.map((selectedFile) =>
+            selectedFile.id === tempId
               ? {
-                  ...f,
+                  ...selectedFile,
                   name: t('fileIdAdder_fetchErrorLabel').replace('{id}', fileApiId),
                   isProcessing: false,
                   error: t('fileIdAdder_fetchErrorShort'),
                   uploadState: 'failed',
                 }
-              : f,
+              : selectedFile,
           ),
         );
       }

@@ -60,8 +60,8 @@ export const generateImagesApi = async (
 
       const response = await ai.models.generateImages({
         model: modelId,
-        prompt: prompt,
-        config: config,
+        prompt,
+        config,
       });
 
       if (abortSignal.aborted) {

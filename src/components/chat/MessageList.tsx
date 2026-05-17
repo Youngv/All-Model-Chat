@@ -85,7 +85,6 @@ const MessageListComponent: React.FC = () => {
     [language, onSendMessage],
   );
   const visibleMessages = useMemo(() => getVisibleChatMessages(messages), [messages]);
-  // UI Logic (Modals, Previews, Configuration)
   const {
     previewFile,
     isHtmlPreviewModalOpen,
@@ -105,7 +104,6 @@ const MessageListComponent: React.FC = () => {
     handleSaveFileConfig,
   } = useMessageListUI({ messages: visibleMessages, onUpdateMessageFile });
 
-  // Scroll Logic
   const {
     virtuosoRef,
     handleScrollerRef,
@@ -121,7 +119,6 @@ const MessageListComponent: React.FC = () => {
     handleScroll,
   } = useMessageListScroll({ messages: visibleMessages, setScrollContainerRef, activeSessionId });
 
-  // Determine if current model is Gemini 3 to enable per-part resolution
   const isGemini3 = useMemo(() => isGemini3Model(currentChatSettings.modelId), [currentChatSettings.modelId]);
   const markdownPreviewFile = previewFile && isMarkdownFile(previewFile) ? previewFile : null;
   const genericPreviewFile = previewFile && !isMarkdownFile(previewFile) ? previewFile : null;
@@ -178,7 +175,6 @@ const MessageListComponent: React.FC = () => {
           />
         )}
 
-        {/* Floating Toolbars & Navigation */}
         <TextSelectionToolbar
           onQuote={handleQuote}
           onInsert={handleInsert}
@@ -197,7 +193,6 @@ const MessageListComponent: React.FC = () => {
         />
       </div>
 
-      {/* Modals */}
       {genericPreviewFile && (
         <Suspense fallback={null}>
           <LazyFilePreviewModal

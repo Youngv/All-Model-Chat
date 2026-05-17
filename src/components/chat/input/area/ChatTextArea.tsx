@@ -1,9 +1,9 @@
-import React, { useRef, useLayoutEffect } from 'react';
+import React, { useRef, useLayoutEffect, type RefObject } from 'react';
 import { MAX_TEXTAREA_HEIGHT_PX } from '@/hooks/chat-input/useChatInputState';
 import { useI18n } from '@/contexts/I18nContext';
 
 interface ChatTextAreaProps {
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  textareaRef: RefObject<HTMLTextAreaElement>;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;

@@ -104,12 +104,9 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
                       <CommandIcon icon={command.icon} />
                     </div>
 
-                    {/* Text Content */}
                     <div className="flex-grow min-w-0 flex flex-col justify-center gap-0.5">
                       <div className="flex items-center gap-2">
-                        <span
-                          className={`font-mono text-sm font-bold tracking-tight ${isSelected ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-primary)]'}`}
-                        >
+                        <span className="font-mono text-sm font-bold tracking-tight text-[var(--theme-text-primary)]">
                           /{command.name}
                         </span>
                       </div>

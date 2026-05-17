@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { Pin, MoreHorizontal } from 'lucide-react';
 import { type SavedChatSession } from '@/types';
@@ -13,8 +13,8 @@ interface SessionItemProps {
   loadingSessionIds: Set<string>;
   generatingTitleSessionIds: Set<string>;
   newlyTitledSessionId: string | null;
-  editInputRef: React.RefObject<HTMLInputElement>;
-  menuRef: React.RefObject<HTMLDivElement>;
+  editInputRef: RefObject<HTMLInputElement>;
+  menuRef: RefObject<HTMLDivElement>;
   onSelectSession: (sessionId: string) => void;
   onTogglePinSession: (sessionId: string) => void;
   onDeleteSession: (sessionId: string) => void;

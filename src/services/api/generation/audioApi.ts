@@ -1,7 +1,6 @@
-import type { GenerateContentConfig, ThinkingConfig, ThinkingLevel, UsageMetadata } from '@google/genai';
+import type { GenerateContentConfig, Part, ThinkingConfig, ThinkingLevel, UsageMetadata } from '@google/genai';
 import { executeConfiguredApiRequest } from '@/services/api/apiExecutor';
 import { logService } from '@/services/logService';
-import type { Part } from '@google/genai';
 import { blobToBase64 } from '@/utils/fileHelpers';
 import { calculateTokenStats, getModelCapabilities } from '@/utils/modelHelpers';
 import { buildExactPricingFromUsageMetadata } from '@/utils/usagePricingTelemetry';
@@ -111,7 +110,7 @@ export const generateSpeechApi = async (
       const response = await ai.models.generateContent({
         model: modelId,
         // TTS models do not support chat history roles, just plain content parts
-        contents: [{ parts: [{ text: text }] }],
+        contents: [{ parts: [{ text }] }],
         config: {
           responseModalities: ['AUDIO'],
           speechConfig: multiSpeakerVoiceConfig ? { multiSpeakerVoiceConfig } : buildSingleSpeakerSpeechConfig(voice),
@@ -158,7 +157,6 @@ export const transcribeAudioApi = async (apiKey: string, audioFile: File, modelI
     errorLabel: 'Error during audio transcription:',
     run: async ({ client: ai }) => {
       logService.debug('Audio transcription request file details', { fileName: audioFile.name, size: audioFile.size });
-      // Use blobToBase64 which is efficient and handles Blobs/Files
       const audioBase64 = await blobToBase64(audioFile);
 
       const audioPart: Part = {

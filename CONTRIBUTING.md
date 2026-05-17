@@ -11,7 +11,10 @@ Thanks for helping improve AMC WebUI.
 
 ## Local Development
 
+Use Node.js 26 for local development. The repository includes `.nvmrc` and enables `engine-strict`, so run `nvm use` before installing dependencies if your shell is on a different Node version.
+
 ```bash
+nvm use
 npm ci --legacy-peer-deps
 npm run dev
 ```

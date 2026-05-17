@@ -95,9 +95,8 @@ export const useAppPromptModes = ({
       return;
     }
 
-    const pendingActivation = pendingLiveArtifactsPromptActivation;
-    const targetMatches =
-      pendingActivation.targetSessionId === null || pendingActivation.targetSessionId === activeSessionId;
+    const { systemInstruction, targetSessionId } = pendingLiveArtifactsPromptActivation;
+    const targetMatches = targetSessionId === null || targetSessionId === activeSessionId;
 
     if (!targetMatches) {
       return;
@@ -105,7 +104,9 @@ export const useAppPromptModes = ({
 
     if (activeChat && isConfiguredLiveArtifactsSystemInstruction(activeChat.settings.systemInstruction)) {
       queueMicrotask(() => {
-        setPendingLiveArtifactsPromptActivation((current) => (current === pendingActivation ? null : current));
+        setPendingLiveArtifactsPromptActivation((current) =>
+          current === pendingLiveArtifactsPromptActivation ? null : current,
+        );
       });
       return;
     }
@@ -119,12 +120,14 @@ export const useAppPromptModes = ({
         ? prev
         : {
             ...prev,
-            systemInstruction: pendingActivation.systemInstruction,
+            systemInstruction,
           },
     );
 
     queueMicrotask(() => {
-      setPendingLiveArtifactsPromptActivation((current) => (current === pendingActivation ? null : current));
+      setPendingLiveArtifactsPromptActivation((current) =>
+        current === pendingLiveArtifactsPromptActivation ? null : current,
+      );
     });
   }, [
     activeChat,

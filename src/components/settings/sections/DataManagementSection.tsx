@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import {
   Settings,
@@ -232,7 +232,7 @@ export const DataManagementSection: React.FC<DataManagementSectionProps> = ({
     </div>
   );
 
-  function handleFileImport(ref: React.RefObject<HTMLInputElement>, handler: (file: File) => void) {
+  function handleFileImport(ref: RefObject<HTMLInputElement>, handler: (file: File) => void) {
     const file = ref.current?.files?.[0];
     if (file) handler(file);
     if (ref.current) ref.current.value = '';

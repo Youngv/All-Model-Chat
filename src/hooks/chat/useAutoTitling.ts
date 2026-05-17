@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useCallback, useEffect } from 'react';
+import { type Dispatch, type MutableRefObject, type SetStateAction, useCallback, useEffect } from 'react';
 import { type AppSettings, type SavedChatSession } from '@/types';
 import { logService } from '@/services/logService';
 import { getGeminiKeyForRequest } from '@/utils/apiUtils';
@@ -16,8 +15,8 @@ interface AutoTitlingProps {
   updateAndPersistSessions: SessionsUpdater;
   language: 'en' | 'zh';
   generatingTitleSessionIds: Set<string>;
-  setGeneratingTitleSessionIds: React.Dispatch<React.SetStateAction<Set<string>>>;
-  sessionKeyMapRef?: React.MutableRefObject<Map<string, string>>;
+  setGeneratingTitleSessionIds: Dispatch<SetStateAction<Set<string>>>;
+  sessionKeyMapRef?: MutableRefObject<Map<string, string>>;
 }
 
 export const useAutoTitling = ({
@@ -38,7 +37,6 @@ export const useAutoTitling = ({
       setGeneratingTitleSessionIds((prev) => new Set(prev).add(sessionId));
       logService.info(`Auto-generating title for session ${sessionId}`);
 
-      // Sticky Key Logic: Prefer key used in the last turn if available
       const stickyKey = isOpenAICompatibleApiActive(appSettings)
         ? undefined
         : sessionKeyMapRef?.current?.get(sessionId);
@@ -46,9 +44,7 @@ export const useAutoTitling = ({
       let keyToUse: string;
       if (stickyKey) {
         keyToUse = stickyKey;
-        // logService.debug(`Reusing sticky key for title generation.`);
       } else {
-        // Fallback to normal rotation (skipIncrement)
         const keyResult = getGeminiKeyForRequest(appSettings, session.settings, { skipIncrement: true });
         if ('error' in keyResult) {
           logService.error(`Could not generate title for session ${sessionId}: ${keyResult.error}`);
@@ -83,7 +79,6 @@ export const useAutoTitling = ({
         }
       } catch (error) {
         logService.error(`Failed to auto-generate title for session ${sessionId}`, { error });
-        // Fallback to local generation to prevent infinite retry loops on "New Chat"
         const localTitle = generateSessionTitle(messages);
         if (localTitle && localTitle !== 'New Chat') {
           updateAndPersistSessions((prev) => prev.map((s) => (s.id === sessionId ? { ...s, title: localTitle } : s)));
@@ -102,33 +97,24 @@ export const useAutoTitling = ({
   useEffect(() => {
     if (!appSettings.isAutoTitleEnabled || !activeChat) return;
 
-    const session = activeChat;
-    const visibleMessages = getVisibleChatMessages(session.messages);
+    const visibleMessages = getVisibleChatMessages(activeChat.messages);
 
-    // Check if title is generic or a placeholder
-    // 1. Is it 'New Chat'?
-    const isNewChat = session.title === 'New Chat';
-    // 2. Is it a placeholder derived from the first message?
-    const isPlaceholder = session.title === generateSessionTitle(session.messages);
+    const isNewChat = activeChat.title === 'New Chat';
+    const isPlaceholder = activeChat.title === generateSessionTitle(activeChat.messages);
 
-    // If neither, assume user renamed it or it's already titled properly
     if (!isNewChat && !isPlaceholder) return;
 
-    // Skip if already generating
-    if (generatingTitleSessionIds.has(session.id)) return;
+    if (generatingTitleSessionIds.has(activeChat.id)) return;
 
-    // Need at least user prompt and model response
     if (visibleMessages.length < 2) return;
 
     const firstMsg = visibleMessages[0];
     const secondMsg = visibleMessages[1];
 
-    // Basic structure check
     if (firstMsg.role !== 'user' || secondMsg.role !== 'model') return;
 
-    // Wait for the first model message to be complete
     if (secondMsg.isLoading || secondMsg.stoppedByUser) return;
 
-    generateTitleForSession(session);
+    generateTitleForSession(activeChat);
   }, [activeChat, appSettings.isAutoTitleEnabled, generatingTitleSessionIds, generateTitleForSession]);
 };

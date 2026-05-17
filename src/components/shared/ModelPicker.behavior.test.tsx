@@ -91,11 +91,11 @@ describe('ModelPicker behavior', () => {
     });
 
     const geminiSection = renderer.container.querySelector('[data-provider-section="gemini-native"]');
-    const openAISection = renderer.container.querySelector('[data-provider-section="openai-compatible"]');
+    const openaiSection = renderer.container.querySelector('[data-provider-section="openai-compatible"]');
 
     expect(geminiSection?.textContent).toContain('Gemini');
     expect(geminiSection?.textContent).toContain('Gemini 3 Flash Preview');
-    expect(openAISection?.textContent).toContain('OpenAI Compatible');
-    expect(openAISection?.textContent).toContain('GPT-5.5');
+    expect(openaiSection?.textContent).toContain('OpenAI Compatible');
+    expect(openaiSection?.textContent).toContain('GPT-5.5');
   });
 });

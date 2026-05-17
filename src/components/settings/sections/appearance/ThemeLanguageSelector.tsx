@@ -1,6 +1,6 @@
 import React from 'react';
 import { useI18n } from '@/contexts/I18nContext';
-import { IconThemeSystem, IconThemeDark, IconThemeLight } from '@/components/icons/CustomIcons';
+import { IconThemeSystem, IconThemeDark, IconThemeLight } from '@/components/icons';
 import { type AppSettings } from '@/types';
 import { Select } from '@/components/shared/Select';
 

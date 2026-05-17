@@ -1,6 +1,4 @@
-import { type Dispatch, type SetStateAction } from 'react';
-import type React from 'react';
-import { useState, useMemo, useCallback } from 'react';
+import { type Dispatch, type RefObject, type SetStateAction, useState, useMemo, useCallback } from 'react';
 import { type translations } from '@/i18n/translations';
 import { type AttachmentAction, type ModelOption } from '@/types';
 import type { SlashCommand as Command } from '@/types/slashCommands';
@@ -29,7 +27,7 @@ interface UseSlashCommandsProps {
   onSelectModel: (modelId: string) => void;
   onMessageSent: () => void;
   setIsHelpModalOpen: (isOpen: boolean) => void;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  textareaRef: RefObject<HTMLTextAreaElement>;
   onEditLastUserMessage: () => void;
   onTogglePip: () => void;
   setInputText: Dispatch<SetStateAction<string>>;
@@ -295,7 +293,7 @@ export const useSlashCommands = ({
         const filtered = commands.filter((cmd) => cmd.name.toLowerCase().startsWith(query));
         setSlashCommandState({
           isOpen: filtered.length > 0 && !value.includes(' '),
-          query: query,
+          query,
           filteredCommands: filtered,
           selectedIndex: 0,
         });

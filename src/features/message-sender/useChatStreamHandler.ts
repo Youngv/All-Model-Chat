@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useCallback } from 'react';
+import { type MutableRefObject, useCallback } from 'react';
 import {
   type AppSettings,
   type SavedChatSession,
@@ -33,7 +32,7 @@ interface ChatStreamHandlerProps {
   appSettings: AppSettings;
   updateAndPersistSessions: SessionsUpdater;
   setSessionLoading: (sessionId: string, isLoading: boolean) => void;
-  activeJobs: React.MutableRefObject<Map<string, AbortController>>;
+  activeJobs: MutableRefObject<Map<string, AbortController>>;
 }
 
 export const useChatStreamHandler = ({

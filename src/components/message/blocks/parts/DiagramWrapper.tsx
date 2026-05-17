@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { Loader2, AlertTriangle, Download, Maximize, Code, Copy, Check, Sidebar } from 'lucide-react';
 import { type UploadedFile } from '@/types';
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
@@ -20,7 +20,7 @@ interface DiagramWrapperProps {
   themeId: string;
   children: React.ReactNode;
   extraActions?: React.ReactNode;
-  containerRef?: React.RefObject<HTMLDivElement>;
+  containerRef?: RefObject<HTMLDivElement>;
 }
 
 export const DiagramWrapper: React.FC<DiagramWrapperProps> = ({

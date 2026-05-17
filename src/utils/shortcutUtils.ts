@@ -39,7 +39,6 @@ const getEventKeyCombo = (e: React.KeyboardEvent | KeyboardEvent): string | null
   if (e.altKey) parts.push('alt');
   if (e.shiftKey) parts.push('shift');
 
-  // Handle normal keys
   let key = e.key;
   if (key === ' ') key = 'space';
   if (key === 'ArrowUp') key = 'arrowup';
@@ -57,7 +56,6 @@ const getEventKeyCombo = (e: React.KeyboardEvent | KeyboardEvent): string | null
 
   parts.push(key);
 
-  // Filter duplicates if any
   const uniqueParts = [...new Set(parts)];
 
   // Sort modifiers: meta, ctrl, alt, shift

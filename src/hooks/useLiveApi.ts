@@ -13,7 +13,7 @@ import { useI18n } from '@/contexts/I18nContext';
 import { getGeminiKeyForRequest, SERVER_MANAGED_API_KEY } from '@/utils/apiUtils';
 import { useStateWithRef } from './useStateWithRef';
 
-interface UseLiveAPIProps {
+interface UseLiveApiProps {
   appSettings: AppSettings;
   chatSettings: ChatSettings;
   modelId: string;
@@ -23,7 +23,7 @@ interface UseLiveAPIProps {
   clientFunctions?: LiveClientFunctions;
 }
 
-export const useLiveAPI = ({
+export const useLiveApi = ({
   appSettings,
   chatSettings,
   modelId,
@@ -31,7 +31,7 @@ export const useLiveAPI = ({
   onTranscript,
   onGeneratedFiles,
   clientFunctions,
-}: UseLiveAPIProps) => {
+}: UseLiveApiProps) => {
   const { t } = useI18n();
   const sessionRef = useRef<Promise<LiveSession> | null>(null);
   const goAwayHandlerRef = useRef<(goAway: { timeLeft?: string }) => void>(() => {});

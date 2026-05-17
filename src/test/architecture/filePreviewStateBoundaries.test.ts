@@ -6,7 +6,7 @@ const projectRoot = path.resolve(__dirname, '../../..');
 
 const readProjectFile = (relativePath: string) => fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
 
-describe('file preview state cleanup guards', () => {
+describe('file preview state boundaries', () => {
   it('keeps copy state local to FilePreviewHeader', () => {
     const source = readProjectFile('src/components/shared/file-preview/FilePreviewHeader.tsx');
 

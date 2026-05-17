@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, type MutableRefObject } from 'react';
 import type { LiveServerMessage, Session as LiveSession } from '@google/genai';
 import { useLiveTools } from './useLiveTools';
 import type { LiveClientFunctions, LiveTranscriptHandler, ThoughtSupportingPart, UploadedFile } from '@/types';
@@ -12,9 +12,9 @@ interface UseLiveMessageProcessingProps {
   onGoAway?: (goAway: NonNullable<LiveServerMessage['goAway']>) => void;
   onGeneratedFiles?: (files: UploadedFile[]) => void;
   clientFunctions?: LiveClientFunctions;
-  sessionRef: React.MutableRefObject<Promise<LiveSession> | null>;
+  sessionRef: MutableRefObject<Promise<LiveSession> | null>;
   setSessionHandle: (handle: string | null) => void;
-  sessionHandleRef: React.MutableRefObject<string | null>;
+  sessionHandleRef: MutableRefObject<string | null>;
 }
 
 export const useLiveMessageProcessing = ({

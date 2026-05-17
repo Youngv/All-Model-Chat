@@ -1,13 +1,12 @@
-/* eslint-disable react-hooks/refs */
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { ALL_SUPPORTED_MIME_TYPES, SUPPORTED_IMAGE_MIME_TYPES } from '@/constants/fileConstants';
 
 interface ChatInputFileInputs {
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  imageInputRef: React.RefObject<HTMLInputElement>;
-  folderInputRef: React.RefObject<HTMLInputElement>;
-  zipInputRef: React.RefObject<HTMLInputElement>;
-  cameraInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: RefObject<HTMLInputElement>;
+  imageInputRef: RefObject<HTMLInputElement>;
+  folderInputRef: RefObject<HTMLInputElement>;
+  zipInputRef: RefObject<HTMLInputElement>;
+  cameraInputRef: RefObject<HTMLInputElement>;
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleFolderChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleZipChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;

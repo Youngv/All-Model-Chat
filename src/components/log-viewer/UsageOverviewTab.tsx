@@ -2,7 +2,7 @@ import React from 'react';
 import { Activity, BarChart3, Coins, Loader2 } from 'lucide-react';
 import { useI18n } from '@/contexts/I18nContext';
 import { SETTINGS_INPUT_CLASS } from '@/constants/appConstants';
-import { useUsageStats, type UsageTimeRange } from '@/hooks/features/useUsageStats';
+import { useUsageStats, type UsageTimeRange } from '@/hooks/log-viewer/useUsageStats';
 import { formatPriceUsd } from '@/utils/usagePricing';
 
 const RANGE_OPTIONS: Array<{ value: UsageTimeRange; labelKey: string }> = [
@@ -50,8 +50,7 @@ const PriceValue: React.FC<{
 };
 
 export const UsageOverviewTab: React.FC = () => {
-  const { t } = useI18n();
-  const { language } = useI18n();
+  const { t, language } = useI18n();
   const { timeRange, setTimeRange, isLoading, summary, byModel } = useUsageStats();
 
   return (

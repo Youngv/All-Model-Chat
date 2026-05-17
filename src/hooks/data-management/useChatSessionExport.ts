@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useCallback } from 'react';
+import { type RefObject, useCallback } from 'react';
 import { type SavedChatSession, type Theme } from '@/types';
 import { logService } from '@/services/logService';
 import { createManagedObjectUrl } from '@/services/objectUrlManager';
@@ -10,7 +9,7 @@ import { buildChatExportFilename, createExportDateMeta, loadExportRuntime } from
 
 interface UseChatSessionExportProps {
   activeChat: SavedChatSession | undefined;
-  scrollContainerRef: React.RefObject<HTMLDivElement>;
+  scrollContainerRef: RefObject<HTMLDivElement>;
   currentTheme: Theme;
   language: 'en' | 'zh';
   t: (key: string) => string;
@@ -83,11 +82,11 @@ export const useChatSessionExport = ({ activeChat, currentTheme, language, t }: 
           title: activeChat.title,
           date: dateStr,
           model: activeChat.settings.modelId,
-          messages: activeChat.messages.map((m) => ({
-            role: m.role === 'user' ? t('export_role_user') : t('export_role_assistant'),
-            timestamp: m.timestamp,
-            content: m.content,
-            files: m.files?.map((f) => ({ name: f.name })),
+          messages: activeChat.messages.map((message) => ({
+            role: message.role === 'user' ? t('export_role_user') : t('export_role_assistant'),
+            timestamp: message.timestamp,
+            content: message.content,
+            files: message.files?.map((file) => ({ name: file.name })),
           })),
         });
 
@@ -95,15 +94,13 @@ export const useChatSessionExport = ({ activeChat, currentTheme, language, t }: 
       } else if (format === 'json') {
         logService.info(`Exporting chat ${activeChat.id} as JSON.`);
         try {
-          // Sanitize the session before export to remove non-serializable blobs
           const sanitizedChat = await serializeSessionForPortableExport(activeChat);
 
-          // We create a structure compatible with the history import feature
           const dataToExport = {
             type: 'AllModelChat-History',
             version: 1,
-            history: [sanitizedChat], // Exporting only the active chat session
-            groups: [], // No groups are exported with a single chat
+            history: [sanitizedChat],
+            groups: [],
           };
           const jsonString = JSON.stringify(dataToExport, null, 2);
           const blob = new Blob([jsonString], { type: 'application/json' });

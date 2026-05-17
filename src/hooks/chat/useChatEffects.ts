@@ -52,7 +52,7 @@ export const useChatEffects = ({
       }
     };
     void loadData();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- Load persisted chat data once on mount.
 
   // 2. Session Validation
   // This effect ensures that if the activeSessionId points to a session that doesn't exist in savedSessions
@@ -107,7 +107,6 @@ export const useChatEffects = ({
     savedSessionsRef.current = savedSessions;
   }, [savedSessions]);
 
-  // Cleanup on unmount only
   useEffect(
     () => () => {
       // Cleanup all file previews when the app unmounts/reloads

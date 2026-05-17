@@ -94,7 +94,6 @@ export const SelectedFileDisplay: React.FC<SelectedFileDisplayProps> = ({
 
   const ErrorIcon = CATEGORY_STYLES['error'].Icon;
   const canCopyFileId = Boolean(file.fileApiName && isActive && !file.error);
-  const hasOverflowActions = canCopyFileId;
   const configureButtonColorClass = file.mediaResolution ? getResolutionColor(file.mediaResolution) : '';
   const actionButtonClass =
     'flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-[var(--theme-border-secondary)] bg-[var(--theme-bg-secondary)]/90 text-[var(--theme-text-secondary)] shadow-sm transition-colors hover:bg-[var(--theme-bg-tertiary)] hover:text-[var(--theme-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-border-focus)]';
@@ -219,7 +218,7 @@ export const SelectedFileDisplay: React.FC<SelectedFileDisplayProps> = ({
           </button>
         )}
 
-        {hasOverflowActions && (
+        {canCopyFileId && (
           <div className="relative">
             <button
               type="button"

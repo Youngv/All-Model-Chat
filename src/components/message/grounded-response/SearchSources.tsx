@@ -1,6 +1,6 @@
 import React from 'react';
 import { Globe } from 'lucide-react';
-import { getDomain, getFavicon } from './utils';
+import { getDomain, getFavicon } from './groundingSources';
 import { useI18n } from '@/contexts/I18nContext';
 
 interface SearchSourcesProps {

@@ -21,7 +21,7 @@ import {
   IconToml,
   IconTypeScript,
   IconYaml,
-} from '@/components/icons/CustomIcons';
+} from '@/components/icons';
 
 type LanguageBadgeConfig = {
   badgeId: string;

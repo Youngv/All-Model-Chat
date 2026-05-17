@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useLayoutEffect, useRef, useState, type MutableRefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { useWindowContext } from '@/contexts/WindowContext';
 
@@ -41,7 +41,7 @@ export const ToolbarContainer = forwardRef<HTMLDivElement, ToolbarContainerProps
         }
 
         if (ref) {
-          (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          (ref as MutableRefObject<HTMLDivElement | null>).current = node;
         }
       },
       [ref],

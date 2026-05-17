@@ -1,4 +1,4 @@
-import { useCallback, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, type Dispatch, type SetStateAction, type MutableRefObject } from 'react';
 import { type SavedChatSession, type ChatGroup } from '@/types';
 import { dbService } from '@/services/db/dbService';
 import { logService } from '@/services/logService';
@@ -11,7 +11,7 @@ interface UseHistoryClearerProps {
   setSavedSessions: Dispatch<SetStateAction<SavedChatSession[]>>;
   setSavedGroups: Dispatch<SetStateAction<ChatGroup[]>>;
   startNewChat: () => void;
-  activeJobs: React.MutableRefObject<Map<string, AbortController>>;
+  activeJobs: MutableRefObject<Map<string, AbortController>>;
 }
 
 export const useHistoryClearer = ({

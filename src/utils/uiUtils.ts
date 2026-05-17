@@ -1,8 +1,7 @@
 import { logService } from '@/services/logService';
 import React from 'react';
-import { type ThemeColors } from '@/types/theme';
+import { type ThemeColors, type Theme } from '@/types/theme';
 import { type AppSettings, MediaResolution } from '@/types';
-import { type Theme } from '@/types/theme';
 import { AVAILABLE_THEMES } from '@/constants/themeConstants';
 import {
   ImageIcon,

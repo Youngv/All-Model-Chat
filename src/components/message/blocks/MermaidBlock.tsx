@@ -55,7 +55,7 @@ export const MermaidBlock: React.FC<MermaidBlockProps> = ({
 
         const svgDataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(renderedSvg)))}`;
         setDiagramFile({
-          id: id,
+          id,
           name: 'mermaid-diagram.svg',
           type: 'image/svg+xml',
           size: renderedSvg.length,

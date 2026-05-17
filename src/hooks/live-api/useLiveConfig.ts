@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
-import { type ChatSettings } from '@/types';
+import { type ChatSettings, type LiveClientFunctions } from '@/types';
 import type { Tool } from '@google/genai';
-import type { LiveClientFunctions } from '@/types';
 import { LOCAL_PYTHON_SYSTEM_PROMPT } from '@/features/prompts/localPython';
 import { getCachedModelCapabilities } from '@/stores/modelCapabilitiesStore';
 
@@ -61,27 +60,21 @@ export const useLiveConfig = ({ chatSettings, sessionHandle, clientFunctions }: 
         : LOCAL_PYTHON_SYSTEM_PROMPT
       : chatSettings.systemInstruction;
 
-    // Build Config
     const liveConfig: LiveConfig = {
-      // Use string literal 'AUDIO' for better compatibility in Live API JSON serialization
       responseModalities: ['AUDIO'],
       speechConfig: {
         voiceConfig: { prebuiltVoiceConfig: { voiceName: chatSettings.ttsVoice || 'Zephyr' } },
       },
-      // Fix: systemInstruction must be a Content object { parts: [{ text: ... }] } for Live API
       systemInstruction: effectiveSystemInstruction ? { parts: [{ text: effectiveSystemInstruction }] } : undefined,
       tools: tools.length > 0 ? tools : undefined,
-      // Enable transcription for both input and output
       inputAudioTranscription: {},
       outputAudioTranscription: {},
-      // Enable Context Compression for long conversations
       contextWindowCompression: {
         slidingWindow: {},
       },
       // Enable session resumption from the first connection so the server
       // can start issuing handle updates immediately.
       sessionResumption: sessionHandle ? { handle: sessionHandle } : {},
-      // Use configured media resolution
       mediaResolution: chatSettings.mediaResolution,
     };
 

@@ -54,7 +54,7 @@ export const ScenarioEditor: React.FC<ScenarioEditorProps> = ({
     if (readOnly) return;
     setScenario((prev) => ({
       ...prev,
-      messages: prev.messages.map((m) => (m.id === id ? { ...m, content } : m)),
+      messages: prev.messages.map((message) => (message.id === id ? { ...message, content } : message)),
     }));
     setEditingMessageId(null);
   };
@@ -63,7 +63,7 @@ export const ScenarioEditor: React.FC<ScenarioEditorProps> = ({
     if (readOnly) return;
     setScenario((prev) => ({
       ...prev,
-      messages: prev.messages.filter((m) => m.id !== id),
+      messages: prev.messages.filter((message) => message.id !== id),
     }));
   };
 
@@ -71,9 +71,9 @@ export const ScenarioEditor: React.FC<ScenarioEditorProps> = ({
     if (readOnly) return;
     if (index + direction < 0 || index + direction >= scenario.messages.length) return;
     const newMessages = [...scenario.messages];
-    const temp = newMessages[index];
+    const movedMessage = newMessages[index];
     newMessages[index] = newMessages[index + direction];
-    newMessages[index + direction] = temp;
+    newMessages[index + direction] = movedMessage;
     setScenario((prev) => ({ ...prev, messages: newMessages }));
   };
 

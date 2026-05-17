@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type MutableRefObject } from 'react';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { useI18n } from '@/contexts/I18nContext';
 
@@ -27,7 +27,7 @@ export const ScrollNavigation: React.FC<ScrollNavigationProps> = ({
   const prevClickTimeoutRef = React.useRef<number | null>(null);
   const nextClickTimeoutRef = React.useRef<number | null>(null);
 
-  const clearScheduledClick = React.useCallback((timeoutRef: React.MutableRefObject<number | null>) => {
+  const clearScheduledClick = React.useCallback((timeoutRef: MutableRefObject<number | null>) => {
     if (timeoutRef.current !== null) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
@@ -42,11 +42,7 @@ export const ScrollNavigation: React.FC<ScrollNavigationProps> = ({
   }, [clearScheduledClick]);
 
   const handleSingleClick = React.useCallback(
-    (
-      event: React.MouseEvent<HTMLButtonElement>,
-      timeoutRef: React.MutableRefObject<number | null>,
-      action: () => void,
-    ) => {
+    (event: React.MouseEvent<HTMLButtonElement>, timeoutRef: MutableRefObject<number | null>, action: () => void) => {
       if (event.detail > 1) {
         return;
       }
@@ -61,7 +57,7 @@ export const ScrollNavigation: React.FC<ScrollNavigationProps> = ({
   );
 
   const handleDoubleClick = React.useCallback(
-    (timeoutRef: React.MutableRefObject<number | null>, action: () => void) => {
+    (timeoutRef: MutableRefObject<number | null>, action: () => void) => {
       clearScheduledClick(timeoutRef);
       action();
     },

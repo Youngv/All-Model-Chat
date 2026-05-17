@@ -68,8 +68,7 @@ export const ThinkingControl: React.FC<ThinkingControlProps> = ({
 
   useEffect(() => {
     if (thinkingBudget > 0) {
-      // Intentional mirror for the freeform custom input.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional mirror for the freeform custom input.
       setCustomBudgetValue(String(thinkingBudget));
     }
   }, [thinkingBudget]);
@@ -85,8 +84,7 @@ export const ThinkingControl: React.FC<ThinkingControlProps> = ({
   useEffect(() => {
     if (thinkingBudget > maxBudget) {
       setThinkingBudget(maxBudget);
-      // Intentional clamp sync for the visible custom input.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional clamp sync for the visible custom input.
       setCustomBudgetValue(String(maxBudget));
     }
   }, [maxBudget, thinkingBudget, setThinkingBudget]);

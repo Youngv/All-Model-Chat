@@ -1,4 +1,4 @@
-import type React from 'react';
+import type { MutableRefObject } from 'react';
 import {
   type AppSettings,
   type ChatMessage,
@@ -45,7 +45,7 @@ export interface BaseSenderProps {
   currentChatSettings: IndividualChatSettings;
   updateAndPersistSessions: SessionsUpdater;
   setSessionLoading: (sessionId: string, isLoading: boolean) => void;
-  activeJobs: React.MutableRefObject<Map<string, AbortController>>;
+  activeJobs: MutableRefObject<Map<string, AbortController>>;
   setAppFileError: (error: string | null) => void;
   language: 'en' | 'zh';
 }
@@ -57,9 +57,9 @@ export interface StandardChatProps extends BaseSenderProps {
   imageSize?: string;
   imageOutputMode: ImageOutputMode;
   personGeneration: ImagePersonGeneration;
-  userScrolledUpRef: React.MutableRefObject<boolean>;
+  userScrolledUpRef: MutableRefObject<boolean>;
   activeSessionId: string | null;
   setActiveSessionId: (id: string | null) => void;
   getStreamHandlers: GetStreamHandlers;
-  sessionKeyMapRef: React.MutableRefObject<Map<string, string>>;
+  sessionKeyMapRef: MutableRefObject<Map<string, string>>;
 }

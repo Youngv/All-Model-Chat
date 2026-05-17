@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 
 import { useI18n } from '@/contexts/I18nContext';
 import { useWindowContext } from '@/contexts/WindowContext';
-import { IconHistory } from '@/components/icons/CustomIcons';
+import { IconHistory } from '@/components/icons';
 import type { SavedChatSession } from '@/types';
 import { SIDEBAR_ICON_BUTTON_CLASS } from './sidebarStyles';
 

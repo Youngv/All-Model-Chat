@@ -43,15 +43,12 @@ export const MessageText: React.FC<MessageTextProps> = ({
   const { content, audioSrc, groundingMetadata, urlContextMetadata, thoughts } = message;
   const isLoading = message.isLoading ?? false;
 
-  // Subscribe to live stream updates if loading
   const { streamContent, streamThoughts } = useMessageStream(message.id, isLoading && message.role === 'model');
 
-  // Use streamed content if available, otherwise fall back to persisted content
   const rawThinkingExtraction = extractRawThinkingBlocks(streamContent ? `${content || ''}${streamContent}` : content);
   const effectiveContent = rawThinkingExtraction.content;
   const effectiveThoughts = [thoughts, streamThoughts, rawThinkingExtraction.thoughts].filter(Boolean).join('\n\n');
 
-  // Apply smooth streaming effect only when loading and for model messages
   const shouldSmooth = isLoading && message.role === 'model';
   const displayedContent = useSmoothStreaming(effectiveContent, shouldSmooth);
   const markdownContent = useMemo(
@@ -59,7 +56,6 @@ export const MessageText: React.FC<MessageTextProps> = ({
     [displayedContent, shouldSmooth],
   );
 
-  // Auto Fullscreen HTML Logic
   const prevIsLoadingRef = useRef(isLoading);
   useEffect(() => {
     let previewTimeout: number | null = null;
@@ -106,7 +102,7 @@ export const MessageText: React.FC<MessageTextProps> = ({
       {groundingMetadata || urlContextMetadata ? (
         <GroundedResponse
           messageId={message.id}
-          text={displayedContent || ''} // Use smoothed text when available
+          text={displayedContent || ''}
           metadata={groundingMetadata}
           urlContextMetadata={urlContextMetadata}
           isLoading={isLoading}

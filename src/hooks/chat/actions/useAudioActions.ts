@@ -37,7 +37,9 @@ export const useAudioActions = ({
       }
 
       if (keyResult.isNewKey && !isOpenAICompatibleApiActive(appSettings)) {
-        const fileRequiresApi = selectedFiles.some((f) => usesRemoteFileReference(f) && f.fileUri);
+        const fileRequiresApi = selectedFiles.some(
+          (selectedFile) => usesRemoteFileReference(selectedFile) && selectedFile.fileUri,
+        );
         if (!fileRequiresApi) {
           logService.info('New API key selected for this session due to transcription.');
           setCurrentChatSettings((prev) => ({ ...prev, lockedApiKey: keyResult.key }));

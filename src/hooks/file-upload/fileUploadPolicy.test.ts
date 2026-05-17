@@ -7,7 +7,7 @@ import {
   getEffectiveMimeType,
   getFilesRequiringFileApi,
   shouldUseFileApi,
-} from './utils';
+} from './fileUploadPolicy';
 
 vi.mock('@/utils/fileHelpers', () => ({
   isTextFile: (file: { name: string; type: string }) => {

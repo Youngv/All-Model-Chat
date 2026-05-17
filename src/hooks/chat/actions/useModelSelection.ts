@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useCallback } from 'react';
+import { type MutableRefObject, useCallback } from 'react';
 import { type AppSettings, type ChatSettings as IndividualChatSettings, type SavedChatSession } from '@/types';
 import { CHAT_INPUT_TEXTAREA_SELECTOR, DEFAULT_CHAT_SETTINGS } from '@/constants/appConstants';
 import { createNewSession } from '@/utils/chat/session';
@@ -18,7 +17,7 @@ interface UseModelSelectionProps {
   setCurrentChatSettings: (updater: (prevSettings: IndividualChatSettings) => IndividualChatSettings) => void;
   setIsSwitchingModel: (switching: boolean) => void;
   handleStopGenerating: () => void;
-  userScrolledUpRef: React.MutableRefObject<boolean>;
+  userScrolledUpRef: MutableRefObject<boolean>;
 }
 
 export const useModelSelection = ({

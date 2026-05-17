@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { Search, X } from 'lucide-react';
-import { IconNewChat, IconNewGroup } from '@/components/icons/CustomIcons';
+import { IconNewChat, IconNewGroup } from '@/components/icons';
 import { SIDEBAR_ACTION_LINK_CLASS, SIDEBAR_ACTION_ROW_CLASS } from './sidebarStyles';
 
 interface SidebarActionsProps {
@@ -10,7 +10,7 @@ interface SidebarActionsProps {
   onAddNewGroup: () => void;
   isSearching: boolean;
   searchQuery: string;
-  searchInputRef?: React.RefObject<HTMLInputElement>;
+  searchInputRef?: RefObject<HTMLInputElement>;
   setIsSearching: (isSearching: boolean) => void;
   setSearchQuery: (query: string) => void;
   newChatShortcut?: string;

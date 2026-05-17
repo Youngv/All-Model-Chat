@@ -66,10 +66,13 @@ describe('chat architecture boundaries', () => {
 
   it('keeps message sender store mutations inside the sender boundary', () => {
     const chatHookSource = readProjectFile('src/hooks/chat/useChat.ts');
-    const messageSenderSource = readProjectFile('src/hooks/useMessageSender.ts');
+    const messageSenderSource = readProjectFile('src/features/message-sender/useMessageSender.ts');
+    const legacyMessageSenderPath = path.join(projectRoot, 'src/hooks/useMessageSender.ts');
     const senderStoreActionsPath = path.join(projectRoot, 'src/features/message-sender/senderStoreActions.ts');
 
+    expect(fs.existsSync(legacyMessageSenderPath)).toBe(false);
     expect(fs.existsSync(senderStoreActionsPath)).toBe(true);
+    expect(chatHookSource).toContain("from '@/features/message-sender/useMessageSender'");
     expect(messageSenderSource).toContain('createSenderStoreActions');
     expect(messageSenderSource).not.toContain('updateAndPersistSessions: SessionsUpdater');
     expect(messageSenderSource).not.toContain('setActiveSessionId: (id: string | null) => void;');

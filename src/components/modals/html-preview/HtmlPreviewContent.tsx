@@ -1,10 +1,10 @@
 import { logService } from '@/services/logService';
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { buildHtmlPreviewSrcDoc } from '@/utils/htmlPreview';
 
 interface HtmlPreviewContentProps {
-  iframeRef: React.RefObject<HTMLIFrameElement>;
+  iframeRef: RefObject<HTMLIFrameElement>;
   htmlContent: string;
   scale: number;
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { SquarePen, Trash2, Pin, PinOff, Download, Copy } from 'lucide-react';
 import { type SavedChatSession } from '@/types';
@@ -10,7 +10,7 @@ import {
 
 interface SessionItemMenuProps {
   session: SavedChatSession;
-  menuRef: React.RefObject<HTMLDivElement>;
+  menuRef: RefObject<HTMLDivElement>;
   onStartEdit: () => void;
   onTogglePin: () => void;
   onDuplicate: () => void;

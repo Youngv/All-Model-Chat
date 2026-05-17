@@ -1,5 +1,4 @@
-import { type Dispatch, type SetStateAction } from 'react';
-import type React from 'react';
+import { type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import {
   type AppSettings,
   type SavedChatSession,
@@ -26,19 +25,19 @@ interface ChatHistoryProps {
   setSavedSessions: Dispatch<SetStateAction<SavedChatSession[]>>;
   setSavedGroups: Dispatch<SetStateAction<ChatGroup[]>>;
   setActiveSessionId: Dispatch<SetStateAction<string | null>>;
-  setActiveMessages: Dispatch<SetStateAction<ChatMessage[]>>; // Added setter
+  setActiveMessages: Dispatch<SetStateAction<ChatMessage[]>>;
   setEditingMessageId: Dispatch<SetStateAction<string | null>>;
   setCommandedInput: CommandedInputSetter;
   setAppFileError: Dispatch<SetStateAction<string | null>>;
   setSelectedFiles: Dispatch<SetStateAction<UploadedFile[]>>;
-  activeJobs: React.MutableRefObject<Map<string, AbortController>>;
+  activeJobs: MutableRefObject<Map<string, AbortController>>;
   updateAndPersistSessions: SessionsUpdater;
   updateAndPersistGroups: GroupsUpdater;
   activeChat: SavedChatSession | undefined;
   language: 'en' | 'zh';
-  userScrolledUpRef: React.MutableRefObject<boolean>;
+  userScrolledUpRef: MutableRefObject<boolean>;
   selectedFiles: UploadedFile[];
-  fileDraftsRef: React.MutableRefObject<Record<string, UploadedFile[]>>;
+  fileDraftsRef: MutableRefObject<Record<string, UploadedFile[]>>;
   activeSessionId: string | null;
   savedSessions: SavedChatSession[];
 }

@@ -33,7 +33,7 @@ describe('useLiveModeHandler', () => {
 
   it('routes non-live messages to the standard sender', async () => {
     const onSendMessage = vi.fn();
-    const liveAPI = {
+    const liveApi = {
       isConnected: false,
       connect: vi.fn(),
       sendText: vi.fn(),
@@ -47,7 +47,7 @@ describe('useLiveModeHandler', () => {
         setSelectedFiles: vi.fn(),
         currentModelId: 'gemini-3.1-pro',
         mediaResolution: MediaResolution.MEDIA_RESOLUTION_UNSPECIFIED,
-        liveAPI,
+        liveApi,
         onAddUserMessage: vi.fn(),
         onSendMessage,
       }),
@@ -58,8 +58,8 @@ describe('useLiveModeHandler', () => {
     });
 
     expect(onSendMessage).toHaveBeenCalledWith('hello', { isFastMode: true });
-    expect(liveAPI.connect).not.toHaveBeenCalled();
-    expect(liveAPI.sendText).not.toHaveBeenCalled();
+    expect(liveApi.connect).not.toHaveBeenCalled();
+    expect(liveApi.sendText).not.toHaveBeenCalled();
     unmount();
   });
 
@@ -67,7 +67,7 @@ describe('useLiveModeHandler', () => {
     const files = [makeFile()];
     const setSelectedFiles = vi.fn();
     const onAddUserMessage = vi.fn();
-    const liveAPI = {
+    const liveApi = {
       isConnected: false,
       connect: vi.fn().mockResolvedValue(true),
       sendText: vi.fn(),
@@ -81,7 +81,7 @@ describe('useLiveModeHandler', () => {
         setSelectedFiles,
         currentModelId: 'gemini-3.1-flash-live',
         mediaResolution: MediaResolution.MEDIA_RESOLUTION_LOW,
-        liveAPI,
+        liveApi,
         onAddUserMessage,
         onSendMessage: vi.fn(),
       }),
@@ -91,14 +91,14 @@ describe('useLiveModeHandler', () => {
       await result.current.handleSmartSendMessage('hello');
     });
 
-    expect(liveAPI.connect).toHaveBeenCalledTimes(1);
+    expect(liveApi.connect).toHaveBeenCalledTimes(1);
     expect(mockBuildContentParts).toHaveBeenCalledWith(
       'hello',
       files,
       'gemini-3.1-flash-live',
       MediaResolution.MEDIA_RESOLUTION_LOW,
     );
-    expect(liveAPI.sendContent).toHaveBeenCalledWith([
+    expect(liveApi.sendContent).toHaveBeenCalledWith([
       { text: 'hello' },
       { fileData: { mimeType: 'video/mp4', fileUri: 'files/clip' } },
     ]);

@@ -5,7 +5,7 @@ import { X, Plus, Upload, Download, ArrowLeft } from 'lucide-react';
 import { Modal } from '@/components/shared/Modal';
 import { ScenarioEditor } from './ScenarioEditor';
 import { ScenarioList } from './ScenarioList';
-import { useScenarioManager } from '@/hooks/features/useScenarioManager';
+import { useScenarioManager } from '@/hooks/scenarios/useScenarioManager';
 import { MODAL_CLOSE_BUTTON_DANGER_HOVER_CLASS, SMALL_ICON_BUTTON_ROUND_CLASS } from '@/constants/appConstants';
 
 interface PreloadedMessagesModalProps {

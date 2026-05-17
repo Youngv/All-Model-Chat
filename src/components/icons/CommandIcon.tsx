@@ -19,7 +19,7 @@ import {
   Telescope,
   Zap,
 } from 'lucide-react';
-import { IconStop } from './CustomIcons';
+import { IconStop } from './groups/GeneralIcons';
 
 export const CommandIcon: React.FC<{ icon: string }> = ({ icon }) => {
   const iconProps = { size: 18, strokeWidth: 2 };

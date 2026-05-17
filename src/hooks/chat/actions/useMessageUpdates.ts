@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useCallback, useRef, useEffect } from 'react';
+import { type MutableRefObject, useCallback, useRef, useEffect } from 'react';
 import type { Part } from '@google/genai';
 import {
   type SavedChatSession,
@@ -36,7 +35,7 @@ interface UseMessageUpdatesProps {
     options?: { persist?: boolean },
   ) => void;
   appendMessageToSession?: (sessionId: string, message: ChatMessage, options?: { persist?: boolean }) => void;
-  userScrolledUpRef: React.MutableRefObject<boolean>;
+  userScrolledUpRef: MutableRefObject<boolean>;
 }
 
 interface LiveModelStreamInput {
@@ -226,7 +225,6 @@ export const useMessageUpdates = ({
               role === 'user' ? liveConversationRefs.current.userId : liveConversationRefs.current.modelId;
             const messages = [...s.messages];
 
-            // Find the index of the existing message, if any
             let messageIndex = currentId ? messages.findIndex((m) => m.id === currentId) : -1;
 
             // Only create or update if there is actual text content (or thoughts)
@@ -259,14 +257,11 @@ export const useMessageUpdates = ({
 
                 messages.push(newMessage);
 
-                // Update ref to track this new message
                 if (role === 'user') liveConversationRefs.current.userId = newMessage.id;
                 else liveConversationRefs.current.modelId = newMessage.id;
 
-                // Update index so we can finalize it below if needed
                 messageIndex = messages.length - 1;
               } else {
-                // Update existing message content
                 const msg = messages[messageIndex];
                 const updates: Partial<ChatMessage> = {};
 

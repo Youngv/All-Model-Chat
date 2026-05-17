@@ -69,6 +69,24 @@ export default tseslint.config(
     },
   },
   {
+    files: ['src/components/chat/input/ChatInputArea.tsx', 'src/components/chat/input/HiddenFileInputs.tsx'],
+    rules: {
+      'react-hooks/refs': 'off',
+    },
+  },
+  {
+    files: [
+      'src/components/icons/CustomIcons.tsx',
+      'src/components/layout/chat-runtime/ChatRuntimeContext.tsx',
+      'src/components/shared/ModelPicker.tsx',
+      'src/contexts/I18nContext.tsx',
+      'src/contexts/WindowContext.tsx',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
     files: [
       'server/**/*.ts',
       'src/services/logService.ts',

@@ -1,6 +1,5 @@
 import { logService } from '@/services/logService';
-import type React from 'react';
-import { useState, useCallback } from 'react';
+import { type Dispatch, type RefObject, type SetStateAction, useState, useCallback } from 'react';
 import { compressAudioToMp3 } from '@/features/audio/audioCompression';
 import { useRecorder } from './core/useRecorder';
 import { useTextAreaInsert } from './useTextAreaInsert';
@@ -8,11 +7,11 @@ import { useI18n } from '@/contexts/I18nContext';
 
 interface UseVoiceInputProps {
   onTranscribeAudio: (file: File) => Promise<string | null>;
-  setInputText: React.Dispatch<React.SetStateAction<string>>;
+  setInputText: Dispatch<SetStateAction<string>>;
   setAppFileError?: (error: string | null) => void;
   isAudioCompressionEnabled?: boolean;
   isSystemAudioRecordingEnabled?: boolean;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  textareaRef: RefObject<HTMLTextAreaElement>;
 }
 
 export const useVoiceInput = ({

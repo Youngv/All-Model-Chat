@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ApiMode, AppSettings, ModelOption } from '@/types';
-import { type SettingsTab } from '@/hooks/features/useSettingsLogic';
+import { type SettingsTab } from '@/stores/settingsUiStore';
 import { getDefaultModelOptions } from '@/utils/defaultModelOptions';
 import { ApiConfigSection } from './sections/ApiConfigSection';
 import { AppearanceSection } from './sections/AppearanceSection';

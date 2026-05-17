@@ -33,16 +33,16 @@ export const MessageFiles: React.FC<MessageFilesProps> = ({
 
     const imgs: UploadedFile[] = [];
     const docs: UploadedFile[] = [];
-    files.forEach((f) => {
+    files.forEach((file) => {
       // Tool result blocks already render generated outputs inline.
       // Hide any generated attachments from the top strip to avoid duplicate previews.
-      if (hasToolResult && f.name.startsWith('generated-')) {
+      if (hasToolResult && file.name.startsWith('generated-')) {
         return;
       }
 
-      const isImg = SUPPORTED_IMAGE_MIME_TYPES.includes(f.type) || f.type === 'image/svg+xml';
-      if (isImg) imgs.push(f);
-      else docs.push(f);
+      const isImg = SUPPORTED_IMAGE_MIME_TYPES.includes(file.type) || file.type === 'image/svg+xml';
+      if (isImg) imgs.push(file);
+      else docs.push(file);
     });
     return { imageFiles: imgs, documentFiles: docs };
   }, [files, hasToolResult]);
@@ -51,7 +51,7 @@ export const MessageFiles: React.FC<MessageFilesProps> = ({
 
   const isQuadImageView =
     imageFiles.length === 4 &&
-    imageFiles.every((f) => f.name.startsWith('generated-image-') || f.name.startsWith('edited-image-'));
+    imageFiles.every((file) => file.name.startsWith('generated-image-') || file.name.startsWith('edited-image-'));
   const isStripImageView = imageFiles.length > 1 && !isQuadImageView;
   const marginClass = hasContentOrAudio ? 'mb-2' : '';
 

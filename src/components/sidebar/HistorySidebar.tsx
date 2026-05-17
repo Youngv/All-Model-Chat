@@ -7,7 +7,7 @@ import { SidebarActions } from './SidebarActions';
 import { GroupItem, type SessionItemPassedProps } from './GroupItem';
 import { CollapsedRecentChatsButton } from './CollapsedRecentChatsButton';
 import { Search, Settings } from 'lucide-react';
-import { IconNewChat, IconSidebarToggle } from '@/components/icons/CustomIcons';
+import { IconNewChat, IconSidebarToggle } from '@/components/icons';
 import { useHistorySidebarLogic } from '@/hooks/useHistorySidebarLogic';
 import { SIDEBAR_CLICKABLE_ICON_BUTTON_CLASS, SIDEBAR_ICON_LINK_BUTTON_CLASS } from './sidebarStyles';
 import { LimitedSessionList } from './LimitedSessionList';
@@ -201,7 +201,24 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = (props) => {
   };
 
   const [listParentRef] = useAutoAnimate<HTMLDivElement>({ duration: 200 });
+  const expandedPaneRef = React.useRef<HTMLDivElement>(null);
   const searchTitle = t('history_search_button') + (searchChatsShortcut ? ` (${searchChatsShortcut})` : '');
+
+  React.useEffect(() => {
+    const pane = expandedPaneRef.current as (HTMLDivElement & { inert?: boolean }) | null;
+    if (!pane) {
+      return;
+    }
+
+    if (isOpen) {
+      pane.inert = false;
+      pane.removeAttribute('inert');
+      return;
+    }
+
+    pane.inert = true;
+    pane.setAttribute('inert', '');
+  }, [isOpen]);
 
   return (
     <aside
@@ -217,11 +234,11 @@ export const HistorySidebar: React.FC<HistorySidebarProps> = (props) => {
       aria-label={t('history_title')}
     >
       <div
+        ref={expandedPaneRef}
+        data-history-sidebar-expanded-pane="true"
         aria-hidden={!isOpen}
         className={`w-64 md:w-[16.2rem] h-full flex flex-col shrink-0 min-w-[16rem] md:min-w-[16.2rem] md:absolute md:inset-0 transition-opacity duration-200 ${
-          isOpen
-            ? 'opacity-100 pointer-events-auto'
-            : 'opacity-100 pointer-events-auto md:opacity-0 md:pointer-events-none'
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-100 pointer-events-none md:opacity-0'
         }`}
       >
         <SidebarHeader isOpen={isOpen} onToggle={onToggle} themeId={themeId} />

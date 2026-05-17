@@ -112,7 +112,6 @@ export const usePdfViewer = (_file: UploadedFile) => {
   const handleRotate = () => setRotation((prev) => (prev + 90) % 360);
   const toggleSidebar = () => setShowSidebar((prev) => !prev);
 
-  // Helper to register page refs
   const setPageRef = useCallback((pageNum: number, element: HTMLDivElement | null) => {
     if (element) {
       pageRefs.current.set(pageNum, element);

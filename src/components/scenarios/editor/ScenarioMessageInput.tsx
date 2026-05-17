@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { User, Bot, Send } from 'lucide-react';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -10,7 +10,7 @@ interface ScenarioMessageInputProps {
   content: string;
   setContent: (content: string) => void;
   onAdd: () => void;
-  inputRef: React.RefObject<HTMLTextAreaElement>;
+  inputRef: RefObject<HTMLTextAreaElement>;
   readOnly: boolean;
 }
 

@@ -155,9 +155,8 @@ export const useChatInputKeyboard = ({
           return;
         }
 
-        const rawInput = inputText;
-        if (rawInput.startsWith('/')) {
-          const handledSlashCommand = slashCommandState.handleSlashCommandExecution(rawInput);
+        if (inputText.startsWith('/')) {
+          const handledSlashCommand = slashCommandState.handleSlashCommandExecution(inputText);
           if (handledSlashCommand) {
             event.preventDefault();
             return;

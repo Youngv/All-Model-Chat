@@ -37,7 +37,7 @@ interface UseChatInputSubmissionParams {
   canQueueMessageBase: boolean;
   submissionState: ChatInputSubmissionState;
   isNativeAudioModel: boolean;
-  liveAPI: LiveModeApi;
+  liveApi: LiveModeApi;
   onUpdateMessageContent: (messageId: string, content: string) => void;
   setEditingMessageId: (id: string | null) => void;
   onMessageSent: () => void;
@@ -60,7 +60,7 @@ export const useChatInputSubmission = ({
   canQueueMessageBase,
   submissionState,
   isNativeAudioModel,
-  liveAPI,
+  liveApi,
   onUpdateMessageContent,
   setEditingMessageId,
   onMessageSent,
@@ -89,7 +89,7 @@ export const useChatInputSubmission = ({
     setSelectedFiles,
     currentModelId: currentChatSettings.modelId,
     mediaResolution: currentChatSettings.mediaResolution,
-    liveAPI,
+    liveApi,
     onAddUserMessage,
     onSendMessage,
   });

@@ -3,7 +3,7 @@ import { setupTestRenderer } from '@/test/testUtils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_APP_SETTINGS } from '@/constants/appConstants';
 import { SettingsContent } from './SettingsContent';
-import type { SettingsTab } from '@/hooks/features/useSettingsLogic';
+import type { SettingsTab } from '@/stores/settingsUiStore';
 import type { ModelsSection } from './sections/ModelsSection';
 import type { GenerationSection } from './sections/GenerationSection';
 import type { ShortcutsSection } from './sections/ShortcutsSection';
@@ -275,7 +275,7 @@ describe('SettingsContent', () => {
     const updateSetting = vi.fn();
     const setAvailableModels = vi.fn();
     const handleModelChange = vi.fn();
-    const openAIModels = [
+    const openaiModels = [
       { id: 'gpt-5.5', name: 'GPT-5.5', isPinned: true },
       { id: 'gpt-4.1', name: 'GPT-4.1' },
     ];
@@ -291,7 +291,7 @@ describe('SettingsContent', () => {
             apiMode: 'openai-compatible',
             modelId: 'gemini-3-flash-preview',
             openaiCompatibleModelId: 'gpt-5.5',
-            openaiCompatibleModels: openAIModels,
+            openaiCompatibleModels: openaiModels,
           }}
           availableModels={geminiModels}
           updateSetting={updateSetting}

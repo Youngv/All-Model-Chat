@@ -65,7 +65,7 @@ describe('ChatInputArea default spacing', () => {
 
     expect(source).toContain('capabilities.isNativeAudioModel');
     expect(source).toContain('<video');
-    expect(source).toContain('ref={liveAPI.videoRef}');
+    expect(source).toContain('ref={liveApi.videoRef}');
     expect(source).toContain('autoPlay');
     expect(source).toContain('playsInline');
     expect(source).toContain('aria-hidden="true"');

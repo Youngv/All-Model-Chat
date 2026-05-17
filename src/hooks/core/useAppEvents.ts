@@ -28,7 +28,7 @@ interface AppEventsProps {
 
 const buildTabCycleAvailableModels = (appSettings: AppSettings, availableModels: ModelOption[]): ModelOption[] => {
   const seenIds = new Set<string>();
-  const openAICompatibleModels =
+  const openaiCompatibleModels =
     appSettings.isOpenAICompatibleApiEnabled === true
       ? appSettings.openaiCompatibleModels.map((model) => ({
           ...model,
@@ -36,7 +36,7 @@ const buildTabCycleAvailableModels = (appSettings: AppSettings, availableModels:
         }))
       : [];
 
-  return [...availableModels, ...openAICompatibleModels].filter((model) => {
+  return [...availableModels, ...openaiCompatibleModels].filter((model) => {
     if (seenIds.has(model.id)) {
       return false;
     }

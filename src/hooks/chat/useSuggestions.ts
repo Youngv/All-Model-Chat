@@ -1,6 +1,4 @@
-// hooks/chat/useSuggestions.ts
-import type React from 'react';
-import { useEffect, useRef, useCallback } from 'react';
+import { type MutableRefObject, useEffect, useRef, useCallback } from 'react';
 import { type AppSettings, type SavedChatSession, type ChatSettings as IndividualChatSettings } from '@/types';
 import { logService } from '@/services/logService';
 import { getGeminiKeyForRequest } from '@/utils/apiUtils';
@@ -21,7 +19,7 @@ interface SuggestionsProps {
   isLoading: boolean;
   updateMessageInSession: MessageUpdater;
   language: 'en' | 'zh';
-  sessionKeyMapRef?: React.MutableRefObject<Map<string, string>>;
+  sessionKeyMapRef?: MutableRefObject<Map<string, string>>;
 }
 
 export const useSuggestions = ({
@@ -42,10 +40,8 @@ export const useSuggestions = ({
       modelContent: string,
       sessionSettings: IndividualChatSettings,
     ) => {
-      // Show loading state
       updateMessageInSession(sessionId, messageId, { isGeneratingSuggestions: true });
 
-      // Sticky Key Logic: Prefer key used in the last turn
       const stickyKey = isOpenAICompatibleApiActive(appSettings)
         ? undefined
         : sessionKeyMapRef?.current?.get(sessionId);
@@ -54,11 +50,9 @@ export const useSuggestions = ({
       if (stickyKey) {
         keyToUse = stickyKey;
       } else {
-        // Use skipIncrement: true to avoid rotating API keys for background suggestions
         const keyResult = getGeminiKeyForRequest(appSettings, sessionSettings, { skipIncrement: true });
         if ('error' in keyResult) {
           logService.error('Cannot generate suggestions: API key not configured.');
-          // Hide loading state on error
           updateMessageInSession(sessionId, messageId, { isGeneratingSuggestions: false });
           return;
         }
@@ -70,12 +64,10 @@ export const useSuggestions = ({
         if (suggestions && suggestions.length > 0) {
           updateMessageInSession(sessionId, messageId, { suggestions, isGeneratingSuggestions: false });
         } else {
-          // Hide loading state if no suggestions are returned
           updateMessageInSession(sessionId, messageId, { isGeneratingSuggestions: false });
         }
       } catch (error) {
         logService.error('Suggestion generation failed in handler', { error });
-        // Hide loading state on error
         updateMessageInSession(sessionId, messageId, { isGeneratingSuggestions: false });
       }
     },
@@ -83,12 +75,10 @@ export const useSuggestions = ({
   );
 
   useEffect(() => {
-    // Trigger condition: loading just finished for the active chat
     if (prevIsLoadingRef.current && !isLoading && appSettings.isSuggestionsEnabled && activeChat) {
       const { id: sessionId, settings } = activeChat;
       const messages = getVisibleChatMessages(activeChat.messages);
 
-      // Filter out non-text models (Imagen, TTS, Audio, etc.)
       const capabilities = getModelCapabilities(settings.modelId);
 
       if (!capabilities.permissions.canGenerateSuggestions) {
@@ -101,17 +91,14 @@ export const useSuggestions = ({
       const lastMessage = messages[messages.length - 1];
       const secondLastMessage = messages[messages.length - 2];
 
-      // Condition: The last turn was a user message followed by a model response,
-      // and we haven't already fetched suggestions for it.
       if (
         lastMessage.role === 'model' &&
         !lastMessage.isLoading &&
-        !lastMessage.stoppedByUser && // Check if stopped by user
+        !lastMessage.stoppedByUser &&
         secondLastMessage.role === 'user' &&
         !lastMessage.suggestions &&
-        lastMessage.isGeneratingSuggestions === undefined // Check undefined to prevent re-triggering
+        lastMessage.isGeneratingSuggestions === undefined
       ) {
-        // Generate suggestions for the completed turn
         generateAndAttachSuggestions(
           sessionId,
           lastMessage.id,

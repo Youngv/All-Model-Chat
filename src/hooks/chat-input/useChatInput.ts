@@ -11,7 +11,7 @@ import { useChatInputTranslation } from './useChatInputTranslation';
 import { getChatInputAvailability, getCurrentChatInputMode } from './chatInputAvailability';
 
 export const useChatInput = () => {
-  const { t, chatInput, inputState, fileRefs, targetDocument, insertText, capabilities, liveAPI } = useChatInputCore();
+  const { t, chatInput, inputState, fileRefs, targetDocument, insertText, capabilities, liveApi } = useChatInputCore();
   const {
     appSettings,
     currentChatSettings,
@@ -153,7 +153,7 @@ export const useChatInput = () => {
       textareaRef: inputState.textareaRef,
     },
     isNativeAudioModel: capabilities.isNativeAudioModel,
-    liveAPI,
+    liveApi,
     onUpdateMessageContent,
     setEditingMessageId,
     onMessageSent,
@@ -165,7 +165,7 @@ export const useChatInput = () => {
     inputState,
     localFileState,
     capabilities,
-    liveAPI,
+    liveApi,
     activeQueuedSubmission,
     canQueueMessage,
     isEditing,
@@ -311,7 +311,7 @@ export const useChatInput = () => {
     chatInput,
     inputState,
     capabilities,
-    liveAPI,
+    liveApi,
     modalsState,
     localFileState,
     voiceState,

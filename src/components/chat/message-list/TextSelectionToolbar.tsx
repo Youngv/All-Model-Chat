@@ -1,15 +1,13 @@
 import { logService } from '@/services/logService';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type RefObject } from 'react';
 import { type translations } from '@/i18n/translations';
 import { useSettingsStore } from '@/stores/settingsStore';
 
-// Hooks
 import { useSelectionPosition } from '@/hooks/text-selection/useSelectionPosition';
 import { useSelectionDrag } from '@/hooks/text-selection/useSelectionDrag';
 import { useSelectionAudio } from '@/hooks/text-selection/useSelectionAudio';
 import { writeSelectionTextToClipboard } from '@/hooks/text-selection/selectionClipboard';
 
-// Components
 import { ToolbarContainer } from './text-selection/ToolbarContainer';
 import { AudioPlayerView } from './text-selection/AudioPlayerView';
 import { StandardActionsView } from './text-selection/StandardActionsView';
@@ -18,7 +16,7 @@ interface TextSelectionToolbarProps {
   onQuote: (text: string) => void;
   onInsert?: (text: string) => void;
   onTTS?: (text: string) => Promise<string | null>;
-  containerRef: React.RefObject<HTMLElement> | HTMLElement | null;
+  containerRef: RefObject<HTMLElement> | HTMLElement | null;
   t?: (key: keyof typeof translations) => string;
 }
 
@@ -54,10 +52,8 @@ export const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({
     };
   }, []);
 
-  // 1. Audio Logic
   const audioState = useSelectionAudio();
 
-  // 2. Position Logic
   const { position, setPosition, selectedText, selectedCopyText, clearSelection } = useSelectionPosition({
     containerRef,
     isAudioActive: audioState.isPlaying || audioState.isLoading,
@@ -66,14 +62,11 @@ export const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({
     preserveFormattingOnCopy,
   });
 
-  // 3. Drag Logic
   const { handleDragStart, isDragging } = useSelectionDrag({
     toolbarRef,
     position,
     onPositionChange: setPosition,
   });
-
-  // --- Actions Handlers ---
 
   const handleQuoteClick = (e: React.MouseEvent) => {
     e.preventDefault();

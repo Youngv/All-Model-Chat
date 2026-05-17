@@ -37,21 +37,19 @@ export const ScenarioList: React.FC<ScenarioListProps> = ({
   const filteredScenarios = useMemo(() => {
     let list = scenarios;
 
-    // Filter by Tab
     if (activeTab === 'mine') {
-      list = list.filter((s) => !systemScenarioIds.includes(s.id));
+      list = list.filter((scenario) => !systemScenarioIds.includes(scenario.id));
     } else if (activeTab === 'system') {
-      list = list.filter((s) => systemScenarioIds.includes(s.id));
+      list = list.filter((scenario) => systemScenarioIds.includes(scenario.id));
     }
 
-    // Filter by Search
     if (searchQuery.trim()) {
       const lowerQuery = searchQuery.toLowerCase();
       list = list.filter(
-        (s) =>
-          s.title.toLowerCase().includes(lowerQuery) ||
-          s.messages.some((m) => m.content.toLowerCase().includes(lowerQuery)) ||
-          (s.systemInstruction && s.systemInstruction.toLowerCase().includes(lowerQuery)),
+        (scenario) =>
+          scenario.title.toLowerCase().includes(lowerQuery) ||
+          scenario.messages.some((message) => message.content.toLowerCase().includes(lowerQuery)) ||
+          (scenario.systemInstruction && scenario.systemInstruction.toLowerCase().includes(lowerQuery)),
       );
     }
 
@@ -66,9 +64,7 @@ export const ScenarioList: React.FC<ScenarioListProps> = ({
 
   return (
     <div className="flex flex-col h-full space-y-4">
-      {/* Controls Container */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-shrink-0">
-        {/* Search Bar */}
         <div className="relative flex-grow group">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--theme-text-tertiary)] group-focus-within:text-[var(--theme-text-primary)] transition-colors">
             <Search size={18} />
@@ -82,7 +78,6 @@ export const ScenarioList: React.FC<ScenarioListProps> = ({
           />
         </div>
 
-        {/* Tabs - Segmented Control */}
         <div className="flex p-1 bg-[var(--theme-bg-input)] border border-[var(--theme-border-secondary)] rounded-xl sm:w-auto w-full self-start sm:self-auto overflow-x-auto no-scrollbar">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -112,7 +107,6 @@ export const ScenarioList: React.FC<ScenarioListProps> = ({
         </div>
       </div>
 
-      {/* Grid Content */}
       <div className="flex-grow overflow-y-auto custom-scrollbar pr-1 pb-4 min-h-0">
         {filteredScenarios.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-[var(--theme-text-tertiary)]">
@@ -131,12 +125,12 @@ export const ScenarioList: React.FC<ScenarioListProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-20 sm:pb-0">
-            {filteredScenarios.map((s) => {
-              const isSystem = systemScenarioIds.includes(s.id);
+            {filteredScenarios.map((scenario) => {
+              const isSystem = systemScenarioIds.includes(scenario.id);
               return (
                 <ScenarioItem
-                  key={s.id}
-                  scenario={s}
+                  key={scenario.id}
+                  scenario={scenario}
                   isSystem={isSystem}
                   onLoad={onLoad}
                   onEdit={isSystem ? undefined : onEdit}

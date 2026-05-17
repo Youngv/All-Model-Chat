@@ -32,19 +32,18 @@ export const HeaderModelSelector: React.FC<HeaderModelSelectorProps> = ({
   onToggleGemmaReasoning,
 }) => {
   const { t } = useI18n();
-  const displayModelName = currentModelName;
 
   const abbreviatedModelName = useMemo(() => {
-    if (!displayModelName) return '';
-    if (displayModelName === t('loading')) return displayModelName;
+    if (!currentModelName) return '';
+    if (currentModelName === t('loading')) return currentModelName;
 
-    let name = displayModelName;
+    let name = currentModelName;
     name = name.replace(/^Gemini\s+/i, '');
     name = name.replace(/\s+Preview/i, '');
     name = name.replace(/\s+Latest/i, '');
 
     return name;
-  }, [displayModelName, t]);
+  }, [currentModelName, t]);
 
   const isSelectorDisabled = availableModels.length === 0 || isLoading || isSwitchingModel;
 
@@ -83,8 +82,8 @@ export const HeaderModelSelector: React.FC<HeaderModelSelectorProps> = ({
             onClick={() => setIsOpen(!isOpen)}
             disabled={isSelectorDisabled}
             className={`min-h-9 flex items-center gap-2 rounded-xl px-2 sm:px-3 bg-transparent hover:bg-[var(--theme-bg-tertiary)] text-[var(--theme-text-primary)] font-medium text-base transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--theme-bg-primary)] focus-visible:ring-[var(--theme-border-focus)] disabled:opacity-70 disabled:cursor-not-allowed border border-transparent hover:border-[var(--theme-border-secondary)] active:bg-[var(--theme-bg-tertiary)] ${isSwitchingModel ? 'animate-pulse' : ''}`}
-            title={`${t('headerModelSelectorTooltip_current')}: ${displayModelName}. ${t('headerModelSelectorTooltip_action')}`}
-            aria-label={`${t('headerModelAriaLabel_current')}: ${displayModelName}. ${t('headerModelAriaLabel_action')}`}
+            title={`${t('headerModelSelectorTooltip_current')}: ${currentModelName}. ${t('headerModelSelectorTooltip_action')}`}
+            aria-label={`${t('headerModelAriaLabel_current')}: ${currentModelName}. ${t('headerModelAriaLabel_action')}`}
             aria-haspopup="listbox"
             aria-expanded={isOpen}
           >

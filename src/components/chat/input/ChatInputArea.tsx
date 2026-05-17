@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/refs */
 import React from 'react';
 import { ChatInputToolbar } from './ChatInputToolbar';
 import { ChatInputActions } from './ChatInputActions';
@@ -20,7 +19,7 @@ export const ChatInputArea: React.FC = () => {
     chatInput,
     inputState,
     capabilities,
-    liveAPI,
+    liveApi,
     modalsState,
     localFileState,
     voiceState,
@@ -80,7 +79,7 @@ export const ChatInputArea: React.FC = () => {
     <div className={wrapperClass} aria-hidden={isUIBlocked}>
       {capabilities.isNativeAudioModel && (
         <video
-          ref={liveAPI.videoRef}
+          ref={liveApi.videoRef}
           autoPlay
           muted
           playsInline
@@ -110,12 +109,12 @@ export const ChatInputArea: React.FC = () => {
         </div>
 
         <LiveStatusBanner
-          isConnected={liveAPI.isConnected}
-          isSpeaking={liveAPI.isSpeaking}
-          isReconnecting={liveAPI.isReconnecting}
-          volume={liveAPI.volume}
-          error={liveAPI.error}
-          onDisconnect={liveAPI.disconnect}
+          isConnected={liveApi.isConnected}
+          isSpeaking={liveApi.isSpeaking}
+          isReconnecting={liveApi.isReconnecting}
+          volume={liveApi.volume}
+          error={liveApi.error}
+          onDisconnect={liveApi.disconnect}
         />
 
         <form onSubmit={handlers.handleSubmit} className={formClass}>

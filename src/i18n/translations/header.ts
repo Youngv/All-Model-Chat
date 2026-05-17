@@ -1,5 +1,4 @@
 export const headerTranslations = {
-  // Header.tsx
   historySidebarClose: { en: 'Close history sidebar', zh: '关闭历史记录侧边栏' },
   historySidebarOpen: { en: 'Open history sidebar', zh: '打开历史记录侧边栏' },
   historySidebarClose_short: { en: 'Close History', zh: '关闭历史' },

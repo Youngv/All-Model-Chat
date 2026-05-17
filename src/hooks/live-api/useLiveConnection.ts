@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, type MutableRefObject } from 'react';
 import type { LiveServerMessage, Part, Session as LiveSession, Tool } from '@google/genai';
 import { float32ToPCM16Base64 } from '@/features/audio/audioProcessing';
 import { getLiveApiClient, LiveApiAuthConfigurationError } from '@/services/api/liveApiAuth';
@@ -23,8 +23,8 @@ interface UseLiveConnectionProps {
   onClose?: () => void;
   onTranscript?: LiveTranscriptHandler;
   setSessionHandle: (handle: string | null) => void;
-  sessionHandleRef: React.MutableRefObject<string | null>;
-  sessionRef: React.MutableRefObject<Promise<LiveSession> | null>;
+  sessionHandleRef: MutableRefObject<string | null>;
+  sessionRef: MutableRefObject<Promise<LiveSession> | null>;
 }
 
 export const useLiveConnection = ({
@@ -54,7 +54,6 @@ export const useLiveConnection = ({
   const setupCompleteResolveRef = useRef<(() => void) | null>(null);
   const setupCompleteRejectRef = useRef<((error: Error) => void) | null>(null);
 
-  // Reconnection Refs
   const retryCountRef = useRef(0);
   const isUserDisconnectRef = useRef(false);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -125,7 +124,7 @@ export const useLiveConnection = ({
     reconnectTimeoutRef.current = setTimeout(() => {
       reconnectTimeoutRef.current = null;
       retryCountRef.current++;
-      connectRef.current(); // Call the latest connect function
+      connectRef.current();
     }, delay);
   }, [resetAudioState, setIsConnected, setIsReconnecting, stopVideo, setTranslationError]);
 
@@ -421,7 +420,8 @@ export const useLiveConnection = ({
     setIsConnected(false);
     setIsReconnecting(false);
     setErrorState(null);
-    setSessionHandle(null); // Clear session handle on manual disconnect to start fresh next time
+    // Manual disconnects should not resume the previous Live API session handle.
+    setSessionHandle(null);
     sessionHandleRef.current = null;
 
     if (onClose) onClose();
@@ -446,15 +446,11 @@ export const useLiveConnection = ({
     disconnectRef.current = disconnect;
   }, [disconnect]);
 
-  // Cleanup on unmount
   useEffect(() => {
-    const connectedRef = isConnectedRef;
-    const reconnectingRef = isReconnectingRef;
-    const connectingRef = isConnectingRef;
-
     return () => {
       isUserDisconnectRef.current = true;
-      if (connectedRef.current || reconnectingRef.current || connectingRef.current) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- Unmount cleanup needs the latest connection flags from stable refs.
+      if (isConnectedRef.current || isReconnectingRef.current || isConnectingRef.current) {
         disconnectRef.current();
       }
     };

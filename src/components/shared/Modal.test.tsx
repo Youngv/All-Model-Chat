@@ -1,4 +1,5 @@
 import { act } from 'react';
+import { fireEvent } from '@testing-library/react';
 import { setupTestRenderer } from '@/test/testUtils';
 import { describe, expect, it, vi } from 'vitest';
 import { Modal } from './Modal';
@@ -9,16 +10,59 @@ describe('Modal', () => {
   it('uses Tailwind v4 compatible default backdrop classes', () => {
     act(() => {
       renderer.root.render(
-        <Modal isOpen onClose={() => {}}>
+        <Modal isOpen onClose={() => {}} ariaLabel="Test dialog">
           <div>Content</div>
         </Modal>,
       );
     });
 
+    const backdrop = document.querySelector('[data-modal-backdrop="true"]');
+    expect(backdrop).not.toBeNull();
+    expect(backdrop?.className).toContain('bg-black/60');
+    expect(backdrop?.className).not.toContain('bg-opacity-60');
+  });
+
+  it('labels the dialog, moves focus inside, traps tab focus, and restores focus on close', () => {
+    const onClose = vi.fn();
+    const launcher = document.createElement('button');
+    launcher.textContent = 'Open modal';
+    document.body.appendChild(launcher);
+    launcher.focus();
+
+    act(() => {
+      renderer.root.render(
+        <Modal isOpen onClose={onClose} ariaLabel="Accessible dialog">
+          <button type="button">First action</button>
+          <button type="button">Second action</button>
+        </Modal>,
+      );
+    });
+
     const dialog = document.querySelector('[role="dialog"]');
+    const [firstAction, secondAction] = Array.from(dialog?.querySelectorAll<HTMLButtonElement>('button') ?? []);
+
     expect(dialog).not.toBeNull();
-    expect(dialog?.className).toContain('bg-black/60');
-    expect(dialog?.className).not.toContain('bg-opacity-60');
+    expect(dialog?.getAttribute('aria-label')).toBe('Accessible dialog');
+    expect(document.activeElement).toBe(firstAction);
+
+    firstAction?.focus();
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(secondAction);
+
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(document.activeElement).toBe(firstAction);
+
+    act(() => {
+      renderer.root.render(
+        <Modal isOpen={false} onClose={onClose} ariaLabel="Accessible dialog">
+          <button type="button">First action</button>
+          <button type="button">Second action</button>
+        </Modal>,
+      );
+    });
+
+    expect(document.activeElement).toBe(launcher);
+    launcher.remove();
   });
 
   it('waits for the exit animation event before unmounting', () => {

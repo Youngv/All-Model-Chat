@@ -35,7 +35,7 @@ const createSubmissionParams = () => {
       textareaRef: { current: textarea },
     },
     isNativeAudioModel: false,
-    liveAPI: {
+    liveApi: {
       isConnected: false,
       connect: vi.fn(async () => true),
       sendText: vi.fn(async () => true),

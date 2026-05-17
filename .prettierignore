@@ -1,4 +1,10 @@
 node_modules/
 dist/
+server/dist/
 coverage/
+playwright-report/
+test-results/
+.playwright-visible-demo-profile/
+tmp-live-artifact-demo/
+.worktrees/
 *.min.js

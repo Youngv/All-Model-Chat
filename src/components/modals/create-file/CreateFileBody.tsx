@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { LazyMarkdownRenderer } from '@/components/message/LazyMarkdownRenderer';
 
@@ -6,7 +6,7 @@ interface CreateFileBodyProps {
   textContent: string;
   setTextContent: (text: string) => void;
   debouncedContent: string;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  textareaRef: RefObject<HTMLTextAreaElement>;
   isPreviewMode: boolean;
   supportsRichPreview: boolean;
   handlePaste: (e: React.ClipboardEvent<HTMLTextAreaElement>) => void;

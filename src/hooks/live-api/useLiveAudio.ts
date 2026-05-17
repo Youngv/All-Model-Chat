@@ -42,11 +42,9 @@ export const useLiveAudio = () => {
     async (onAudioData: (data: Float32Array) => void) => {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
-      // Output Context (Playback)
       const audioCtx = new AudioContextClass({ sampleRate: 24000 });
       audioContextRef.current = audioCtx;
 
-      // Input Context (Microphone)
       const inputCtx = new AudioContextClass({ sampleRate: 16000 });
       inputContextRef.current = inputCtx;
 
@@ -60,7 +58,6 @@ export const useLiveAudio = () => {
       });
       streamRef.current = stream;
 
-      // Apply initial mute state
       stream.getAudioTracks().forEach((track) => {
         track.enabled = !isMutedRef.current;
       });
@@ -72,7 +69,6 @@ export const useLiveAudio = () => {
       const source = inputCtx.createMediaStreamSource(stream);
       inputSourceRef.current = source;
 
-      // AudioWorklet Setup
       const blob = new Blob([audioWorkletCode], { type: 'application/javascript' });
       const blobUrl = createManagedObjectUrl(blob);
 
@@ -85,7 +81,6 @@ export const useLiveAudio = () => {
       const workletNode = new AudioWorkletNode(inputCtx, 'pcm-processor');
       processorRef.current = workletNode;
 
-      // Handle Worklet Messages (Volume + Data)
       workletNode.port.onmessage = (e) => {
         // If muted, we effectively send silence or nothing.
         // However, track.enabled = false usually stops data flow at the source level (OS/Browser).
@@ -102,7 +97,6 @@ export const useLiveAudio = () => {
           return;
         }
 
-        // Calculate Volume
         let sum = 0;
         const sampleCount = inputData.length;
         const step = Math.ceil(sampleCount / 100);
@@ -112,7 +106,6 @@ export const useLiveAudio = () => {
         const rms = Math.sqrt(sum / (sampleCount / step));
         setVolume(rms);
 
-        // Pass data to callback (for sending to API)
         onAudioData(inputData);
       };
 
@@ -195,13 +188,11 @@ export const useLiveAudio = () => {
     clearOutputAudioTail();
     outputAudioActiveRef.current = false;
 
-    // Stop Microphone
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
 
-    // Disconnect Input Nodes
     if (processorRef.current) {
       processorRef.current.disconnect();
       processorRef.current = null;
@@ -211,7 +202,6 @@ export const useLiveAudio = () => {
       inputSourceRef.current = null;
     }
 
-    // Close Contexts
     if (audioContextRef.current) {
       audioContextRef.current.close().catch(() => {});
       audioContextRef.current = null;
@@ -222,7 +212,7 @@ export const useLiveAudio = () => {
     }
 
     setVolume(0);
-    setIsMuted(false); // Reset mute state on cleanup
+    setIsMuted(false);
   }, [clearOutputAudioTail, setIsMuted, stopAudioPlayback]);
 
   return {

@@ -26,21 +26,21 @@ const useLatestCallback = <Args extends unknown[], ReturnValue>(callback: (...ar
 export const ChatInputProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { t } = useI18n();
   const logic = useChatInput();
-  const { inputState, localFileState, voiceState, liveAPI, queuedSubmission, handlers, isAnyModalOpen } = logic;
+  const { inputState, localFileState, voiceState, liveApi, queuedSubmission, handlers, isAnyModalOpen } = logic;
 
   const handleStartLiveCamera = React.useCallback(async () => {
-    const didStart = await liveAPI.startCamera();
-    if (didStart && !liveAPI.isConnected) {
-      await liveAPI.connect();
+    const didStart = await liveApi.startCamera();
+    if (didStart && !liveApi.isConnected) {
+      await liveApi.connect();
     }
-  }, [liveAPI]);
+  }, [liveApi]);
 
   const handleStartLiveScreenShare = React.useCallback(async () => {
-    const didStart = await liveAPI.startScreenShare();
-    if (didStart && !liveAPI.isConnected) {
-      await liveAPI.connect();
+    const didStart = await liveApi.startScreenShare();
+    if (didStart && !liveApi.isConnected) {
+      await liveApi.connect();
     }
-  }, [liveAPI]);
+  }, [liveApi]);
 
   const inputDisabled =
     isAnyModalOpen ||
@@ -56,12 +56,12 @@ export const ChatInputProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const onRecordButtonClick = useLatestCallback(voiceState.handleVoiceInputClick);
   const onCancelRecording = useLatestCallback(voiceState.handleCancelRecording);
   const onToggleFullscreen = useLatestCallback(inputState.handleToggleFullscreen);
-  const onStartLiveSession = useLatestCallback(() => liveAPI.connect());
-  const onDisconnectLiveSession = useLatestCallback(() => liveAPI.disconnect());
-  const onToggleLiveMute = useLatestCallback(() => liveAPI.toggleMute());
+  const onStartLiveSession = useLatestCallback(() => liveApi.connect());
+  const onDisconnectLiveSession = useLatestCallback(() => liveApi.disconnect());
+  const onToggleLiveMute = useLatestCallback(() => liveApi.toggleMute());
   const onStartLiveCamera = useLatestCallback(() => handleStartLiveCamera());
   const onStartLiveScreenShare = useLatestCallback(() => handleStartLiveScreenShare());
-  const onStopLiveVideo = useLatestCallback(() => liveAPI.stopVideo());
+  const onStopLiveVideo = useLatestCallback(() => liveApi.stopVideo());
   const onToggleToolAndFocus = useLatestCallback(handlers.handleToggleToolAndFocus);
   const onCountTokens = useLatestCallback(() => localFileState.setShowTokenModal(true));
   const onAddFileByIdSubmit = useLatestCallback(handlers.handleAddFileByIdSubmit);
@@ -165,13 +165,13 @@ export const ChatInputProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       isFullscreen: inputState.isFullscreen,
       onStartLiveSession,
       onDisconnectLiveSession,
-      isLiveConnected: liveAPI.isConnected,
-      isLiveMuted: liveAPI.isMuted,
+      isLiveConnected: liveApi.isConnected,
+      isLiveMuted: liveApi.isMuted,
       onToggleLiveMute,
       onStartLiveCamera,
       onStartLiveScreenShare,
       onStopLiveVideo,
-      liveVideoSource: liveAPI.videoSource,
+      liveVideoSource: liveApi.videoSource,
       onToggleToolAndFocus,
       onCountTokens,
       isImageModel: logic.capabilities.isImagenModel || false,
@@ -189,9 +189,9 @@ export const ChatInputProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       inputState.isFullscreen,
       inputState.isTranslating,
       inputState.isWaitingForUpload,
-      liveAPI.isConnected,
-      liveAPI.isMuted,
-      liveAPI.videoSource,
+      liveApi.isConnected,
+      liveApi.isMuted,
+      liveApi.videoSource,
       logic.capabilities.isImagenModel,
       logic.capabilities.isNativeAudioModel,
       logic.capabilities.isRealImagenModel,

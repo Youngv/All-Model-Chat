@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, type RefObject } from 'react';
 
 export const useTextAreaInsert = (
-  textareaRef: React.RefObject<HTMLTextAreaElement>,
+  textareaRef: RefObject<HTMLTextAreaElement>,
   setInputText: React.Dispatch<React.SetStateAction<string>>,
 ) => {
   const insertText = useCallback(

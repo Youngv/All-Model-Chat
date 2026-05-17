@@ -1,6 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useCallback, useContext, useMemo } from 'react';
-import type { DragEvent, ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, type DragEvent, type ReactNode } from 'react';
 import type { Part } from '@google/genai';
 
 import type { AppViewModel } from '@/hooks/app/useApp';
@@ -129,7 +127,7 @@ const buildHeaderModels = (
 ) => {
   const seenIds = new Set<string>();
   const geminiModels = apiModels.map((model) => ({ ...model, apiMode: 'gemini-native' as const }));
-  const openAICompatibleModels =
+  const openaiCompatibleModels =
     appSettings.isOpenAICompatibleApiEnabled === true
       ? appSettings.openaiCompatibleModels.map((model) => ({
           ...model,
@@ -137,7 +135,7 @@ const buildHeaderModels = (
         }))
       : [];
 
-  return [...geminiModels, ...openAICompatibleModels].filter((model) => {
+  return [...geminiModels, ...openaiCompatibleModels].filter((model) => {
     if (seenIds.has(model.id)) {
       return false;
     }
@@ -257,7 +255,7 @@ const useChatRuntimeValues = (app: AppViewModel): ChatRuntimeValues => {
 
   const currentModelName = getCurrentModelDisplayName();
   const isOpenAICompatibleMode = isOpenAICompatibleApiActive(appSettings);
-  const openAICompatibleModelIds = useMemo(
+  const openaiCompatibleModelIds = useMemo(
     () =>
       new Set(
         appSettings.isOpenAICompatibleApiEnabled === true
@@ -276,7 +274,7 @@ const useChatRuntimeValues = (app: AppViewModel): ChatRuntimeValues => {
     : chatState.currentChatSettings.modelId || appSettings.modelId;
   const handleHeaderSelectModel = useCallback(
     (modelId: string) => {
-      const isOpenAICompatibleModel = openAICompatibleModelIds.has(modelId);
+      const isOpenAICompatibleModel = openaiCompatibleModelIds.has(modelId);
       const isGeminiModel = geminiModelIds.has(modelId);
 
       if (
@@ -306,7 +304,7 @@ const useChatRuntimeValues = (app: AppViewModel): ChatRuntimeValues => {
       appSettings.isOpenAICompatibleApiEnabled,
       geminiModelIds,
       isOpenAICompatibleMode,
-      openAICompatibleModelIds,
+      openaiCompatibleModelIds,
       setAppSettings,
     ],
   );

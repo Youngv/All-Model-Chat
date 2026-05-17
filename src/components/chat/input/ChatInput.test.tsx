@@ -142,8 +142,8 @@ vi.mock('@/hooks/useVoiceInput', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useLiveAPI', () => ({
-  useLiveAPI: () => mockLiveApiState,
+vi.mock('@/hooks/useLiveApi', () => ({
+  useLiveApi: () => mockLiveApiState,
 }));
 
 vi.mock('@/utils/apiUtils', () => ({
@@ -218,7 +218,7 @@ vi.mock('./ChatInputArea', async () => {
       chatInput,
       inputState,
       handlers,
-      liveAPI,
+      liveApi,
       localFileState,
       inputDisabled,
       canQueueMessage,
@@ -243,9 +243,9 @@ vi.mock('./ChatInputArea', async () => {
           </div>
         ) : null}
         <div data-testid="live-status">
-          <span data-testid="live-connected">{String(liveAPI.isConnected)}</span>
-          <span data-testid="live-reconnecting">{String(liveAPI.isReconnecting)}</span>
-          <span data-testid="live-error">{liveAPI.error ?? ''}</span>
+          <span data-testid="live-connected">{String(liveApi.isConnected)}</span>
+          <span data-testid="live-reconnecting">{String(liveApi.isReconnecting)}</span>
+          <span data-testid="live-error">{liveApi.error ?? ''}</span>
         </div>
         <textarea
           data-testid="chat-input-textarea"

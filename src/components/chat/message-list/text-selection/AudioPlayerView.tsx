@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, type RefObject } from 'react';
 import { GripVertical, X, Loader2, Pause, Play } from 'lucide-react';
 import { useI18n } from '@/contexts/I18nContext';
 
 interface AudioPlayerViewProps {
   audioUrl: string | null;
   isLoading: boolean;
-  audioRef: React.RefObject<HTMLAudioElement>;
+  audioRef: RefObject<HTMLAudioElement>;
   onDragStart: (e: React.MouseEvent) => void;
   onClose: (e: React.MouseEvent) => void;
 }
@@ -23,11 +23,14 @@ export const AudioPlayerView: React.FC<AudioPlayerViewProps> = ({
   const [currentTime, setCurrentTime] = useState(0);
 
   const formatTime = (time: number) => {
-    if (!time || Number.isNaN(time)) return '0:00';
+    if (!time || Number.isNaN(time) || !Number.isFinite(time)) return '0:00';
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
+
+  const progressPercent =
+    duration > 0 && Number.isFinite(duration) ? Math.min(100, Math.max(0, (currentTime / duration) * 100)) : 0;
 
   const togglePlayback = () => {
     const audio = audioRef.current;
@@ -51,9 +54,11 @@ export const AudioPlayerView: React.FC<AudioPlayerViewProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-[var(--theme-text-primary)]">
-        <Loader2 size={14} className="animate-spin text-[var(--theme-text-link)]" />
-        <span>{t('generating_audio')}</span>
+      <div className="flex h-11 items-center gap-2.5 rounded-full border border-[var(--theme-border-secondary)] bg-[var(--theme-bg-primary)]/95 px-3 py-1.5 text-xs font-medium text-[var(--theme-text-primary)] shadow-[0_10px_28px_rgba(0,0,0,0.16)] backdrop-blur-xl">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--theme-border-secondary)] bg-[var(--theme-bg-secondary)] text-[var(--theme-text-link)] shadow-sm">
+          <Loader2 size={14} className="animate-spin" />
+        </span>
+        <span className="pr-1 text-[var(--theme-text-secondary)]">{t('generating_audio')}</span>
       </div>
     );
   }
@@ -61,13 +66,17 @@ export const AudioPlayerView: React.FC<AudioPlayerViewProps> = ({
   if (!audioUrl) return null;
 
   return (
-    <div className="flex w-[min(22rem,calc(100vw-2rem))] items-center gap-2 pl-1 pr-2 py-1">
+    <div
+      aria-label="Text selection audio player"
+      data-audio-player-surface
+      className="flex h-11 w-[min(24rem,calc(100vw-1rem))] items-center gap-2 rounded-full border border-[var(--theme-border-secondary)] bg-[var(--theme-bg-primary)]/95 py-1.5 pl-1.5 pr-2 shadow-[0_12px_34px_rgba(0,0,0,0.18)] backdrop-blur-xl ring-1 ring-white/10 dark:ring-white/5"
+    >
       <div
         onMouseDown={onDragStart}
-        className="cursor-grab active:cursor-grabbing p-1 text-[var(--theme-text-tertiary)] hover:text-[var(--theme-text-primary)] transition-colors touch-none"
+        className="flex h-8 w-5 cursor-grab touch-none items-center justify-center rounded-full text-[var(--theme-text-tertiary)] transition-colors hover:bg-[var(--theme-bg-secondary)] hover:text-[var(--theme-text-secondary)] active:cursor-grabbing"
         title={t('drag_to_move')}
       >
-        <GripVertical size={14} />
+        <GripVertical size={13} />
       </div>
 
       <audio
@@ -75,7 +84,10 @@ export const AudioPlayerView: React.FC<AudioPlayerViewProps> = ({
         src={audioUrl}
         autoPlay
         className="hidden"
-        onLoadedMetadata={() => setDuration(audioRef.current?.duration || 0)}
+        onLoadedMetadata={() => {
+          const nextDuration = audioRef.current?.duration ?? 0;
+          setDuration(Number.isFinite(nextDuration) ? nextDuration : 0);
+        }}
         onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
@@ -88,7 +100,7 @@ export const AudioPlayerView: React.FC<AudioPlayerViewProps> = ({
       <button
         type="button"
         onClick={togglePlayback}
-        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--theme-bg-tertiary)] text-[var(--theme-text-primary)] transition-colors hover:bg-[var(--theme-bg-input)] focus:outline-none focus:ring-2 focus:ring-[var(--theme-border-focus)]"
+        className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-full border border-[var(--theme-border-secondary)] bg-[var(--theme-bg-secondary)] text-[var(--theme-text-primary)] shadow-sm transition-all hover:border-[var(--theme-border-focus)] hover:bg-[var(--theme-bg-tertiary)] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--theme-border-focus)] focus:ring-offset-2 focus:ring-offset-[var(--theme-bg-primary)]"
         aria-label={isPlaying ? t('audioPlayer_pause') : t('audioPlayer_play')}
       >
         {isPlaying ? (
@@ -98,28 +110,52 @@ export const AudioPlayerView: React.FC<AudioPlayerViewProps> = ({
         )}
       </button>
 
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <input
-          type="range"
-          min="0"
-          max={duration || 100}
-          value={currentTime}
-          onChange={handleSeek}
-          disabled={!duration}
-          className="h-1 min-w-0 flex-1 accent-[var(--theme-text-link)]"
-          aria-label={t('audioPlayer_playback_progress')}
-        />
-        <span className="w-16 flex-shrink-0 text-right font-mono text-[11px] tabular-nums text-[var(--theme-text-tertiary)]">
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </span>
+      <div className="flex min-w-0 flex-1 items-center gap-2.5 rounded-full border border-[var(--theme-border-secondary)] bg-[var(--theme-bg-secondary)]/60 px-2.5 py-1.5">
+        <div className="relative h-5 min-w-24 flex-1">
+          <div
+            data-audio-progress-track
+            className="absolute left-0 right-0 top-1/2 h-1.5 -translate-y-1/2 overflow-hidden rounded-full bg-[var(--theme-bg-tertiary)] shadow-inner"
+          >
+            <div
+              data-audio-progress-fill
+              className="h-full rounded-full bg-[var(--theme-text-link)] transition-[width] duration-100 ease-linear"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <div
+            data-audio-progress-thumb
+            className="pointer-events-none absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--theme-bg-primary)] bg-[var(--theme-text-link)] opacity-90 shadow-[0_1px_5px_rgba(0,0,0,0.28)] transition-[left] duration-100 ease-linear"
+            style={{ left: `${progressPercent}%` }}
+          />
+          <input
+            type="range"
+            min="0"
+            max={duration || 100}
+            value={currentTime}
+            onChange={handleSeek}
+            disabled={!duration}
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-default"
+            aria-label={t('audioPlayer_playback_progress')}
+          />
+        </div>
+
+        <div className="flex w-12 flex-shrink-0 flex-col items-end gap-0.5 border-l border-[var(--theme-border-secondary)] pl-2 font-mono text-[10px] leading-none tabular-nums">
+          <span data-audio-time-readout className="text-[var(--theme-text-primary)]">
+            {formatTime(currentTime)}
+          </span>
+          <span data-audio-time-readout className="text-[var(--theme-text-tertiary)]">
+            {formatTime(duration)}
+          </span>
+        </div>
       </div>
 
       <button
+        type="button"
         onClick={onClose}
-        className="p-1.5 rounded-full text-[var(--theme-text-tertiary)] hover:text-[var(--theme-text-primary)] hover:bg-[var(--theme-bg-tertiary)] ml-1"
+        className="ml-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[var(--theme-text-tertiary)] transition-colors hover:bg-[var(--theme-bg-secondary)] hover:text-[var(--theme-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--theme-border-focus)]"
         aria-label={t('close')}
       >
-        <X size={16} />
+        <X size={14} />
       </button>
     </div>
   );

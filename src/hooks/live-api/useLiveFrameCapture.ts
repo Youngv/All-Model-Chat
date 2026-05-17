@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type MutableRefObject } from 'react';
 import type { Session as LiveSession } from '@google/genai';
 
 interface UseLiveFrameCaptureProps {
@@ -8,7 +8,7 @@ interface UseLiveFrameCaptureProps {
   volume: number;
   isMuted: boolean;
   captureFrame: () => string | null;
-  sessionRef: React.MutableRefObject<Promise<LiveSession> | null>;
+  sessionRef: MutableRefObject<Promise<LiveSession> | null>;
 }
 
 export const useLiveFrameCapture = ({

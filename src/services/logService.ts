@@ -393,7 +393,6 @@ class LogServiceImpl {
     this.queueLog(this.createLogEntry('DEBUG', category, message, data));
   }
 
-  // Helper to extract stack traces
   private serializeError(error: unknown): unknown {
     if (error instanceof Error) {
       const normalizedError = error as Error & { cause?: unknown };

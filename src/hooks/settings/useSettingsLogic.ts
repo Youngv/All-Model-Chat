@@ -4,9 +4,7 @@ import { DEFAULT_APP_SETTINGS } from '@/constants/appConstants';
 import { logService } from '@/services/logService';
 import { resolveModelSwitchSettings } from '@/utils/modelHelpers';
 import { type translations } from '@/i18n/translations';
-import { useSettingsUiStore, type SettingsTab, type SettingsTabDescriptor } from '@/stores/settingsUiStore';
-
-export type { SettingsTab, SettingsTabDescriptor };
+import { useSettingsUiStore, type SettingsTabDescriptor } from '@/stores/settingsUiStore';
 
 interface UseSettingsLogicProps {
   isOpen: boolean;
@@ -27,9 +25,11 @@ export const useSettingsLogic = ({
   onImportHistory,
   t,
 }: UseSettingsLogicProps) => {
-  useSettingsUiStore.getState().hydrateLegacySettingsUiPreferences();
-
   const latestSettingsRef = useRef(currentSettings);
+
+  useEffect(() => {
+    useSettingsUiStore.getState().hydrateLegacySettingsUiPreferences();
+  }, []);
 
   useEffect(() => {
     latestSettingsRef.current = currentSettings;
@@ -51,10 +51,8 @@ export const useSettingsLogic = ({
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Restore scroll position when tab changes or modal opens
   useLayoutEffect(() => {
     if (isOpen && scrollContainerRef.current) {
-      // Use requestAnimationFrame to ensure content has reflowed
       requestAnimationFrame(() => {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = activeTabScrollTop;

@@ -6,7 +6,7 @@ const projectRoot = path.resolve(__dirname, '../../..');
 
 const readProjectFile = (relativePath: string) => fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
 
-describe('header, message actions, and readme cleanup guards', () => {
+describe('header, message actions, and documentation guardrails', () => {
   it('removes dead Header prop references', () => {
     const source = readProjectFile('src/components/header/Header.tsx');
 

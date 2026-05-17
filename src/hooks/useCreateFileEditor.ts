@@ -52,10 +52,8 @@ export const useCreateFileEditor = ({
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
 
-  // Refs
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Filename Logic
   const [filenameBase, setFilenameBase] = useState(() => {
     if (!initialFilename) return '';
     const lastDotIndex = initialFilename.lastIndexOf('.');
@@ -76,7 +74,7 @@ export const useCreateFileEditor = ({
     const lastDotIndex = initialFilename.lastIndexOf('.');
     if (lastDotIndex === -1) return '.md';
     const ext = initialFilename.substring(lastDotIndex);
-    return SUPPORTED_EXTENSIONS.includes(ext) ? ext : ext;
+    return ext;
   });
 
   const handleSetExtension = useCallback((nextExtension: string) => {
@@ -102,7 +100,6 @@ export const useCreateFileEditor = ({
     [debouncedEditorContent],
   );
 
-  // Logic: PDF Generation
   const generatePdfBlob = async (filename: string): Promise<Blob> =>
     (await import('@/utils/export/markdownPdf')).createMarkdownPdfBlob(
       resolveInlineImagePlaceholders(textContent, imagePlaceholdersRef.current),
@@ -151,7 +148,6 @@ export const useCreateFileEditor = ({
     }
   };
 
-  // Logic: Image Insertion
   const insertImageFile = useCallback((file: File, startPos: number, endPos: number = startPos) => {
     const placeholder = createInlineImagePlaceholder(nextImageIndexRef.current++);
     const reader = new FileReader();
@@ -180,7 +176,6 @@ export const useCreateFileEditor = ({
     reader.readAsDataURL(file);
   }, []);
 
-  // Logic: Paste Handler
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
       const textarea = textareaRef.current;
@@ -229,7 +224,6 @@ export const useCreateFileEditor = ({
     [isPasteRichTextAsMarkdownEnabled, insertImageFile, textContent],
   );
 
-  // Logic: Drop Handler
   const handleDrop = useCallback(
     (e: React.DragEvent, isDragging: boolean) => {
       if (!isDragging) return;

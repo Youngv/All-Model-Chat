@@ -42,7 +42,7 @@ export const SUPPORTED_TEXT_MIME_TYPES = [
 ];
 export const SUPPORTED_AUDIO_MIME_TYPES = [
   'audio/mpeg',
-  'audio/mp3', // Added for broader compatibility
+  'audio/mp3', // Some browsers report MP3 files with this MIME type.
   'audio/ogg',
   'audio/wav',
   'audio/aac',

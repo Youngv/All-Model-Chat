@@ -4,7 +4,7 @@ import { Modal } from '@/components/shared/Modal';
 import { type UploadedFile, type AppSettings, type ModelOption } from '@/types';
 import { ChevronDown, X, Calculator } from 'lucide-react';
 import { getModelIcon, ModelPicker } from '@/components/shared/ModelPicker';
-import { useTokenCountLogic } from '@/hooks/features/useTokenCountLogic';
+import { useTokenCountLogic } from '@/hooks/token-count/useTokenCountLogic';
 import { TokenCountInput } from './token-count/TokenCountInput';
 import { TokenCountFiles } from './token-count/TokenCountFiles';
 import { TokenCountFooter } from './token-count/TokenCountFooter';

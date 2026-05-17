@@ -2,7 +2,7 @@ import type { FunctionDeclaration, Type } from '@google/genai';
 import type { ExecutionResult } from './pyodideService';
 import type { UploadedFile } from '@/types';
 import { createUploadedFileFromBase64 } from '@/utils/chat/parsing';
-import { hasGeneratedImageFile } from './helpers';
+import { hasGeneratedImageFile } from './executionFiles';
 
 type PythonRunOptions = { files?: UploadedFile[]; abortSignal?: AbortSignal };
 type PythonRunResult = Omit<ExecutionResult, 'status'>;

@@ -1,6 +1,5 @@
 import React, { Suspense, useState, useEffect, useRef, useCallback } from 'react';
-import { X, Code, Eye, Download, FileCode2 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { X, Code, Eye, Download, FileCode2, type LucideIcon } from 'lucide-react';
 import { type SideViewContent } from '@/types';
 import { createManagedObjectUrl } from '@/services/objectUrlManager';
 import { triggerDownload, sanitizeFilename } from '@/utils/export/core';
@@ -46,13 +45,11 @@ interface SidePanelProps {
 
 export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId }) => {
   const { t } = useI18n();
-  // Initialize with content immediately to ensure iframe has srcDoc on first render
   const [localCode, setLocalCode] = useState(content?.content || '');
   const [debouncedCode, setDebouncedCode] = useState(content?.content || '');
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('preview');
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Resizing State
   const [width, setWidth] = useState(600);
   const [isResizing, setIsResizing] = useState(false);
   const isResizingRef = useRef(false);
@@ -60,7 +57,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId 
 
   const isMobile = useIsMobile();
 
-  // Debounce code updates for preview to avoid excessive rendering during edits
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedCode(localCode);
@@ -68,7 +64,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId 
     return () => clearTimeout(timer);
   }, [localCode]);
 
-  // Resizing Logic
   const startResizing = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);
@@ -131,8 +126,8 @@ export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId 
           <iframe
             ref={iframeRef}
             className="w-full h-full border-0 block"
-            // SECURITY: Removed allow-same-origin to prevent access to localStorage/parent DOM
-            // Added allow-downloads to match main preview capabilities
+            // SECURITY: Keep allow-same-origin off to prevent access to localStorage/parent DOM.
+            // Allow downloads from rendered HTML previews.
             sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads"
             title={t('sidePanel_live_preview')}
             srcDoc={debouncedCode}
@@ -193,7 +188,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId 
             ? 'xml'
             : 'plaintext');
 
-  // Determine preview label and icon
   const isHtml = content.type === 'html';
 
   const PreviewIcon = isHtml ? FileCode2 : Eye;
@@ -213,7 +207,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId 
                 `}
         style={{ width: isMobile ? '100%' : `${width}px` }}
       >
-        {/* Resize Handle - Desktop Only */}
         {!isMobile && (
           <div
             onMouseDown={startResizing}
@@ -226,9 +219,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId 
           />
         )}
 
-        {/* Unified Header */}
         <div className="flex items-center justify-between px-4 h-14 border-b border-[var(--theme-border-secondary)] bg-[var(--theme-bg-primary)] flex-shrink-0">
-          {/* Left: Tabs */}
           <div className="flex bg-[var(--theme-bg-input)] p-1 rounded-lg border border-[var(--theme-border-secondary)] flex-shrink-0">
             <PanelTabButton
               activeTab={activeTab}
@@ -246,7 +237,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId 
             />
           </div>
 
-          {/* Right: Actions */}
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
               onClick={handleDownload}
@@ -265,7 +255,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({ content, onClose, themeId 
           </div>
         </div>
 
-        {/* Content Body */}
         <div className="flex-grow flex flex-col min-h-0 bg-[var(--theme-bg-primary)] relative">
           <div
             className={`absolute inset-0 transition-opacity duration-200 ${activeTab === 'code' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}

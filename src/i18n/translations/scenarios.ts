@@ -65,7 +65,7 @@ export const scenariosTranslations = {
   scenarios_system_preset_readonly_badge: { en: 'System Preset (Read Only)', zh: '系统预设（只读）' },
   scenarios_editor_badge: { en: 'Editor', zh: '编辑器' },
 
-  // New UI translations
+  // Scenario editor actions
   scenarios_create_button: { en: 'Add', zh: '添加' },
   scenarios_import_button: { en: 'Import', zh: '导入' },
   scenarios_export_button: { en: 'Export', zh: '导出' },

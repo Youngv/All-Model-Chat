@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Link as LinkIcon, AlertTriangle, CheckCircle, Globe } from 'lucide-react';
-import { getDomain } from './utils';
+import { getDomain } from './groundingSources';
 import { useI18n } from '@/contexts/I18nContext';
 
 interface UrlContextItem {

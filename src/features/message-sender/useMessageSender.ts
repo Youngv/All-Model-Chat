@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useCallback, useMemo } from 'react';
+import { type MutableRefObject, useCallback, useMemo } from 'react';
 import {
   type AppSettings,
   type ChatMessage,
@@ -15,7 +14,7 @@ import { sendStandardMessage } from '@/features/message-sender/standardChatStrat
 import { createSenderStoreActions } from '@/features/message-sender/senderStoreActions';
 import { sendTtsImagenMessage } from '@/features/message-sender/ttsImagenStrategy';
 import { ensureFilesApiReferences } from '@/features/message-sender/fileApiReference';
-import { prepareFilesForOpenAICompatibleMode } from '@/features/message-sender/openAICompatibleFiles';
+import { prepareFilesForOpenAICompatibleMode } from '@/features/message-sender/openaiCompatibleFiles';
 import { formatMessageSenderText } from '@/features/message-sender/i18nFormat';
 import { getModelCapabilities } from '@/utils/modelHelpers';
 import { useI18n } from '@/contexts/I18nContext';
@@ -39,9 +38,9 @@ interface MessageSenderProps {
   imageSize?: string;
   imageOutputMode: ImageOutputMode;
   personGeneration: ImagePersonGeneration;
-  userScrolledUpRef: React.MutableRefObject<boolean>;
+  userScrolledUpRef: MutableRefObject<boolean>;
   activeSessionId: string | null;
-  sessionKeyMapRef: React.MutableRefObject<Map<string, string>>;
+  sessionKeyMapRef: MutableRefObject<Map<string, string>>;
   language: 'en' | 'zh';
 }
 
@@ -74,7 +73,6 @@ export const useMessageSender = (props: MessageSenderProps) => {
     [t],
   );
 
-  // Initialize Stream Handler Factory
   const { getStreamHandlers } = useChatStreamHandler({
     appSettings,
     updateAndPersistSessions,
@@ -137,17 +135,19 @@ export const useMessageSender = (props: MessageSenderProps) => {
         !textToUse.trim() &&
         !permissions.requiresTextPrompt &&
         !isContinueMode &&
-        filesToUse.filter((f) => f.uploadState === 'active').length === 0
+        filesToUse.filter((file) => file.uploadState === 'active').length === 0
       )
         return;
       if (permissions.requiresTextPrompt && !textToUse.trim()) return;
-      if (filesToUse.some((f) => f.isProcessing || (f.uploadState !== 'active' && !f.error))) {
+      if (filesToUse.some((file) => file.isProcessing || (file.uploadState !== 'active' && !file.error))) {
         logService.warn('Send message blocked: files are still processing.');
         setAppFileError(t('messageSender_waitForFiles'));
         return;
       }
 
-      if (filesToUse.some((f) => f.uploadState === 'failed' || f.uploadState === 'cancelled' || !!f.error)) {
+      if (
+        filesToUse.some((file) => file.uploadState === 'failed' || file.uploadState === 'cancelled' || !!file.error)
+      ) {
         logService.warn('Send message blocked: failed or cancelled attachments are still selected.');
         setAppFileError(t('messageSender_fileUploadFailedBeforeSend'));
         return;

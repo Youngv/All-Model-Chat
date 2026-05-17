@@ -132,4 +132,44 @@ describe('HistorySidebar search shortcut', () => {
 
     expect(collapsedToggle?.className).toContain('-translate-y-1');
   });
+
+  it('marks the hidden expanded sidebar pane inert when collapsed', async () => {
+    await act(async () => {
+      renderer.root.render(
+        <HistorySidebar
+          isOpen={false}
+          onToggle={vi.fn()}
+          onAutoClose={vi.fn()}
+          sessions={[]}
+          groups={[]}
+          activeSessionId={null}
+          loadingSessionIds={new Set()}
+          generatingTitleSessionIds={new Set()}
+          onSelectSession={vi.fn()}
+          onNewChat={vi.fn()}
+          onDeleteSession={vi.fn()}
+          onRenameSession={vi.fn()}
+          onTogglePinSession={vi.fn()}
+          onDuplicateSession={vi.fn()}
+          onOpenExportModal={vi.fn()}
+          onAddNewGroup={vi.fn()}
+          onDeleteGroup={vi.fn()}
+          onRenameGroup={vi.fn()}
+          onMoveSessionToGroup={vi.fn()}
+          onToggleGroupExpansion={vi.fn()}
+          onOpenSettingsModal={vi.fn()}
+          themeId="pearl"
+          newChatShortcut=""
+          searchChatsShortcut=""
+        />,
+      );
+    });
+
+    const hiddenExpandedPane = renderer.container.querySelector<HTMLElement>(
+      '[data-history-sidebar-expanded-pane="true"][aria-hidden="true"]',
+    );
+
+    expect(hiddenExpandedPane).not.toBeNull();
+    expect(hiddenExpandedPane).toHaveAttribute('inert');
+  });
 });

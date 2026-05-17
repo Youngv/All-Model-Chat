@@ -9,7 +9,7 @@ const turndownService = new TurndownService({
 });
 
 // Use GitHub Flavored Markdown plugin (tables, task lists, etc.)
-turndownService.use(gfm as (service: TurndownService) => void);
+turndownService.use(gfm);
 
 // Remove scripts, styles, and other non-content elements
 turndownService.remove(['script', 'style', 'noscript', 'iframe', 'object', 'video', 'audio']);

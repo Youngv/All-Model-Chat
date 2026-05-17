@@ -2,4 +2,7 @@ export * from './settings';
 export * from './chat';
 export * from './chatTools';
 export * from './api';
+export * from './logging';
+export * from './slashCommands';
+export * from './sync';
 export * from './theme';

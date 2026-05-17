@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { SquarePen, Trash2 } from 'lucide-react';
 import {
@@ -8,7 +8,7 @@ import {
 } from '@/constants/appConstants';
 
 interface GroupItemMenuProps {
-  menuRef: React.RefObject<HTMLDivElement>;
+  menuRef: RefObject<HTMLDivElement>;
   onStartEdit: () => void;
   onDelete: () => void;
 }

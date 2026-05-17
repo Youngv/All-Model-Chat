@@ -409,7 +409,7 @@ describe('translation coverage for protected UI surfaces', () => {
         snippets: ['Failed to load default models'],
       },
       {
-        file: 'src/hooks/features/useTokenCountLogic.ts',
+        file: 'src/hooks/token-count/useTokenCountLogic.ts',
         snippets: ['Failed to calculate tokens'],
       },
       {
@@ -484,7 +484,7 @@ describe('translation coverage for protected UI surfaces', () => {
         snippets: ["'View'", 'No preview available', '>Prompt<'],
       },
       {
-        file: 'src/hooks/features/useScenarioManager.ts',
+        file: 'src/hooks/scenarios/useScenarioManager.ts',
         snippets: ['Scenario deleted.'],
       },
       {
@@ -574,11 +574,11 @@ describe('translation coverage for protected UI surfaces', () => {
         ],
       },
       {
-        file: 'src/hooks/files/useFileDragDrop.ts',
+        file: 'src/hooks/file-upload/useFileDragDrop.ts',
         snippets: ['Processing dropped files...'],
       },
       {
-        file: 'src/hooks/files/useFilePolling.ts',
+        file: 'src/hooks/file-upload/useFilePolling.ts',
         snippets: ['File processing timed out.', 'Backend processing failed.'],
       },
       {
@@ -625,7 +625,7 @@ describe('translation coverage for protected UI surfaces', () => {
         snippets: ['Mermaid Diagram'],
       },
       {
-        file: 'src/hooks/features/useScenarioManager.ts',
+        file: 'src/hooks/scenarios/useScenarioManager.ts',
         snippets: ['Scenario title cannot be empty.', ' (Copy)'],
       },
       {
@@ -641,7 +641,7 @@ describe('translation coverage for protected UI surfaces', () => {
         snippets: ['"Pause"', '"Play"', '"Playback Speed"', '"Download Audio"'],
       },
       {
-        file: 'src/hooks/useMessageSender.ts',
+        file: 'src/features/message-sender/useMessageSender.ts',
         snippets: [
           '"Wait for files to finish processing."',
           '"This image model supports image attachments only."',

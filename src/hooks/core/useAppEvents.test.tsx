@@ -204,7 +204,7 @@ describe('useAppEvents PWA lifecycle', () => {
   it('starts the Tab cycle from the configured Gemini list when a GPT-compatible model is active', async () => {
     const handleSelectModelInHeader = vi.fn();
     const setAppSettings = vi.fn();
-    const openAICompatibleSettings = createAppSettings({
+    const openaiCompatibleSettings = createAppSettings({
       ...appSettings,
       apiMode: 'openai-compatible',
       isOpenAICompatibleApiEnabled: true,
@@ -217,7 +217,7 @@ describe('useAppEvents PWA lifecycle', () => {
 
     const { unmount } = renderHook(() =>
       useAppEvents({
-        appSettings: openAICompatibleSettings,
+        appSettings: openaiCompatibleSettings,
         setAppSettings,
         startNewChat: vi.fn(),
         currentChatSettings: createChatSettings({
@@ -245,7 +245,7 @@ describe('useAppEvents PWA lifecycle', () => {
     expect(setAppSettings).toHaveBeenCalledWith(expect.any(Function));
 
     const updateSettings = setAppSettings.mock.calls[0][0] as (prev: AppSettings) => AppSettings;
-    expect(updateSettings(openAICompatibleSettings)).toEqual(
+    expect(updateSettings(openaiCompatibleSettings)).toEqual(
       expect.objectContaining({
         apiMode: 'gemini-native',
         openaiCompatibleModelId: 'gpt-5.5',

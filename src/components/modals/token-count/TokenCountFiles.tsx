@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { type UploadedFile } from '@/types';
 import { Plus, X, Image as ImageIcon, FileText } from 'lucide-react';
@@ -8,7 +8,7 @@ import { isImageMimeType } from '@/utils/fileTypeUtils';
 
 interface TokenCountFilesProps {
   files: UploadedFile[];
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: RefObject<HTMLInputElement>;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveFile: (id: string) => void;
 }

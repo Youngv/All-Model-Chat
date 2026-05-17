@@ -362,7 +362,7 @@ Live API uses the browser-local API key to connect directly to the official Live
 
 ## Project Structure
 
-Core frontend areas include `src/components/`, `src/features/`, `src/hooks/`, `src/services/`, `src/pwa/`, `src/schemas/`, and `src/test/`.
+Core frontend areas include `src/components/`, `src/features/`, `src/hooks/`, `src/services/`, `src/i18n/`, `src/pwa/`, `src/schemas/`, and `src/test/`.
 
 Placement rules:
 
@@ -383,6 +383,7 @@ AMC-WebUI/
 │   ├── services/               # API, IndexedDB, logging, object URL, and infrastructure services
 │   ├── stores/                 # Zustand stores for chat, settings, and UI state
 │   ├── utils/                  # Export, session, IndexedDB, Markdown, file, and media utilities
+│   ├── i18n/                   # Translation aggregation, coverage tests, and bilingual copy
 │   ├── pwa/                    # Service worker, PWA registration, and install state
 │   ├── runtime/                # Runtime config loading and public config mapping
 │   ├── schemas/                # Zod configuration schemas

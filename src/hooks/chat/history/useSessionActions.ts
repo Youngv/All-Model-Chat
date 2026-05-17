@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type MutableRefObject } from 'react';
 import { type SavedChatSession } from '@/types';
 import { logService } from '@/services/logService';
 import { cloneMessagesWithFreshIds, createNewSession } from '@/utils/chat/session';
@@ -12,7 +12,7 @@ interface UseSessionActionsProps {
     updater: (prev: SavedChatSession[]) => SavedChatSession[],
     options?: { persist?: boolean },
   ) => void | Promise<void>;
-  activeJobs: React.MutableRefObject<Map<string, AbortController>>;
+  activeJobs: MutableRefObject<Map<string, AbortController>>;
 }
 
 export const useSessionActions = ({ updateAndPersistSessions, activeJobs }: UseSessionActionsProps) => {

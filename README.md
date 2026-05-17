@@ -395,7 +395,7 @@ Live API 默认由浏览器使用本地 API Key 直连官方 Live 服务。
 
 ## 项目结构
 
-核心前端目录包括 `src/components/`、`src/features/`、`src/hooks/`、`src/services/`、`src/pwa/`、`src/schemas/` 与 `src/test/`。
+核心前端目录包括 `src/components/`、`src/features/`、`src/hooks/`、`src/services/`、`src/i18n/`、`src/pwa/`、`src/schemas/` 与 `src/test/`。
 
 放置规则：
 
@@ -416,6 +416,7 @@ AMC-WebUI/
 │   ├── services/               # API、IndexedDB、日志、对象 URL 等基础设施
 │   ├── stores/                 # Zustand 状态（chat / settings / ui）
 │   ├── utils/                  # 导出、会话、IndexedDB、Markdown、文件处理等工具
+│   ├── i18n/                   # 翻译聚合、覆盖率测试与中英文文案
 │   ├── pwa/                    # Service Worker、PWA 注册与安装状态
 │   ├── runtime/                # 运行时配置读取与公开配置映射
 │   ├── schemas/                # Zod 配置 schema

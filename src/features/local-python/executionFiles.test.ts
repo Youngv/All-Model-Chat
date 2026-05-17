@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ChatMessage, UploadedFile } from '@/types';
-import { collectLocalPythonInputFiles } from './helpers';
+import { collectLocalPythonInputFiles } from './executionFiles';
 
 const makeFile = (id: string, name: string): UploadedFile => ({
   id,
@@ -19,7 +19,7 @@ const makeMessage = (id: string, role: 'user' | 'model', content: string, files?
   timestamp: new Date(),
 });
 
-describe('local-python helpers', () => {
+describe('local Python execution files', () => {
   it('collects only active user-provided files before the target model message', () => {
     const inputA = makeFile('input-a', 'dataset-a.csv');
     const inputB = makeFile('input-b', 'dataset-b.csv');

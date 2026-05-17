@@ -12,7 +12,7 @@ import {
   Expand,
   Atom,
 } from 'lucide-react';
-import { IconHtml5 } from '@/components/icons/CustomIcons';
+import { IconHtml5 } from '@/components/icons';
 import {
   FOCUS_VISIBLE_RING_SECONDARY_OFFSET_CLASS,
   ICON_BUTTON_CLASS,

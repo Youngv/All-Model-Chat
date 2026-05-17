@@ -30,13 +30,28 @@ const useChatInputClipboardPath = path.join(projectRoot, 'src/hooks/chat-input/u
 const useSelectionPositionPath = path.join(projectRoot, 'src/hooks/text-selection/useSelectionPosition.ts');
 const tableBlockPath = path.join(projectRoot, 'src/components/message/blocks/TableBlock.tsx');
 const folderImportUtilsPath = path.join(projectRoot, 'src/utils/folderImportUtils.ts');
-const useFileDragDropPath = path.join(projectRoot, 'src/hooks/files/useFileDragDrop.ts');
+const useFileDragDropPath = path.join(projectRoot, 'src/hooks/file-upload/useFileDragDrop.ts');
 const useFilePreProcessingPath = path.join(projectRoot, 'src/hooks/file-upload/useFilePreProcessing.ts');
 const useFilePreProcessingEffectsPath = path.join(projectRoot, 'src/hooks/chat-input/useFilePreProcessingEffects.ts');
 const audioApiPath = path.join(projectRoot, 'src/services/api/generation/audioApi.ts');
 const localPythonClientFunctionToolPath = path.join(projectRoot, 'src/features/local-python/clientFunctionTool.ts');
 const assistantAvatarPath = path.join(projectRoot, 'public/assets/assistant-avatar.png');
 const interfaceTogglesPath = path.join(projectRoot, 'src/components/settings/sections/appearance/InterfaceToggles.tsx');
+
+const expectTypeImportFrom = (source: string, moduleName: string, importedNames: string[]) => {
+  const escapedModuleName = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const typeImportPattern = new RegExp(`import\\s+type\\s+\\{([^}]+)\\}\\s+from\\s+['"]${escapedModuleName}['"]`);
+  const match = source.match(typeImportPattern);
+  expect(match).not.toBeNull();
+
+  const importedTypeNames =
+    match?.[1]
+      .split(',')
+      .map((name) => name.trim().split(/\s+as\s+/)[0])
+      .filter(Boolean) ?? [];
+
+  expect(importedTypeNames).toEqual(expect.arrayContaining(importedNames));
+};
 
 describe('vite.config runtime ownership', () => {
   it('does not externalize core runtime libraries needed in the Vite bundle', () => {
@@ -280,10 +295,14 @@ describe('Runtime loading boundaries', () => {
 
     expect(audioApiSource).not.toMatch(/import\s+\{\s*ThinkingLevel/);
     expect(localPythonToolSource).not.toMatch(/import\s+\{\s*Type/);
-    expect(audioApiSource).toContain(
-      "import type { GenerateContentConfig, ThinkingConfig, ThinkingLevel, UsageMetadata } from '@google/genai'",
-    );
-    expect(localPythonToolSource).toContain("import type { FunctionDeclaration, Type } from '@google/genai'");
+    expectTypeImportFrom(audioApiSource, '@google/genai', [
+      'GenerateContentConfig',
+      'Part',
+      'ThinkingConfig',
+      'ThinkingLevel',
+      'UsageMetadata',
+    ]);
+    expectTypeImportFrom(localPythonToolSource, '@google/genai', ['FunctionDeclaration', 'Type']);
   });
 
   it('keeps TTS voice options on a single static import path to avoid mixed-import build warnings', () => {

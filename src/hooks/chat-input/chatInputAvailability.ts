@@ -49,7 +49,7 @@ interface ChatInputModeOptions {
   };
   localFileState: Pick<ChatInputLocalFileState, 'isConverting'>;
   capabilities: Partial<ChatInputCapabilities>;
-  liveAPI: {
+  liveApi: {
     isConnected: boolean;
     isReconnecting: boolean;
     error: string | null;
@@ -112,7 +112,7 @@ export const getCurrentChatInputMode = ({
   inputState,
   localFileState,
   capabilities,
-  liveAPI,
+  liveApi,
   activeQueuedSubmission,
   canQueueMessage,
   isEditing,
@@ -125,9 +125,9 @@ export const getCurrentChatInputMode = ({
     canQueueMessage,
     isNativeAudioModel: capabilities.permissions?.canUseLiveControls || capabilities.isNativeAudioModel || false,
     liveStatus: {
-      isConnected: liveAPI.isConnected,
-      isReconnecting: liveAPI.isReconnecting,
-      error: liveAPI.error,
+      isConnected: liveApi.isConnected,
+      isReconnecting: liveApi.isReconnecting,
+      error: liveApi.error,
     },
     isProcessingFile,
     isConverting: localFileState.isConverting,

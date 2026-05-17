@@ -1,6 +1,13 @@
 import { logService } from '@/services/logService';
-import { useCallback, useMemo, useState } from 'react';
-import type React from 'react';
+import {
+  type Dispatch,
+  type MutableRefObject,
+  type RefObject,
+  type SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 
 import type { UploadedFile } from '@/types';
 import { EXTENSION_TO_MIME } from '@/constants/fileConstants';
@@ -13,21 +20,21 @@ import { useI18n } from '@/contexts/I18nContext';
 
 interface UseChatInputFileUiOptions {
   selectedFiles: UploadedFile[];
-  setSelectedFiles: React.Dispatch<React.SetStateAction<UploadedFile[]>>;
-  setInputText: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedFiles: Dispatch<SetStateAction<UploadedFile[]>>;
+  setInputText: Dispatch<SetStateAction<string>>;
   setAppFileError: (error: string | null) => void;
   onProcessFiles: (files: FileList | File[]) => Promise<void>;
   onOpenFolderPicker: () => Promise<void>;
   onScreenshot: () => Promise<void>;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  imageInputRef: React.RefObject<HTMLInputElement>;
-  folderInputRef: React.RefObject<HTMLInputElement>;
-  zipInputRef: React.RefObject<HTMLInputElement>;
-  cameraInputRef: React.RefObject<HTMLInputElement>;
-  justInitiatedFileOpRef: React.MutableRefObject<boolean>;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  fileInputRef: RefObject<HTMLInputElement>;
+  imageInputRef: RefObject<HTMLInputElement>;
+  folderInputRef: RefObject<HTMLInputElement>;
+  zipInputRef: RefObject<HTMLInputElement>;
+  cameraInputRef: RefObject<HTMLInputElement>;
+  justInitiatedFileOpRef: MutableRefObject<boolean>;
+  textareaRef: RefObject<HTMLTextAreaElement>;
   isConverting: boolean;
-  setIsConverting: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsConverting: Dispatch<SetStateAction<boolean>>;
 }
 
 export const useChatInputFileUi = ({

@@ -105,19 +105,17 @@ export const useCodeBlock = ({
   const prevTextLength = useRef(0);
   const lastKnownScrollTop = useRef(0);
 
-  // Find the code element
   const codeElement = React.Children.toArray(children).find(
     (child): child is React.ReactElement<CodeElementProps> =>
       React.isValidElement<CodeElementProps>(child) &&
       (child.type === 'code' || Boolean(child.props.className?.includes('language-'))),
   );
 
-  // Synchronously resolve content string
-  const currentContent = codeElement ? extractTextFromNode(codeElement.props.children) : extractTextFromNode(children);
-  const resolvedCodeText = currentContent;
+  const resolvedCodeText = codeElement
+    ? extractTextFromNode(codeElement.props.children)
+    : extractTextFromNode(children);
   const isExpanded = expandedOverride ?? expandCodeBlocksByDefault;
 
-  // Scroll handler
   const handleScroll = useCallback(() => {
     const el = preRef.current;
     if (!el) return;

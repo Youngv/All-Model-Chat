@@ -13,7 +13,7 @@ import {
 } from '@/services/api/openaiCompatibleApi';
 import { createStandardClientFunctions } from '@/features/standard-chat/standardClientFunctions';
 import { runStandardToolLoop } from '@/features/standard-chat/standardToolLoop';
-import { collectLocalPythonInputFiles } from '@/features/local-python/helpers';
+import { collectLocalPythonInputFiles } from '@/features/local-python/executionFiles';
 import { getPyodideService } from '@/features/local-python/loadPyodideService';
 import { updateSessionById } from '@/utils/chat/sessionMutations';
 import type {
@@ -149,7 +149,7 @@ export const performStandardChatApiCall = async ({
   });
 
   if (isOpenAICompatibleMode) {
-    const openAICompatibleConfig = {
+    const openaiCompatibleConfig = {
       baseUrl: appSettings.openaiCompatibleBaseUrl,
       systemInstruction: sessionToUpdate.systemInstruction,
       temperature: sessionToUpdate.temperature,
@@ -164,7 +164,7 @@ export const performStandardChatApiCall = async ({
             apiModelId,
             historyForChat,
             finalParts,
-            openAICompatibleConfig,
+            openaiCompatibleConfig,
             newAbortController.signal,
             streamOnPart,
             onThoughtChunk,
@@ -184,7 +184,7 @@ export const performStandardChatApiCall = async ({
           apiModelId,
           historyForChat,
           finalParts,
-          openAICompatibleConfig,
+          openaiCompatibleConfig,
           newAbortController.signal,
           streamOnError,
           nonStreamOnComplete,

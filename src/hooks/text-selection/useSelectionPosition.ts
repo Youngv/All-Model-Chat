@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, type RefObject } from 'react';
 import { useWindowContext } from '@/contexts/WindowContext';
 import { copySelectionTextToClipboardEvent } from './selectionClipboard';
 import {
@@ -7,13 +7,13 @@ import {
   LIVE_ARTIFACT_SELECTION_EVENT,
 } from './liveArtifactSelection';
 
-type ContainerRefLike = React.RefObject<HTMLElement> | HTMLElement | null;
+type ContainerRefLike = RefObject<HTMLElement> | HTMLElement | null;
 type SelectionBounds = Pick<DOMRect, 'top' | 'left' | 'width' | 'height' | 'bottom'>;
 
 interface UseSelectionPositionProps {
   containerRef: ContainerRefLike;
   isAudioActive: boolean;
-  toolbarRef: React.RefObject<HTMLDivElement>;
+  toolbarRef: RefObject<HTMLDivElement>;
   onCopySuccess?: (text: string) => void;
   preserveFormattingOnCopy?: boolean;
 }

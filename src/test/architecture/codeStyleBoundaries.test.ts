@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 const projectRoot = path.resolve(__dirname, '../../..');
 
 const readProjectFile = (relativePath: string) => fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
+const importDeclarationPattern = /^import\s+(?:type\s+)?[\s\S]*?\s+from\s+['"]([^'"]+)['"];$/gm;
 const sourceImportSpecifierPattern =
   /\b(?:import|export)\b[\s\S]*?from\s+['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)|vi\.(?:mock|doMock|unmock|importActual|importMock)\s*(?:<[^>]+>)?\(\s*['"]([^'"]+)['"]/g;
 const listProjectSourceFiles = (relativeDir: string): string[] => {
@@ -35,11 +36,14 @@ describe('code style boundaries', () => {
     const npmrc = readProjectFile('.npmrc');
     const zhReadme = readProjectFile('README.md');
     const enReadme = readProjectFile('README.en.md');
+    const contributing = readProjectFile('CONTRIBUTING.md');
 
     expect(packageJson.engines?.node).toBe('>=26 <27');
     expect(npmrc).toContain('engine-strict=true');
     expect(zhReadme).toContain('Node.js 26');
     expect(enReadme).toContain('Node.js 26');
+    expect(contributing).toContain('nvm use');
+    expect(contributing).toContain('Node.js 26');
   });
 
   it('reuses build artifacts in docker CI instead of rebuilding the frontend twice', () => {
@@ -74,12 +78,63 @@ describe('code style boundaries', () => {
     expect(offenders).toEqual([]);
   });
 
+  it('does not repeat static import declarations from the same module in production sources', () => {
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('.test.'))
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .flatMap((relativePath) => {
+        const source = readProjectFile(relativePath);
+        const importCounts = new Map<string, number>();
+
+        for (const match of source.matchAll(importDeclarationPattern)) {
+          const specifier = match[1];
+          importCounts.set(specifier, (importCounts.get(specifier) ?? 0) + 1);
+        }
+
+        return Array.from(importCounts)
+          .filter(([, count]) => count > 1)
+          .map(([specifier]) => `${relativePath}:${specifier}`);
+      });
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('uses direct React ref type imports instead of namespace ref aliases', () => {
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('.test.'))
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .filter((relativePath) => /React\.(?:MutableRefObject|RefObject)\b/.test(readProjectFile(relativePath)));
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('does not call useI18n more than once in a production component or hook', () => {
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('.test.'))
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .filter((relativePath) => (readProjectFile(relativePath).match(/\buseI18n\(/g) ?? []).length > 1);
+
+    expect(offenders).toEqual([]);
+  });
+
   it('documents a cleanup script for local build and test artifacts', () => {
     const packageJson = JSON.parse(readProjectFile('package.json')) as { scripts?: Record<string, string> };
+    const prettierIgnore = readProjectFile('.prettierignore');
 
     expect(packageJson.scripts?.clean).toBe(
       'rm -rf dist coverage playwright-report test-results tmp-live-artifact-demo .playwright-visible-demo-profile .codex-dev-server.*',
     );
+
+    for (const ignoredPath of [
+      '.worktrees/',
+      'playwright-report/',
+      'test-results/',
+      '.playwright-visible-demo-profile/',
+      'tmp-live-artifact-demo/',
+      'server/dist/',
+    ]) {
+      expect(prettierIgnore).toContain(ignoredPath);
+    }
   });
 
   it('keeps Vite configuration focused on assembly instead of local API internals', () => {
@@ -112,6 +167,160 @@ describe('code style boundaries', () => {
     expect(chatTypes).not.toMatch(/\/\/\s*Added (?:for|to)\b/);
   });
 
+  it('keeps production comments focused on current behavior instead of change history', () => {
+    const changeHistoryCommentPattern =
+      /\/\/\s*(?:New\s+(?:method|UI|ASR|SRT)\b|Added\s+(?:setter|for|to|allow-downloads)\b|Renamed\b|Removed\b|Changed\b|.*\bLegacy\/Shared\b|.*\bduring refactor transition\b|.*\bnew specific container class\b|.*\bPreviously this logic\b|.*\bAbuse Check\b|Update state:)/i;
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('.test.'))
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .filter((relativePath) =>
+        readProjectFile(relativePath)
+          .split('\n')
+          .some((line) => changeHistoryCommentPattern.test(line)),
+      );
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('does not keep tautological ternaries in production sources', () => {
+    const tautologicalLiteralTernaryPattern = /\?\s*(['"`][^'"`]+['"`])\s*:\s*\1/;
+    const tautologicalExtensionFallbackPattern = /SUPPORTED_EXTENSIONS\.includes\(ext\)\s*\?\s*ext\s*:\s*ext/;
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('.test.'))
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .filter((relativePath) => {
+        const source = readProjectFile(relativePath);
+        return tautologicalLiteralTernaryPattern.test(source) || tautologicalExtensionFallbackPattern.test(source);
+      });
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('keeps production comments from echoing nearby code structure', () => {
+    const lowInformationCommentPattern =
+      /(?:\/\/\s*(?:Refs|Hooks|Components|Header|Content Area|Scrollable Content|Model Selection|Floating Toolbars & Navigation|Modals|Actions|Build Config|Fix:|Filename Logic|Logic|(?:\d+\.\s*)?(?:Audio|Position|Drag|Scroll|UI|Auto Fullscreen HTML|Sticky Key|Token|Thinking Budget|Core Logging|Comparison|Resizing) Logic|Find the index|Update ref|Update index|Update existing message content|Clear files for new chat|Determine default resolution|Start polling for new files|Normal Logic|Enhanced Navigation Logic|Minimum scale floor|Add local preview URL|Preserve local file reference|Clear speed on complete|Important for cross-origin images|Must be false to allow export|Helper to extract stack traces|Helper to register page refs|Helper to match types|Pass data to callback|Only fire callback if we have data|Filter and read files that have raw data|Filter duplicates if any|Reconnection Refs|Cleanup on unmount|Determine state priorities|Determine disabled state|Determine background class|Find the code element|Synchronously resolve content string|Scroll handler|Check if title is generic or a placeholder|Skip if already generating|Need at least user prompt and model response|Basic structure check|Wait for the first model message to be complete|Initialize Stream Handler Factory|Pyodide Execution Logic|Simple CSV detection|Simple JSON detection|Output Context|Input Context|Apply initial mute state|AudioWorklet Setup|Handle Worklet Messages|Calculate Volume|Stop Microphone|Disconnect Input Nodes|Close Contexts|Pass progress callback|Mark active immediately|Sanitize the session before export|We create a structure compatible with the history import feature|Exporting only the active chat session|No groups are exported with a single chat|Use blobToBase64 which is efficient and handles Blobs\/Files|Use configured media resolution|Save if any changes were made)\b|\{\/\*\s*Text Content\s*\*\/\})/;
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('.test.'))
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .filter((relativePath) =>
+        readProjectFile(relativePath)
+          .split('\n')
+          .some((line) => lowInformationCommentPattern.test(line)),
+      );
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('does not repeat file paths in source header comments', () => {
+    const pathHeaderCommentPattern =
+      /^\/\/\s*(?:src\/|hooks\/|components\/|utils\/|services\/|features\/).+\.(?:ts|tsx)$/;
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('.test.'))
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .filter((relativePath) => pathHeaderCommentPattern.test(readProjectFile(relativePath).split('\n')[0] ?? ''));
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('avoids trivial identity aliases in hot UI paths', () => {
+    const headerModelSelectorSource = readProjectFile('src/components/header/HeaderModelSelector.tsx');
+    const chatInputKeyboardSource = readProjectFile('src/hooks/chat-input/useChatInputKeyboard.ts');
+    const useChatSource = readProjectFile('src/hooks/chat/useChat.ts');
+    const selectedFileDisplaySource = readProjectFile('src/components/chat/input/SelectedFileDisplay.tsx');
+    const liveConnectionSource = readProjectFile('src/hooks/live-api/useLiveConnection.ts');
+    const autoTitlingSource = readProjectFile('src/hooks/chat/useAutoTitling.ts');
+    const appPromptModesSource = readProjectFile('src/hooks/app/useAppPromptModes.ts');
+    const groundingSourcesSource = readProjectFile('src/components/message/grounded-response/groundingSources.ts');
+    const useCodeBlockSource = readProjectFile('src/hooks/ui/useCodeBlock.ts');
+
+    expect(headerModelSelectorSource).not.toContain('const displayModelName = currentModelName;');
+    expect(chatInputKeyboardSource).not.toContain('const rawInput = inputText;');
+    expect(useChatSource).not.toContain('const messages = activeMessages;');
+    expect(useChatSource).not.toContain('const effectiveApiModels = apiModelsFromHook;');
+    expect(selectedFileDisplaySource).not.toContain('const hasOverflowActions = canCopyFileId;');
+    expect(liveConnectionSource).not.toContain('const connectedRef = isConnectedRef;');
+    expect(liveConnectionSource).not.toContain('const reconnectingRef = isReconnectingRef;');
+    expect(liveConnectionSource).not.toContain('const connectingRef = isConnectingRef;');
+    expect(autoTitlingSource).not.toContain('const session = activeChat;');
+    expect(appPromptModesSource).not.toContain('const pendingActivation = pendingLiveArtifactsPromptActivation;');
+    expect(groundingSourcesSource).not.toContain('const rawText = text;');
+    expect(useCodeBlockSource).not.toContain('const resolvedCodeText = currentContent;');
+  });
+
+  it('uses object property shorthand for direct same-name assignments', () => {
+    const redundantPropertyAssignmentPattern = /\b([A-Za-z_$][\w$]*)\s*:\s*\1(?=\s*[,}])/;
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('.test.'))
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .filter((relativePath) =>
+        readProjectFile(relativePath)
+          .split('\n')
+          .some((line) => !line.includes('?') && redundantPropertyAssignmentPattern.test(line)),
+      );
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('uses descriptive callback parameter names in file collection updates', () => {
+    const fileCollectionSources = [
+      'src/hooks/file-upload/uploadFileItem.ts',
+      'src/hooks/file-upload/useFilePolling.ts',
+      'src/hooks/file-upload/useFileIdAdder.ts',
+      'src/hooks/file-upload/useFilePreProcessing.ts',
+      'src/hooks/chat/useChat.ts',
+      'src/features/message-sender/useMessageSender.ts',
+      'src/hooks/chat/actions/useAudioActions.ts',
+      'src/hooks/token-count/useTokenCountLogic.ts',
+      'src/hooks/useMessageExport.ts',
+      'src/hooks/data-management/useChatSessionExport.ts',
+      'src/utils/export/templates.ts',
+      'src/components/message/content/MessageFiles.tsx',
+      'src/components/message/blocks/CodeBlock.tsx',
+      'src/components/message/blocks/ToolResultBlock.tsx',
+    ];
+    const terseFileCallbackPattern = /\.(?:map|filter|find|some|every|forEach)\(\(?f\b/;
+    const offenders = fileCollectionSources.filter((relativePath) =>
+      readProjectFile(relativePath)
+        .split('\n')
+        .some((line) => terseFileCallbackPattern.test(line)),
+    );
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('uses descriptive callback parameter names in scenario collection updates', () => {
+    const scenarioCollectionSources = [
+      'src/hooks/scenarios/useScenarioManager.ts',
+      'src/components/scenarios/ScenarioEditor.tsx',
+      'src/components/scenarios/ScenarioList.tsx',
+      'src/components/scenarios/editor/ScenarioMessageList.tsx',
+    ];
+    const terseScenarioCallbackPattern = /\.(?:map|filter|find|some)\(\(?[ms]\b/;
+    const offenders = scenarioCollectionSources.filter((relativePath) =>
+      readProjectFile(relativePath)
+        .split('\n')
+        .some((line) => terseScenarioCallbackPattern.test(line)),
+    );
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('exports ordinary type modules through the central types barrel', () => {
+    const typeFiles = fs
+      .readdirSync(path.join(projectRoot, 'src/types'))
+      .filter((fileName) => fileName.endsWith('.ts'))
+      .filter((fileName) => fileName !== 'index.ts')
+      .filter((fileName) => !fileName.endsWith('.d.ts'))
+      .map((fileName) => path.basename(fileName, '.ts'))
+      .sort();
+    const typesIndex = readProjectFile('src/types/index.ts');
+    const exportedModules = Array.from(typesIndex.matchAll(/export \* from '\.\/([^']+)';/g))
+      .map((match) => match[1])
+      .sort();
+
+    expect(exportedModules).toEqual(typeFiles);
+  });
+
   it('routes browser runtime diagnostics through logService instead of direct console calls', () => {
     const allowedConsoleFiles = new Set([
       'src/services/logService.ts',
@@ -127,5 +336,65 @@ describe('code style boundaries', () => {
       .filter((relativePath) => /\bconsole\.(?:debug|error|info|log|warn)\b/.test(readProjectFile(relativePath)));
 
     expect(offenders).toEqual([]);
+  });
+
+  it('keeps chat input visibility flags explicitly boolean', () => {
+    const toolbarSource = readProjectFile('src/components/chat/input/ChatInputToolbar.tsx');
+
+    expect(toolbarSource).toContain('const canShowTtsVoice =');
+    expect(toolbarSource).toContain('const canShowMediaResolution =');
+    expect(toolbarSource).toContain('Boolean(ttsVoice)');
+    expect(toolbarSource).toContain('Boolean(mediaResolution)');
+    expect(toolbarSource).not.toMatch(/const showTtsVoice\s*=\s*[^;]*&&\s*ttsVoice\s*&&/);
+    expect(toolbarSource).not.toMatch(/const showMediaResolution\s*=\s*[^;]*&&\s*mediaResolution\s*&&/);
+  });
+
+  it('keeps hook lint escapes narrow and explained', () => {
+    const selectionDragSource = readProjectFile('src/hooks/text-selection/useSelectionDrag.ts');
+    const sourceFiles = listProjectSourceFiles('src').filter(
+      (relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts',
+    );
+    const sourceLevelRefDisables = sourceFiles.filter((relativePath) =>
+      readProjectFile(relativePath).includes('eslint-disable react-hooks/refs'),
+    );
+    const unexplainedSetStateEffectDisables = sourceFiles.filter((relativePath) =>
+      readProjectFile(relativePath)
+        .split('\n')
+        .some(
+          (line) => line.includes('eslint-disable-next-line react-hooks/set-state-in-effect') && !line.includes('--'),
+        ),
+    );
+    const unexplainedExhaustiveDepsDisables = sourceFiles.filter((relativePath) =>
+      readProjectFile(relativePath)
+        .split('\n')
+        .some(
+          (line) =>
+            (line.includes('eslint-disable-line react-hooks/exhaustive-deps') ||
+              line.includes('eslint-disable-next-line react-hooks/exhaustive-deps')) &&
+            !line.includes('--'),
+        ),
+    );
+
+    expect(selectionDragSource).not.toMatch(
+      /^\/\* eslint-disable react-hooks\/immutability, react-hooks\/exhaustive-deps \*\//,
+    );
+    expect(selectionDragSource).not.toContain('eslint-disable react-hooks/exhaustive-deps');
+    expect(selectionDragSource).not.toContain('eslint-disable-next-line react-hooks/immutability');
+    expect(sourceLevelRefDisables).toEqual([]);
+    expect(unexplainedSetStateEffectDisables).toEqual([]);
+    expect(unexplainedExhaustiveDepsDisables).toEqual([]);
+  });
+
+  it('keeps React Refresh component-export exceptions in ESLint config instead of source comments', () => {
+    const sourceFiles = listProjectSourceFiles('src').filter(
+      (relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts',
+    );
+    const sourceLevelReactRefreshDisables = sourceFiles.filter((relativePath) =>
+      readProjectFile(relativePath).includes('eslint-disable react-refresh/only-export-components'),
+    );
+    const eslintConfig = readProjectFile('eslint.config.js');
+
+    expect(sourceLevelReactRefreshDisables).toEqual([]);
+    expect(eslintConfig).toContain("'react-refresh/only-export-components': 'off'");
   });
 });

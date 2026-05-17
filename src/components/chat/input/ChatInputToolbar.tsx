@@ -68,10 +68,10 @@ const ChatInputToolbarComponent: React.FC = () => {
   const showQuadToggle = (isImagenModel || isGemini3ImageModel) && generateQuadImages !== undefined;
 
   // Allow voice selection for both explicit TTS models and Native Audio (Live) models
-  const showTtsVoice = (isTtsModel || isNativeAudioModel) && ttsVoice && setTtsVoice;
+  const canShowTtsVoice = (isTtsModel || isNativeAudioModel) && Boolean(ttsVoice);
 
   // Show Media Resolution selector for Native Audio (Live API) to control stream quality
-  const showMediaResolution = isNativeAudioModel && mediaResolution && setMediaResolution;
+  const canShowMediaResolution = isNativeAudioModel && Boolean(mediaResolution);
 
   const hasVisibleContent =
     showAspectRatio ||
@@ -79,8 +79,8 @@ const ChatInputToolbarComponent: React.FC = () => {
     showImageOutputMode ||
     showPersonGeneration ||
     showQuadToggle ||
-    showTtsVoice ||
-    showMediaResolution ||
+    canShowTtsVoice ||
+    canShowMediaResolution ||
     fileError ||
     showAddByIdInput ||
     showAddByUrlInput;
@@ -92,10 +92,10 @@ const ChatInputToolbarComponent: React.FC = () => {
         showImageOutputMode ||
         showPersonGeneration ||
         showQuadToggle ||
-        showTtsVoice ||
-        showMediaResolution) && (
+        canShowTtsVoice ||
+        canShowMediaResolution) && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {showTtsVoice && <TtsVoiceSelector ttsVoice={ttsVoice!} setTtsVoice={setTtsVoice!} />}
+          {canShowTtsVoice && <TtsVoiceSelector ttsVoice={ttsVoice} setTtsVoice={setTtsVoice} />}
           {isTtsModel && (
             <button
               onClick={onEditTtsContext}
@@ -123,10 +123,10 @@ const ChatInputToolbarComponent: React.FC = () => {
               )}
             </button>
           )}
-          {showMediaResolution && (
+          {canShowMediaResolution && mediaResolution !== undefined && (
             <MediaResolutionSelector
-              mediaResolution={mediaResolution!}
-              setMediaResolution={setMediaResolution!}
+              mediaResolution={mediaResolution}
+              setMediaResolution={setMediaResolution}
               isNativeAudioModel={isNativeAudioModel}
             />
           )}

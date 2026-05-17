@@ -1,4 +1,4 @@
-import { useCallback, type Dispatch, type SetStateAction, useEffect, useRef } from 'react';
+import { useCallback, type Dispatch, type SetStateAction, useEffect, useRef, type MutableRefObject } from 'react';
 import {
   type AppSettings,
   type SavedChatSession,
@@ -27,7 +27,7 @@ interface UseSessionLoaderProps {
   setSavedSessions: Dispatch<SetStateAction<SavedChatSession[]>>;
   setSavedGroups: Dispatch<SetStateAction<ChatGroup[]>>;
   setActiveSessionId: (value: SetStateAction<string | null>, options?: SetActiveSessionOptions) => void;
-  setActiveMessages: Dispatch<SetStateAction<ChatMessage[]>>; // Added setter
+  setActiveMessages: Dispatch<SetStateAction<ChatMessage[]>>;
   setSelectedFiles: Dispatch<SetStateAction<UploadedFile[]>>;
   setEditingMessageId: Dispatch<SetStateAction<string | null>>;
   setCommandedInput: Dispatch<SetStateAction<InputCommand | null>>;
@@ -37,9 +37,9 @@ interface UseSessionLoaderProps {
     options?: { persist?: boolean },
   ) => void | Promise<void>;
   activeChat: SavedChatSession | undefined;
-  userScrolledUpRef: React.MutableRefObject<boolean>;
+  userScrolledUpRef: MutableRefObject<boolean>;
   selectedFiles: UploadedFile[];
-  fileDraftsRef: React.MutableRefObject<Record<string, UploadedFile[]>>;
+  fileDraftsRef: MutableRefObject<Record<string, UploadedFile[]>>;
   activeSessionId: string | null;
   savedSessions: SavedChatSession[];
 }
@@ -219,13 +219,12 @@ export const useSessionLoader = ({
 
       const newSession = createNewSession(settingsForNewChat);
 
-      // Update state: Set Active Messages to empty, Add new session metadata to list
+      // Reset active chat state before adding the new session metadata.
       setActiveMessages([]);
       setActiveSessionId(newSession.id, { history });
 
       updateAndPersistSessions((prev) => [newSession, ...prev]);
 
-      // Clear files for new chat
       setSelectedFiles([]);
 
       setEditingMessageId(null);

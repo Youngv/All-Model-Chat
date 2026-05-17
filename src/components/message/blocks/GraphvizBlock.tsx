@@ -97,7 +97,7 @@ export const GraphvizBlock: React.FC<GraphvizBlockProps> = ({
       const id = `graphviz-svg-${Math.random().toString(36).substring(2, 9)}`;
       const svgDataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(cachedSvg)))}`;
       setDiagramFile({
-        id: id,
+        id,
         name: 'graphviz-diagram.svg',
         type: 'image/svg+xml',
         size: cachedSvg.length,
@@ -172,7 +172,7 @@ export const GraphvizBlock: React.FC<GraphvizBlockProps> = ({
       const svgDataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgString)))}`;
 
       setDiagramFile({
-        id: id,
+        id,
         name: 'graphviz-diagram.svg',
         type: 'image/svg+xml',
         size: svgString.length,

@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { type UploadedFile, type SideViewContent } from '@/types';
 import { LazyMarkdownRenderer } from './LazyMarkdownRenderer';
-import { insertCitations, extractSources } from './grounded-response/utils';
+import { insertCitations, extractSources } from './grounded-response/groundingSources';
 import { ContextUrls } from './grounded-response/ContextUrls';
 import { SearchSources } from './grounded-response/SearchSources';
-import { IconGoogle } from '@/components/icons/CustomIcons';
+import { IconGoogle } from '@/components/icons';
 import type { LiveArtifactFollowupPayload } from '@/utils/liveArtifactFollowup';
 
 interface GroundedResponseProps {

@@ -39,7 +39,9 @@ export const useFilePolling = ({
     const lastAttempts = lastPollingAttempt.current;
     const filesCurrentlyPolling = new Set(pollingIntervals.current.keys());
     const filesThatShouldPoll = new Set(
-      selectedFiles.filter((f) => f.uploadState === 'processing_api' && !f.error).map((f) => f.id),
+      selectedFiles
+        .filter((selectedFile) => selectedFile.uploadState === 'processing_api' && !selectedFile.error)
+        .map((selectedFile) => selectedFile.id),
     );
 
     // Stop polling for files that are no longer in the 'processing_api' state
@@ -54,10 +56,9 @@ export const useFilePolling = ({
       }
     }
 
-    // Start polling for new files that entered the 'processing_api' state
     for (const fileId of filesThatShouldPoll) {
       if (!filesCurrentlyPolling.has(fileId)) {
-        const fileToPoll = selectedFiles.find((f) => f.id === fileId);
+        const fileToPoll = selectedFiles.find((selectedFile) => selectedFile.id === fileId);
         if (!fileToPoll || !fileToPoll.fileApiName) continue;
 
         logService.info(`Starting polling for file ${fileId} (${fileToPoll.fileApiName})`);
@@ -80,10 +81,15 @@ export const useFilePolling = ({
           if (Date.now() - startTime > MAX_POLLING_DURATION_MS) {
             logService.error(`Polling timed out for file ${fileApiName}`);
             setSelectedFiles((prev) =>
-              prev.map((f) =>
-                f.id === fileId
-                  ? { ...f, error: t('fileProcessing_timed_out'), uploadState: 'failed', isProcessing: false }
-                  : f,
+              prev.map((selectedFile) =>
+                selectedFile.id === fileId
+                  ? {
+                      ...selectedFile,
+                      error: t('fileProcessing_timed_out'),
+                      uploadState: 'failed',
+                      isProcessing: false,
+                    }
+                  : selectedFile,
               ),
             );
             return;
@@ -100,8 +106,10 @@ export const useFilePolling = ({
             const translationKey = getApiKeyErrorTranslationKey(keyResult.error);
             const errorMessage = translationKey ? t(translationKey) : keyResult.error;
             setSelectedFiles((prev) =>
-              prev.map((f) =>
-                f.id === fileId ? { ...f, error: errorMessage, uploadState: 'failed', isProcessing: false } : f,
+              prev.map((selectedFile) =>
+                selectedFile.id === fileId
+                  ? { ...selectedFile, error: errorMessage, uploadState: 'failed', isProcessing: false }
+                  : selectedFile,
               ),
             );
             pollingInFlight.current.delete(fileId);
@@ -114,16 +122,25 @@ export const useFilePolling = ({
               logService.info(`File ${fileApiName} is now ACTIVE.`);
               pollingFailures.current.delete(fileId);
               setSelectedFiles((prev) =>
-                prev.map((f) => (f.id === fileId ? { ...f, uploadState: 'active', isProcessing: false } : f)),
+                prev.map((selectedFile) =>
+                  selectedFile.id === fileId
+                    ? { ...selectedFile, uploadState: 'active', isProcessing: false }
+                    : selectedFile,
+                ),
               );
             } else if (metadata?.state === 'FAILED') {
               logService.error(`File ${fileApiName} processing FAILED on backend.`);
               pollingFailures.current.delete(fileId);
               setSelectedFiles((prev) =>
-                prev.map((f) =>
-                  f.id === fileId
-                    ? { ...f, error: t('fileProcessing_backend_failed'), uploadState: 'failed', isProcessing: false }
-                    : f,
+                prev.map((selectedFile) =>
+                  selectedFile.id === fileId
+                    ? {
+                        ...selectedFile,
+                        error: t('fileProcessing_backend_failed'),
+                        uploadState: 'failed',
+                        isProcessing: false,
+                      }
+                    : selectedFile,
                 ),
               );
             } else {
@@ -144,7 +161,6 @@ export const useFilePolling = ({
       }
     }
 
-    // Cleanup on unmount
     return () => {
       intervals.forEach((intervalId) => window.clearInterval(intervalId));
       intervals.clear();

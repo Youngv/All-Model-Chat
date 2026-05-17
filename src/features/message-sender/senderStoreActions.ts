@@ -1,4 +1,4 @@
-import type React from 'react';
+import type { MutableRefObject } from 'react';
 import { useChatStore } from '@/stores/chatStore';
 import type { SessionsUpdater } from './types';
 
@@ -6,7 +6,7 @@ interface SenderStoreActions {
   updateAndPersistSessions: SessionsUpdater;
   setActiveSessionId: (id: string | null) => void;
   setSessionLoading: (sessionId: string, isLoading: boolean) => void;
-  activeJobs: React.MutableRefObject<Map<string, AbortController>>;
+  activeJobs: MutableRefObject<Map<string, AbortController>>;
 }
 
 export const createSenderStoreActions = (): SenderStoreActions => {

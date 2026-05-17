@@ -1,6 +1,4 @@
-import { type Dispatch, type SetStateAction } from 'react';
-import type React from 'react';
-import { useCallback } from 'react';
+import { type Dispatch, type MutableRefObject, type SetStateAction, useCallback } from 'react';
 import { type ChatMessage, type UploadedFile, type SavedChatSession, type InputCommand } from '@/types';
 import { logService } from '@/services/logService';
 import { CHAT_INPUT_TEXTAREA_SELECTOR } from '@/constants/appConstants';
@@ -31,7 +29,7 @@ interface MessageActionsProps {
   isLoading: boolean;
   activeSessionId: string | null;
   editingMessageId: string | null;
-  activeJobs: React.MutableRefObject<Map<string, AbortController>>;
+  activeJobs: MutableRefObject<Map<string, AbortController>>;
   setCommandedInput: CommandedInputSetter;
   setSelectedFiles: (files: UploadedFile[] | ((prev: UploadedFile[]) => UploadedFile[])) => void;
   setEditingMessageId: (id: string | null) => void;
@@ -39,7 +37,7 @@ interface MessageActionsProps {
   setAppFileError: (error: string | null) => void;
   updateAndPersistSessions: SessionsUpdater;
   setActiveSessionId: ActiveSessionSetter;
-  userScrolledUpRef: React.MutableRefObject<boolean>;
+  userScrolledUpRef: MutableRefObject<boolean>;
   handleSendMessage: SendMessageFunc;
   setSessionLoading: (sessionId: string, isLoading: boolean) => void;
 }

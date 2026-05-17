@@ -79,7 +79,7 @@ export const sendStatelessMessageStreamApi: StreamMessageSender = async (
   let finalUsageMetadata: UsageMetadata | undefined = undefined;
   let finalGroundingMetadata: MetadataWithCitations | null = null;
   let finalUrlContextMetadata: unknown = null;
-  const contents = [...history, { role: role, parts }];
+  const contents = [...history, { role, parts }];
 
   try {
     await executeConfiguredApiRequest({

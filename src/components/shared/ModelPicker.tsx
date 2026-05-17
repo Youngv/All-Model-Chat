@@ -1,6 +1,5 @@
 import { useI18n } from '@/contexts/I18nContext';
-/* eslint-disable react-refresh/only-export-components */
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, type RefObject } from 'react';
 import { type ModelOption } from '@/types';
 import {
   Banana,
@@ -101,7 +100,7 @@ interface ModelPickerProps {
     isOpen: boolean;
     setIsOpen: (v: boolean) => void;
     selectedModel: ModelOption | undefined;
-    ref: React.RefObject<HTMLDivElement>;
+    ref: RefObject<HTMLDivElement>;
   }) => React.ReactNode;
 
   dropdownClassName?: string;

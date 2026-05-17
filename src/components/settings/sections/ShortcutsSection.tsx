@@ -51,7 +51,7 @@ export const ShortcutsSection: React.FC<ShortcutsSectionProps> = ({
     [currentSettings, onUpdateSettings],
   );
 
-  // Read-only mode fallback if props missing (e.g. during refactor transition)
+  // Show a read-only fallback when settings callbacks are unavailable.
   if (!currentSettings || !onUpdateSettings) {
     return <div className="p-4 text-center text-[var(--theme-text-tertiary)]">{t('shortcuts_unavailable')}</div>;
   }

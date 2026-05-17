@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, type MutableRefObject } from 'react';
 import { Document, Page } from 'react-pdf';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/contexts/I18nContext';
@@ -13,7 +13,7 @@ interface PdfMainContentProps {
   onLoadSuccess: (data: { numPages: number }) => void;
   onLoadError: (err: Error) => void;
   setPageRef: (pageNum: number, element: HTMLDivElement | null) => void;
-  containerRef: React.MutableRefObject<HTMLDivElement | null>;
+  containerRef: MutableRefObject<HTMLDivElement | null>;
 }
 
 // 核心优化：懒加载/虚拟化 PDF 页面
@@ -28,7 +28,7 @@ const LazyPdfPage = ({
   scale: number;
   rotation: number;
   setPageRef: (pageNum: number, element: HTMLDivElement | null) => void;
-  containerRef: React.MutableRefObject<HTMLDivElement | null>;
+  containerRef: MutableRefObject<HTMLDivElement | null>;
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });

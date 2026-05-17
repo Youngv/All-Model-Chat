@@ -107,7 +107,7 @@ vi.mock('@/features/standard-chat/standardToolLoop', () => ({
   runStandardToolLoop: mockRunStandardToolLoop,
 }));
 
-vi.mock('@/features/local-python/helpers', () => ({
+vi.mock('@/features/local-python/executionFiles', () => ({
   collectLocalPythonInputFiles: vi.fn(() => []),
 }));
 

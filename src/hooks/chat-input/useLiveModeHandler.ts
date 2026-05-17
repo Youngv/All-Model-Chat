@@ -19,7 +19,7 @@ interface UseLiveModeHandlerParams {
   setSelectedFiles: SetSelectedFiles;
   currentModelId: string;
   mediaResolution?: MediaResolution;
-  liveAPI: LiveModeApi;
+  liveApi: LiveModeApi;
   onAddUserMessage?: (text: string, files?: UploadedFile[]) => void;
   onSendMessage: (text: string, options?: { isFastMode?: boolean; files?: UploadedFile[] }) => void;
 }
@@ -30,7 +30,7 @@ export const useLiveModeHandler = ({
   setSelectedFiles,
   currentModelId,
   mediaResolution,
-  liveAPI,
+  liveApi,
   onAddUserMessage,
   onSendMessage,
 }: UseLiveModeHandlerParams) => {
@@ -42,10 +42,10 @@ export const useLiveModeHandler = ({
       }
 
       const filesToSend = options?.files ?? selectedFiles;
-      let didConnect = liveAPI.isConnected;
-      if (!liveAPI.isConnected) {
+      let didConnect = liveApi.isConnected;
+      if (!liveApi.isConnected) {
         try {
-          didConnect = await liveAPI.connect();
+          didConnect = await liveApi.connect();
         } catch (error) {
           logService.error('Failed to auto-connect Live API:', error);
           return;
@@ -61,9 +61,9 @@ export const useLiveModeHandler = ({
       if (filesToSend.length > 0) {
         const builtContent = await buildContentParts(text, filesToSend, currentModelId, mediaResolution);
         enrichedFiles = builtContent.enrichedFiles;
-        didSend = await liveAPI.sendContent(builtContent.contentParts);
+        didSend = await liveApi.sendContent(builtContent.contentParts);
       } else {
-        didSend = await liveAPI.sendText(text);
+        didSend = await liveApi.sendText(text);
       }
 
       if (!didSend) {
@@ -76,7 +76,7 @@ export const useLiveModeHandler = ({
     [
       currentModelId,
       isNativeAudioModel,
-      liveAPI,
+      liveApi,
       mediaResolution,
       onAddUserMessage,
       onSendMessage,

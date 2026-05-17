@@ -2,7 +2,7 @@ import type { UploadedFile, FileTransferStrategy } from '@/types';
 
 type FileTransferStrategyInput = Pick<UploadedFile, 'fileApiName' | 'fileUri' | 'rawFile' | 'transferStrategy'>;
 
-export const resolveFileTransferStrategy = (file: FileTransferStrategyInput): FileTransferStrategy => {
+const resolveFileTransferStrategy = (file: FileTransferStrategyInput): FileTransferStrategy => {
   if (file.transferStrategy) {
     return file.transferStrategy;
   }

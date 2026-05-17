@@ -144,7 +144,6 @@ export const useRecorder = (options: UseRecorderOptions = {}) => {
 
         recorder.onstop = () => {
           const blob = new Blob(chunksRef.current, { type: recorder.mimeType || supportedMimeType || 'audio/webm' });
-          // Only fire callback if we have data
           if (blob.size > 0 && onStop) {
             onStop(blob);
           }

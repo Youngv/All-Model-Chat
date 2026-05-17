@@ -6,7 +6,7 @@ const projectRoot = path.resolve(__dirname, '../../..');
 
 const readProjectFile = (relativePath: string) => fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
 
-describe('review findings cleanup guards', () => {
+describe('project documentation structure', () => {
   it('keeps the shared chat input selector in tracked app constants', () => {
     const appConstants = readProjectFile('src/constants/appConstants.ts');
     const storageKeys = readProjectFile('src/constants/storageKeys.ts');
@@ -22,6 +22,7 @@ describe('review findings cleanup guards', () => {
 
     for (const source of [zhReadme, enReadme]) {
       expect(source).toContain('src/features/');
+      expect(source).toContain('src/i18n/');
       expect(source).toContain('src/pwa/');
       expect(source).toContain('src/schemas/');
       expect(source).toContain('src/test/');

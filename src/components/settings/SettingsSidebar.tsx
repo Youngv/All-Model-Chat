@@ -1,9 +1,8 @@
 import React, { useRef } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
-import { KeyRound, LayoutPanelLeft, SlidersHorizontal } from 'lucide-react';
-import { X } from 'lucide-react';
-import { type SettingsTab, type SettingsTabDescriptor } from '@/hooks/features/useSettingsLogic';
-import { IconAbout, IconData, IconKeyboard } from '@/components/icons/CustomIcons';
+import { KeyRound, LayoutPanelLeft, SlidersHorizontal, X } from 'lucide-react';
+import { type SettingsTab, type SettingsTabDescriptor } from '@/stores/settingsUiStore';
+import { IconAbout, IconData, IconKeyboard } from '@/components/icons';
 
 const SETTINGS_TAB_ICONS: Record<SettingsTab, React.ElementType> = {
   models: SlidersHorizontal,

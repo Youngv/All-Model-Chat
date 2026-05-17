@@ -31,7 +31,7 @@ export const messagesTranslations = {
   suggestion_explain_short: { en: 'Simplify complex concepts.', zh: '通俗易懂地解释复杂概念。' },
   suggestion_prompt_label: { en: 'Prompt', zh: '提示' },
 
-  // New ASR and SRT Translations
+  // Audio transcription and subtitle suggestions
   suggestion_asr_title: { en: 'Audio to Text', zh: '音频转写' },
   suggestion_asr_desc: {
     en: 'Please perform Automatic Speech Recognition (ASR) on the attached audio file. Transcribe the spoken content verbatim into text. Do not summarize, just output the exact words spoken:',
@@ -45,7 +45,7 @@ export const messagesTranslations = {
   },
   suggestion_srt_short: { en: 'Generate SRT subtitles from video.', zh: '从视频生成 SRT 字幕文件。' },
 
-  // HTML Generation Translations
+  // Live artifact suggestions
   suggestion_html_title: { en: 'Live Artifacts', zh: '可视化整理' },
   suggestion_html_desc: {
     en: 'Use Live Artifacts to organize the provided information as a structured, responsive HTML artifact. Keep all important information:',

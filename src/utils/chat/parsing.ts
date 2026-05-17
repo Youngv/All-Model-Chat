@@ -75,7 +75,7 @@ export const createUploadedFileFromBase64 = (
     name: fileName,
     type: mimeType,
     size: blob.size,
-    dataUrl: dataUrl,
+    dataUrl,
     rawFile: file,
     uploadState: 'active',
   };

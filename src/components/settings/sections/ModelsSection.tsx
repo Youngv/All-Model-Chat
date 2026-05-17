@@ -128,7 +128,7 @@ export const ModelsSection: React.FC<ModelsSectionProps> = ({
     }
   };
 
-  const openAICompatibleModelListEditor = isOpenAICompatibleApiEnabled ? (
+  const openaiCompatibleModelListEditor = isOpenAICompatibleApiEnabled ? (
     <OpenAICompatibleModelListEditor
       models={currentSettings.openaiCompatibleModels ?? []}
       selectedModelId={currentSettings.openaiCompatibleModelId}
@@ -160,7 +160,7 @@ export const ModelsSection: React.FC<ModelsSectionProps> = ({
         setAvailableModels={setAvailableModels}
         defaultModels={defaultModels}
         defaultApiMode={defaultApiMode}
-        extraModelListContent={openAICompatibleModelListEditor}
+        extraModelListContent={openaiCompatibleModelListEditor}
       />
 
       <GenerationSection

@@ -13,7 +13,7 @@ import {
   IconFileEdit,
   IconZip,
   IconYoutube,
-} from '@/components/icons/CustomIcons';
+} from '@/components/icons';
 import {
   CHAT_INPUT_BUTTON_CLASS,
   MENU_ITEM_BUTTON_CLASS,

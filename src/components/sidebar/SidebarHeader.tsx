@@ -1,6 +1,6 @@
 import React from 'react';
 import { useI18n } from '@/contexts/I18nContext';
-import { IconSidebarToggle } from '@/components/icons/CustomIcons';
+import { IconSidebarToggle } from '@/components/icons';
 import { FOCUS_VISIBLE_RING_PRIMARY_OFFSET_CLASS } from '@/constants/appConstants';
 
 interface SidebarHeaderProps {

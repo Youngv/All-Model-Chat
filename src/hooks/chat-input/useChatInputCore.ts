@@ -8,7 +8,7 @@ import { getCachedModelCapabilities } from '@/stores/modelCapabilitiesStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { getVisibleChatMessages } from '@/utils/chat/visibility';
 import { useChatState } from '@/hooks/chat/useChatState';
-import { useLiveAPI } from '@/hooks/useLiveAPI';
+import { useLiveApi } from '@/hooks/useLiveApi';
 import { useTextAreaInsert } from '@/hooks/useTextAreaInsert';
 import { useChatInputState } from './useChatInputState';
 import { useChatInputToolStates } from './useChatInputToolStates';
@@ -127,7 +127,7 @@ export const useChatInputCore = () => {
 
   const capabilities = getCachedModelCapabilities(currentChatSettings.modelId);
 
-  const liveAPI = useLiveAPI({
+  const liveApi = useLiveApi({
     appSettings,
     chatSettings: currentChatSettings,
     modelId: currentChatSettings.modelId,
@@ -153,6 +153,6 @@ export const useChatInputCore = () => {
     targetDocument,
     insertText,
     capabilities,
-    liveAPI,
+    liveApi,
   };
 };

@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, type MutableRefObject } from 'react';
 import type { LiveServerMessage, Session as LiveSession } from '@google/genai';
 import type { LiveClientFunctions, UploadedFile } from '@/types';
 import { toStructuredToolResponse } from '@/features/chat-tools/toolResponse';
@@ -6,7 +6,7 @@ import { logService } from '@/services/logService';
 
 interface UseLiveToolsProps {
   clientFunctions?: LiveClientFunctions;
-  sessionRef: React.MutableRefObject<Promise<LiveSession> | null>;
+  sessionRef: MutableRefObject<Promise<LiveSession> | null>;
   onGeneratedFiles?: (files: UploadedFile[]) => void;
 }
 

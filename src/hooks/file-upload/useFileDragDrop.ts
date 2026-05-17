@@ -1,10 +1,9 @@
 import { logService } from '@/services/logService';
-import type React from 'react';
-import { useState, useCallback } from 'react';
+import { type DragEvent, useState, useCallback } from 'react';
 import { type UploadedFile } from '@/types';
 import { generateUniqueId } from '@/utils/chat/ids';
 import { useI18n } from '@/contexts/I18nContext';
-import { createProcessingPlaceholderFile } from '@/hooks/file-upload/utils';
+import { createProcessingPlaceholderFile } from './fileUploadPolicy';
 
 interface UseFileDragDropProps {
   onFilesDropped: (files: FileList | File[]) => Promise<void>;
@@ -17,7 +16,7 @@ export const useFileDragDrop = ({ onFilesDropped, onAddTempFile, onRemoveTempFil
   const [isAppDraggingOver, setIsAppDraggingOver] = useState<boolean>(false);
   const [isProcessingDrop, setIsProcessingDrop] = useState<boolean>(false);
 
-  const handleAppDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+  const handleAppDragEnter = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer.types.includes('Files')) {
@@ -26,7 +25,7 @@ export const useFileDragDrop = ({ onFilesDropped, onAddTempFile, onRemoveTempFil
   }, []);
 
   const handleAppDragOver = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
+    (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
       if (e.dataTransfer.types.includes('Files')) {
@@ -41,7 +40,7 @@ export const useFileDragDrop = ({ onFilesDropped, onAddTempFile, onRemoveTempFil
     [isAppDraggingOver],
   );
 
-  const handleAppDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+  const handleAppDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     // Only reset if leaving the main container, not entering a child
@@ -50,7 +49,7 @@ export const useFileDragDrop = ({ onFilesDropped, onAddTempFile, onRemoveTempFil
   }, []);
 
   const handleAppDrop = useCallback(
-    async (e: React.DragEvent<HTMLDivElement>) => {
+    async (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
       setIsAppDraggingOver(false);

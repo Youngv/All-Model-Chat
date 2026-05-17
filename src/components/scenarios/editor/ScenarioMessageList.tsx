@@ -26,13 +26,8 @@ export const ScenarioMessageList: React.FC<ScenarioMessageListProps> = ({
   const { t } = useI18n();
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom if adding new messages (heuristic: if editingId is null and length increased, handled by parent usually,
-  // but here we just expose the ref or handle scroll on prop change if needed.
-  // For simplicity, we'll let parent handle "scroll on add" via a ref if needed, or do it here on length change.)
   useEffect(() => {
     if (listRef.current && !editingMessageId) {
-      // Check if we are near bottom or just added?
-      // Simple approach: scroll to bottom on length increase
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
   }, [messages.length, editingMessageId]);
@@ -48,16 +43,15 @@ export const ScenarioMessageList: React.FC<ScenarioMessageListProps> = ({
           <p className="text-xs mt-1">{t('scenarios_editor_no_messages_hint')}</p>
         </div>
       ) : (
-        messages.map((msg, index) => {
-          const isEditing = editingMessageId === msg.id;
-          const isUser = msg.role === 'user';
+        messages.map((message, index) => {
+          const isEditing = editingMessageId === message.id;
+          const isUser = message.role === 'user';
 
           return (
             <div
-              key={msg.id}
+              key={message.id}
               className={`group flex gap-3 sm:gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-in fade-in slide-in-from-bottom-2 duration-200`}
             >
-              {/* Avatar */}
               <div
                 className={`
                                 flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-sm mt-1 border
@@ -71,7 +65,6 @@ export const ScenarioMessageList: React.FC<ScenarioMessageListProps> = ({
                 {isUser ? <User size={14} strokeWidth={2.5} /> : <Bot size={14} strokeWidth={2.5} />}
               </div>
 
-              {/* Bubble */}
               <div className={`relative max-w-[85%] sm:max-w-[75%]`}>
                 <div
                   className={`
@@ -87,14 +80,14 @@ export const ScenarioMessageList: React.FC<ScenarioMessageListProps> = ({
                     <div className="flex flex-col gap-2 min-w-[240px] sm:min-w-[280px]">
                       <textarea
                         className="w-full bg-[var(--theme-bg-primary)] border border-[var(--theme-border-focus)] rounded-md p-3 text-inherit outline-none resize-y focus:ring-2 focus:ring-[var(--theme-border-focus)]/20"
-                        defaultValue={msg.content}
+                        defaultValue={message.content}
                         autoFocus
                         rows={4}
-                        onBlur={(e) => onUpdateMessage(msg.id, e.target.value)}
+                        onBlur={(e) => onUpdateMessage(message.id, e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
-                            onUpdateMessage(msg.id, e.currentTarget.value);
+                            onUpdateMessage(message.id, e.currentTarget.value);
                           }
                         }}
                       />
@@ -103,11 +96,10 @@ export const ScenarioMessageList: React.FC<ScenarioMessageListProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="leading-relaxed">{msg.content}</div>
+                    <div className="leading-relaxed">{message.content}</div>
                   )}
                 </div>
 
-                {/* Floating Actions */}
                 {!isEditing && !readOnly && (
                   <div
                     className={`
@@ -132,13 +124,13 @@ export const ScenarioMessageList: React.FC<ScenarioMessageListProps> = ({
                     </button>
                     <div className="w-px h-3 bg-[var(--theme-border-secondary)] mx-0.5"></div>
                     <button
-                      onClick={() => setEditingMessageId(msg.id)}
+                      onClick={() => setEditingMessageId(message.id)}
                       className={`${SMALL_ICON_BUTTON_CLASS} rounded-full hover:text-[var(--theme-text-link)]`}
                     >
                       <Edit3 size={12} />
                     </button>
                     <button
-                      onClick={() => onDeleteMessage(msg.id)}
+                      onClick={() => onDeleteMessage(message.id)}
                       className={`${SMALL_ICON_DANGER_BUTTON_CLASS} rounded-full`}
                     >
                       <Trash2 size={12} />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { Document, Page } from 'react-pdf';
 
 const THUMBNAIL_WINDOW_RADIUS = 5;
@@ -9,7 +9,7 @@ interface PdfSidebarProps {
   currentPage: number;
   showSidebar: boolean;
   onPageClick: (pageNum: number) => void;
-  sidebarRef: React.RefObject<HTMLDivElement>;
+  sidebarRef: RefObject<HTMLDivElement>;
 }
 
 export const PdfSidebar: React.FC<PdfSidebarProps> = ({

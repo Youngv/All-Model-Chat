@@ -39,13 +39,11 @@ export const ToolResultBlock: React.FC<ToolResultBlockProps> = ({
     if (!rawCode) return;
 
     let extension = 'txt';
-    const lines = rawCode.split('\n').filter((l) => l.trim());
+    const lines = rawCode.split('\n').filter((line) => line.trim());
 
-    // Simple CSV detection: Header row with commas + at least one data row with commas
     if (lines.length > 1 && lines[0].includes(',') && lines[1].includes(',')) {
       extension = 'csv';
     }
-    // Simple JSON detection
     if (rawCode.trim().startsWith('{') || rawCode.trim().startsWith('[')) {
       extension = 'json';
     }
@@ -58,7 +56,7 @@ export const ToolResultBlock: React.FC<ToolResultBlockProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const generatedFiles = files?.filter((f) => f.name.startsWith('generated-')) || [];
+  const generatedFiles = files?.filter((file) => file.name.startsWith('generated-')) || [];
   const hasDownloadableText = rawCode && rawCode.length >= 5;
 
   return (

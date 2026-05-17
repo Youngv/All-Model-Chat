@@ -418,7 +418,7 @@ export const dbService = {
     );
   },
 
-  // New method: Fetches a single session by ID
+  // Hydrates a saved session with persisted file records.
   getSession: async (id: string) => {
     const session = await getItem<SavedChatSession>(SESSIONS_STORE, id);
     if (!session) {
@@ -441,7 +441,7 @@ export const dbService = {
     return hydratedSession;
   },
 
-  // New method: Fetches all sessions but excludes the heavy 'messages' array
+  // Loads session metadata without the heavier message arrays.
   getAllSessionMetadata: async (): Promise<SavedChatSession[]> => {
     const db = await getDb();
     return new Promise((resolve, reject) => {
@@ -453,7 +453,7 @@ export const dbService = {
       request.onsuccess = (event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
         if (cursor) {
-          // Return with empty messages to save memory
+          // Keep metadata reads lightweight by omitting message bodies.
           results.push({ ...cursor.value, messages: [] });
           cursor.continue();
         } else {

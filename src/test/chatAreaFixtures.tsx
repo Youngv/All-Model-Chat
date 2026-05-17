@@ -3,11 +3,11 @@ import { createTestRenderer, type TestRenderer } from '@/test/testUtils';
 import { vi } from 'vitest';
 import { I18nProvider } from '@/contexts/I18nContext';
 import { WindowProvider } from '@/contexts/WindowContext';
-import { ChatRuntimeProvider } from '@/components/layout/chat-runtime/ChatRuntimeContext';
-import type {
-  useChatHeaderRuntime,
-  useChatInputRuntime,
-  useChatMessageListRuntime,
+import {
+  ChatRuntimeProvider,
+  type useChatHeaderRuntime,
+  type useChatInputRuntime,
+  type useChatMessageListRuntime,
 } from '@/components/layout/chat-runtime/ChatRuntimeContext';
 import { useChatStore } from '@/stores/chatStore';
 import { useSettingsStore } from '@/stores/settingsStore';

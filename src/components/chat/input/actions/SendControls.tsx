@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Edit2, ArrowUp, CornerDownLeft, Ban } from 'lucide-react';
 import { useI18n } from '@/contexts/I18nContext';
-import { IconStop } from '@/components/icons/CustomIcons';
+import { IconStop } from '@/components/icons';
 import { CHAT_INPUT_BUTTON_CLASS } from '@/constants/appConstants';
 import { useChatInputRuntime } from '@/components/layout/chat-runtime/ChatRuntimeContext';
 import { useChatStore } from '@/stores/chatStore';
@@ -46,17 +46,14 @@ export const SendControls: React.FC = () => {
     setRipples((prev) => [...prev, { x, y, id: Date.now(), size }]);
   };
 
-  // Determine state priorities
   const isStop = isLoading;
   const isUpload = !isLoading && isWaitingForUpload;
   const isEdit = !isLoading && isEditing;
   const isSend = !isLoading && !isEditing && !isWaitingForUpload;
 
-  // Determine disabled state
   // Note: Stop button is never disabled by canSend.
   const isDisabled = !isLoading && !isUpload && !canSend;
 
-  // Determine background class
   let bgClass = 'bg-[var(--theme-bg-accent)] hover:bg-[var(--theme-bg-accent-hover)] text-[var(--theme-text-accent)]';
 
   if (isDisabled && !isUpload) {

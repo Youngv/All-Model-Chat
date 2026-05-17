@@ -62,7 +62,7 @@ describe('SettingsModal', () => {
   it('opens the settings surface without any enter animation class', async () => {
     await renderSettingsModal();
 
-    const settingsSurface = document.querySelector('[role="dialog"] > div');
+    const settingsSurface = document.querySelector('[role="dialog"]');
 
     expect(settingsSurface).not.toBeNull();
     expect(settingsSurface?.className).not.toContain('modal-enter-animation');

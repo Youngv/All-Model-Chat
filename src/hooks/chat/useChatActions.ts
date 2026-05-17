@@ -1,4 +1,4 @@
-import type React from 'react';
+import type { MutableRefObject } from 'react';
 import {
   type AppSettings,
   type ChatMessage,
@@ -39,7 +39,7 @@ interface UseChatActionsProps {
   handleStopGenerating: (options?: { silent?: boolean }) => void;
   startNewChat: () => void;
   handleTogglePinSession: (sessionId: string) => void;
-  userScrolledUpRef: React.MutableRefObject<boolean>;
+  userScrolledUpRef: MutableRefObject<boolean>;
 }
 
 export const useChatActions = ({
@@ -96,7 +96,7 @@ export const useChatActions = ({
   const { handleUpdateMessageContent, handleUpdateMessageFile, handleAddUserMessage, handleLiveTranscript } =
     useMessageUpdates({
       activeSessionId,
-      setActiveSessionId: (id) => setActiveSessionId(id), // Helper to match types if needed, though strictly compatible
+      setActiveSessionId,
       appSettings,
       currentChatSettings,
       updateAndPersistSessions,

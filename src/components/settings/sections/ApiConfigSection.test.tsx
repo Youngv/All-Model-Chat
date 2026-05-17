@@ -143,17 +143,17 @@ describe('ApiConfigSection', () => {
     await renderApiConfigSection({ onUpdate });
 
     const providerSelector = renderer.container.querySelector('[role="group"][aria-label="API Provider"]');
-    const openAIProviderButton = Array.from(renderer.container.querySelectorAll('button')).find(
+    const openaiProviderButton = Array.from(renderer.container.querySelectorAll('button')).find(
       (button) => button.textContent?.trim() === 'OpenAI-Compatible API',
     );
 
     expect(providerSelector).not.toBeNull();
     expect(renderer.container.querySelector('#openai-compatible-api-enabled-toggle')).toBeNull();
-    expect(openAIProviderButton).toBeDefined();
+    expect(openaiProviderButton).toBeDefined();
     expect(renderer.container.textContent).not.toContain('OpenAI-Compatible API Keys');
 
     await act(async () => {
-      openAIProviderButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      openaiProviderButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
     expect(onUpdate).toHaveBeenCalledWith('isOpenAICompatibleApiEnabled', true);

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { extractSources, insertCitations } from './utils';
+import { extractSources, insertCitations } from './groundingSources';
 
-describe('grounded-response utils', () => {
+describe('grounding source helpers', () => {
   it('extracts attribution sources from image grounding chunks', () => {
     const sources = extractSources({
       groundingChunks: [

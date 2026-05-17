@@ -1,7 +1,12 @@
 import type { CountTokensConfig, FunctionDeclaration } from '@google/genai';
 import { loadDeepSearchSystemPrompt, loadLocalPythonSystemPrompt } from '@/constants/promptHelpers';
-import type { ChatSettings, ImageOutputMode, ImagePersonGeneration, SafetySetting } from '@/types/settings';
-import { MediaResolution } from '@/types/settings';
+import {
+  MediaResolution,
+  type ChatSettings,
+  type ImageOutputMode,
+  type ImagePersonGeneration,
+  type SafetySetting,
+} from '@/types/settings';
 import { logService } from '@/services/logService';
 import {
   isGemini3Model,

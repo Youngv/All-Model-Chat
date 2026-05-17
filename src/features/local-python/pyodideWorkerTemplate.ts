@@ -263,7 +263,7 @@ self.onmessage = async (event) => {
         id, 
         status: 'success', 
         output: stdout.join('\\n'), 
-        image: image,
+        image,
         files: generatedFiles,
         result: result !== undefined ? String(result) : undefined
       });

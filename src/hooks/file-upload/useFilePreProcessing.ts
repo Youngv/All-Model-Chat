@@ -1,4 +1,3 @@
-// hooks/file-upload/useFilePreProcessing.ts
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import { type AppSettings, type UploadedFile } from '@/types';
 import { logService } from '@/services/logService';
@@ -7,7 +6,7 @@ import { isAudioMimeType, isTextFile } from '@/utils/fileTypeUtils';
 import { compressAudioToMp3 } from '@/features/audio/audioCompression';
 import { extractDocxText, isDocxFile } from '@/utils/docxPreview';
 import { useI18n } from '@/contexts/I18nContext';
-import { createProcessingPlaceholderFile } from './utils';
+import { createProcessingPlaceholderFile } from './fileUploadPolicy';
 
 interface UseFilePreProcessingProps {
   appSettings: AppSettings;
@@ -61,7 +60,7 @@ export const useFilePreProcessing = ({ appSettings, setSelectedFiles }: UseFileP
             logService.error(`Failed to auto-convert zip file ${file.name}`, { error });
             processedFiles.push(file);
           } finally {
-            writeSelectedFiles((prev) => prev.filter((f) => f.id !== tempId));
+            writeSelectedFiles((prev) => prev.filter((selectedFile) => selectedFile.id !== tempId));
           }
         } else if (isDocxFile(file)) {
           const tempId = generateUniqueId();
@@ -92,7 +91,7 @@ export const useFilePreProcessing = ({ appSettings, setSelectedFiles }: UseFileP
             // Fallback: send original file (might fail if not supported by API directly, but safer than crashing)
             processedFiles.push(file);
           } finally {
-            writeSelectedFiles((prev) => prev.filter((f) => f.id !== tempId));
+            writeSelectedFiles((prev) => prev.filter((selectedFile) => selectedFile.id !== tempId));
           }
         } else if (isAudio) {
           if (appSettings.isAudioCompressionEnabled) {
@@ -123,7 +122,7 @@ export const useFilePreProcessing = ({ appSettings, setSelectedFiles }: UseFileP
                 processedFiles.push(file);
               }
             } finally {
-              writeSelectedFiles((prev) => prev.filter((f) => f.id !== tempId));
+              writeSelectedFiles((prev) => prev.filter((selectedFile) => selectedFile.id !== tempId));
             }
           } else {
             processedFiles.push(file);

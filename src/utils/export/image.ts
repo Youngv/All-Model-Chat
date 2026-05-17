@@ -59,15 +59,14 @@ export const exportElementAsPng = async (
     logService.warn(`[Export] Area too large, reducing scale to ${targetScale.toFixed(2)}`);
   }
 
-  // Minimum scale floor
   targetScale = Math.max(targetScale, 0.5);
 
   try {
     const canvas = await html2canvas(element, {
-      height: height,
-      width: width,
-      useCORS: true, // Important for cross-origin images
-      allowTaint: false, // Must be false to allow export
+      height,
+      width,
+      useCORS: true,
+      allowTaint: false,
       logging: false,
       backgroundColor: options?.backgroundColor ?? null,
       scale: targetScale,

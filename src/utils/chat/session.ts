@@ -104,12 +104,12 @@ export const rehydrateSessionFiles = (session: SavedChatSession): SavedChatSessi
     if (!message.files?.length) return message;
 
     const newFiles = message.files.map((file) => {
-      // 1. Check for legacy Base64 stored in dataUrl (Abuse Check)
-      // If dataUrl exists but it's NOT a blob: URI, it might be a base64 string
+      // Migrate inline base64 dataUrl values into managed blob URLs.
+      // dataUrl values that are not blob/http are treated as inline base64 payloads.
       if (file.dataUrl && !file.dataUrl.startsWith('blob:') && !file.dataUrl.startsWith('http')) {
-        // It's likely a base64 string. Convert to Blob to save memory/performance.
+        // Convert base64 payloads to Blob objects to keep preview memory bounded.
         try {
-          // Strip prefix if present (data:image/png;base64,...)
+          // Strip optional data URL prefix if present (data:image/png;base64,...).
           const base64Clean = file.dataUrl.includes(',') ? file.dataUrl.split(',')[1] : file.dataUrl;
           const blob = base64ToBlob(base64Clean, file.type);
           const newFile = new File([blob], file.name, { type: file.type });
@@ -125,19 +125,18 @@ export const rehydrateSessionFiles = (session: SavedChatSession): SavedChatSessi
         }
       }
 
-      // 2. Standard Rehydration from IndexedDB Blob (rawFile)
+      // Rehydrate previews from IndexedDB Blob records.
       const isValidRawFile = file.rawFile instanceof Blob;
 
-      // Always create Object URL for Blobs if we have the raw file, needed for previewing (text, images, media, etc.)
-      // Previously this logic was restricted to visual media/PDFs, causing text files to have stale/invalid dataUrls on reload.
+      // Blob-backed files need fresh object URLs for previews after reload.
       if (isValidRawFile) {
         try {
-          // Create a new blob URL. The browser will handle the old invalid one on page unload.
+          // Managed object URLs keep preview cleanup tied to the session owner.
           const dataUrl = createManagedObjectUrl(file.rawFile as Blob, {
             key: `session-file:${session.id}:${message.id}:${file.id}`,
             ownerId: sessionResourceOwner,
           });
-          return { ...file, dataUrl: dataUrl };
+          return { ...file, dataUrl };
         } catch (error) {
           logSessionError('Failed to create object URL for file on load', { fileId: file.id, error });
           return { ...file, dataUrl: undefined, error: 'Preview failed to load' };

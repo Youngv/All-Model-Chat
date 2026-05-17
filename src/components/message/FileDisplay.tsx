@@ -35,7 +35,6 @@ const getDisplayType = (mimeType: string, name: string) => {
   if (mimeType.includes('javascript')) return 'JS';
   if (mimeType.includes('python')) return 'PY';
 
-  // Fallback
   const subtype = mimeType.split('/').pop()?.toUpperCase() || 'FILE';
   return subtype.length > 8 ? subtype.substring(0, 8) : subtype;
 };

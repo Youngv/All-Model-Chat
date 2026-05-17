@@ -174,7 +174,7 @@ export const useTokenCountLogic = ({
     setFiles((prev) => {
       const removedFile = prev.find((file) => file.id === id);
       cleanupFilePreviewUrl(removedFile);
-      return prev.filter((f) => f.id !== id);
+      return prev.filter((file) => file.id !== id);
     });
     setTokenCount(null);
   };

@@ -8,7 +8,7 @@ import {
 import { logService } from '@/services/logService';
 import { releaseManagedObjectUrl } from '@/services/objectUrlManager';
 import { getApiKeyErrorTranslationKey, getGeminiKeyForRequest } from '@/utils/apiUtils';
-import { buildFileUploadPreflight, checkBatchNeedsApiKey, getFilesRequiringFileApi } from './utils';
+import { buildFileUploadPreflight, checkBatchNeedsApiKey, getFilesRequiringFileApi } from './fileUploadPolicy';
 import { uploadFileItem } from './uploadFileItem';
 import { runWithConcurrencyLimit } from './uploadQueue';
 import { useI18n } from '@/contexts/I18nContext';
@@ -34,7 +34,6 @@ export const useFileUploader = ({
   setCurrentChatSettings,
 }: UseFileUploaderProps) => {
   const { t } = useI18n();
-  // Refs to track upload speed for each file ID
   const uploadStatsRef = useRef<Map<string, { lastLoaded: number; lastTime: number }>>(new Map());
 
   const uploadFiles = useCallback(
@@ -71,7 +70,6 @@ export const useFileUploader = ({
         }
       }
 
-      // Determine default resolution for new files
       const defaultResolution =
         currentChatSettings.mediaResolution !== MediaResolution.MEDIA_RESOLUTION_UNSPECIFIED
           ? currentChatSettings.mediaResolution

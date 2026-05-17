@@ -7,7 +7,7 @@ import { Modal } from '@/components/shared/Modal';
 import { FilePreviewHeader, type FilePreviewHeaderHandle } from '@/components/shared/file-preview/FilePreviewHeader';
 import { ImageViewer } from '@/components/shared/file-preview/ImageViewer';
 import { TextFileViewer } from '@/components/shared/file-preview/TextFileViewer';
-import { IconYoutube } from '@/components/icons/CustomIcons';
+import { IconYoutube } from '@/components/icons';
 import { cleanupFilePreviewUrl, copyFileToClipboard, fileToBlobUrl } from '@/utils/fileHelpers';
 import { extractDocxText, isDocxFile } from '@/utils/docxPreview';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -57,10 +57,10 @@ const FilePreviewModalContent: React.FC<FilePreviewModalContentProps> = ({
   const [isDocxPreviewLoading, setIsDocxPreviewLoading] = useState(false);
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const filePreviewHeaderRef = useRef<FilePreviewHeaderHandle>(null);
-  const previewFile = useMemo(() => (localPreviewUrl ? { ...file, dataUrl: localPreviewUrl } : file), [
-    file,
-    localPreviewUrl,
-  ]);
+  const previewFile = useMemo(
+    () => (localPreviewUrl ? { ...file, dataUrl: localPreviewUrl } : file),
+    [file, localPreviewUrl],
+  );
 
   useEffect(() => {
     if (file.dataUrl || !(file.rawFile instanceof Blob)) {
@@ -162,8 +162,7 @@ const FilePreviewModalContent: React.FC<FilePreviewModalContentProps> = ({
       };
     }
 
-    // Intentional loading-state transition before async preview extraction begins.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional loading-state transition before async preview extraction begins.
     setIsDocxPreviewLoading(true);
 
     void extractDocxText(file.rawFile)

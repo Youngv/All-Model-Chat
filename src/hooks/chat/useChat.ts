@@ -1,12 +1,11 @@
-import type React from 'react';
-import { useRef, useCallback, useMemo } from 'react';
+import { type Dispatch, type SetStateAction, useRef, useCallback, useMemo } from 'react';
 import { type AppSettings, type UploadedFile } from '@/types';
 import { useModels } from '@/hooks/core/useModels';
 import { useChatHistory } from './useChatHistory';
-import { useFileHandling } from '@/hooks/files/useFileHandling';
-import { useFileDragDrop } from '@/hooks/files/useFileDragDrop';
+import { useFileHandling } from '@/hooks/file-upload/useFileHandling';
+import { useFileDragDrop } from '@/hooks/file-upload/useFileDragDrop';
 import { usePreloadedScenarios } from '@/hooks/usePreloadedScenarios';
-import { useMessageSender } from '@/hooks/useMessageSender';
+import { useMessageSender } from '@/features/message-sender/useMessageSender';
 import { useChatScroll } from './useChatScroll';
 import { useAutoTitling } from './useAutoTitling';
 import { useSuggestions } from './useSuggestions';
@@ -22,7 +21,7 @@ import { useChatStore } from '@/stores/chatStore';
 
 export const useChat = (
   appSettings: AppSettings,
-  setAppSettings: React.Dispatch<React.SetStateAction<AppSettings>>,
+  setAppSettings: Dispatch<SetStateAction<AppSettings>>,
   language: 'en' | 'zh',
 ) => {
   // Computed state — reactive values that require derivation
@@ -70,17 +69,12 @@ export const useChat = (
   const userScrolledUpRef = useChatStore.getState()._userScrolledUp;
   const fileDraftsRef = useChatStore.getState()._fileDrafts;
 
-  // Aliases
-  const messages = activeMessages;
-
   // Optimize background performance when loading
   useBackgroundKeepAlive(isLoading);
 
   const sessionKeyMapRef = useRef<Map<string, string>>(new Map());
 
   const { apiModels: apiModelsFromHook, isModelsLoading, modelsLoadingError, setApiModels } = useModels();
-
-  const effectiveApiModels = apiModelsFromHook;
 
   const historyHandler = useChatHistory({
     appSettings,
@@ -124,7 +118,7 @@ export const useChat = (
 
   const handleRemoveTempFile = useCallback(
     (id: string) => {
-      setSelectedFiles((prev) => prev.filter((f) => f.id !== id));
+      setSelectedFiles((prev) => prev.filter((selectedFile) => selectedFile.id !== id));
     },
     [setSelectedFiles],
   );
@@ -147,7 +141,7 @@ export const useChat = (
   const messageSender = useMessageSender({
     appSettings,
     currentChatSettings,
-    messages,
+    messages: activeMessages,
     selectedFiles,
     setSelectedFiles,
     editingMessageId,
@@ -164,7 +158,7 @@ export const useChat = (
   });
 
   const messageActions = useMessageActions({
-    messages,
+    messages: activeMessages,
     isLoading,
     activeSessionId,
     editingMessageId,
@@ -252,7 +246,7 @@ export const useChat = (
 
   return {
     // Computed state
-    messages,
+    messages: activeMessages,
     isLoading,
     currentChatSettings,
     activeChat,
@@ -269,7 +263,7 @@ export const useChat = (
     savedSessions,
     savedGroups,
     activeSessionId,
-    apiModels: effectiveApiModels,
+    apiModels: apiModelsFromHook,
     setApiModels,
     isModelsLoading,
     modelsLoadingError,
@@ -329,7 +323,6 @@ export const useChat = (
     handleSaveAllScenarios: scenarioHandler.handleSaveAllScenarios,
     handleLoadPreloadedScenario: scenarioHandler.handleLoadPreloadedScenario,
 
-    // Actions
     handleTranscribeAudio: chatActions.handleTranscribeAudio,
     setCommandedInput,
     setCurrentChatSettings,

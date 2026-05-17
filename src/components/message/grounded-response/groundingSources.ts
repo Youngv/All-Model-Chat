@@ -23,7 +23,7 @@ export const getDomain = (url: string) => {
 
 export const getFavicon = (url: string, title?: string) => {
   try {
-    // Heuristic: If title looks like a domain (has dot, no spaces), use it.
+    // If the title looks like a domain (has dot, no spaces), use it.
     // This helps when the URI is a proxy/redirect (e.g. Vertex AI Search).
     if (title && title.includes('.') && !title.trim().includes(' ')) {
       return `https://www.google.com/s2/favicons?domain=${title.trim()}&sz=64`;
@@ -43,21 +43,19 @@ export const insertCitations = (text: string, metadata: unknown): string => {
     return text;
   }
 
-  // IMPORTANT: Do NOT sanitize text here.
+  // Do not sanitize text here.
   // The indices in metadata.groundingSupports are byte offsets based on the RAW text returned by the API.
-  const rawText = text;
-
-  // Combine grounding chunks and citations into a single, indexed array
+  // Combine grounding chunks and citations into a single indexed array.
   const sources = [
     ...(metadata.groundingChunks?.map((chunk) => getGroundingChunkSource(chunk)) || []),
     ...(metadata.citations || []),
   ].filter(Boolean);
 
-  if (sources.length === 0) return rawText;
+  if (sources.length === 0) return text;
 
-  const encodedText = new TextEncoder().encode(rawText);
+  const encodedText = new TextEncoder().encode(text);
   const toCharIndex = (byteIndex: number) => {
-    // Decode bytes up to byteIndex to find the corresponding character index in JS string
+    // Decode bytes up to byteIndex to find the corresponding character index in the JS string.
     return new TextDecoder().decode(encodedText.slice(0, byteIndex)).length;
   };
 
@@ -65,7 +63,7 @@ export const insertCitations = (text: string, metadata: unknown): string => {
     (a, b) => (b.segment?.endIndex || 0) - (a.segment?.endIndex || 0),
   );
 
-  let contentWithCitations = rawText;
+  let contentWithCitations = text;
   for (const support of sortedSupports) {
     const byteEndIndex = support.segment?.endIndex;
     if (typeof byteEndIndex !== 'number') continue;
@@ -80,7 +78,7 @@ export const insertCitations = (text: string, metadata: unknown): string => {
         if (!source || !source.uri) return '';
 
         const titleAttr = `Source: ${source.title || source.uri}`.replace(/"/g, '&quot;');
-        // Direct brackets in text for consistent coloring
+        // Use direct brackets in text for consistent coloring.
         return `<a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="citation-ref" title="${titleAttr}">[${chunkIndex + 1}]</a>`;
       })
       .join('');

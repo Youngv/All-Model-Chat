@@ -215,12 +215,9 @@ export class PyodideService {
     this.initWorker();
     const id = this.createRequestId();
 
-    // Filter and read files that have raw data
     const filesToMount = await Promise.all(
       files.map(async (f) => {
         if (!f.rawFile) return null;
-        // Only mount text or basic data types, avoid massive videos unless necessary
-        // For now we assume if it's passed here, it's intended for analysis
         const buffer = await f.rawFile.arrayBuffer();
         return { name: f.name, data: buffer };
       }),

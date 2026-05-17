@@ -48,7 +48,7 @@ export const useMessageExport = ({ message, sessionTitle, messageIndex, themeId 
       const messageWrapper = document.querySelector(`[data-message-id="${message.id}"]`);
       // We want the inner bubble, usually inside the wrapper.
       // The structure is Wrapper -> Container -> [Actions, Bubble, Actions]
-      // We prioritize the new specific container class, falling back to older selectors if needed
+      // Prefer the message content container, then broader bubble selectors.
       const contentNodeSource =
         messageWrapper?.querySelector('.message-content-container') ||
         messageWrapper?.querySelector('.markdown-body') ||
@@ -118,7 +118,7 @@ export const useMessageExport = ({ message, sessionTitle, messageIndex, themeId 
               role: message.role === 'user' ? t('export_role_user') : t('export_role_assistant'),
               timestamp: new Date(message.timestamp),
               content: markdownContent,
-              files: message.files?.map((f) => ({ name: f.name })),
+              files: message.files?.map((file) => ({ name: file.name })),
             },
           ],
         });

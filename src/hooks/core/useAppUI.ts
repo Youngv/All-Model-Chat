@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { type TouchEvent, useCallback, useEffect, useRef } from 'react';
 import { useUIStore } from '@/stores/uiStore';
 
 const DESKTOP_BREAKPOINT = 768;
@@ -51,7 +50,7 @@ export const useAppUI = () => {
     };
   }, [syncHistorySidebarForViewport]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: TouchEvent) => {
     if (window.innerWidth >= DESKTOP_BREAKPOINT) {
       return;
     }
@@ -67,7 +66,7 @@ export const useAppUI = () => {
   }, []);
 
   const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
+    (e: TouchEvent) => {
       if (window.innerWidth >= DESKTOP_BREAKPOINT) {
         return;
       }

@@ -1,6 +1,5 @@
 import type { ComponentType, JSXElementConstructor, PropsWithChildren, ReactNode } from 'react';
-import { render as testingLibraryRender } from '@testing-library/react';
-import type { RenderOptions, RenderResult } from '@testing-library/react';
+import { render as testingLibraryRender, type RenderOptions, type RenderResult } from '@testing-library/react';
 import { afterEach, beforeEach } from 'vitest';
 
 export type TestWrapper = ComponentType<PropsWithChildren> | JSXElementConstructor<{ children: ReactNode }>;

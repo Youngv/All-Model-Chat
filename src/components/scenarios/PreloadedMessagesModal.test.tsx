@@ -31,7 +31,7 @@ const { scenarioManagerState } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@/hooks/features/useScenarioManager', () => ({
+vi.mock('@/hooks/scenarios/useScenarioManager', () => ({
   useScenarioManager: () => scenarioManagerState,
 }));
 

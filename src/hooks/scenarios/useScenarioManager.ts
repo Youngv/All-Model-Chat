@@ -1,6 +1,5 @@
 import { logService } from '@/services/logService';
-import type React from 'react';
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { type ChangeEvent, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { type SavedScenario } from '@/types';
 import { type translations } from '@/i18n/translations';
 import { generateUniqueId } from '@/utils/chat/ids';
@@ -78,7 +77,7 @@ export const useScenarioManager = ({
         ...scenario,
         id: generateUniqueId(),
         title: t('scenarios_copy_title').replace('{title}', scenario.title),
-        messages: scenario.messages.map((m) => ({ ...m, id: generateUniqueId() })), // Deep copy messages with new IDs
+        messages: scenario.messages.map((message) => ({ ...message, id: generateUniqueId() })),
       };
 
       setScenarios((prev) => buildSavedScenarios([newScenario, ...getExportableUserScenarios(prev)]));
@@ -100,9 +99,11 @@ export const useScenarioManager = ({
       }
       setScenarios((prev) => {
         const nextUserScenarios = getExportableUserScenarios(prev);
-        const existing = nextUserScenarios.find((s) => s.id === scenarioToSave.id);
+        const existing = nextUserScenarios.find((scenario) => scenario.id === scenarioToSave.id);
         if (existing) {
-          return buildSavedScenarios(nextUserScenarios.map((s) => (s.id === scenarioToSave.id ? scenarioToSave : s)));
+          return buildSavedScenarios(
+            nextUserScenarios.map((scenario) => (scenario.id === scenarioToSave.id ? scenarioToSave : scenario)),
+          );
         }
         return buildSavedScenarios([...nextUserScenarios, scenarioToSave]);
       });
@@ -114,8 +115,10 @@ export const useScenarioManager = ({
   );
 
   const handleDeleteScenario = useCallback(
-    (id: string) => {
-      setScenarios((prev) => buildSavedScenarios(getExportableUserScenarios(prev).filter((s) => s.id !== id)));
+    (scenarioId: string) => {
+      setScenarios((prev) =>
+        buildSavedScenarios(getExportableUserScenarios(prev).filter((scenario) => scenario.id !== scenarioId)),
+      );
       showFeedback('info', t('scenarios_feedback_cleared'));
     },
     [showFeedback, t],
@@ -134,8 +137,8 @@ export const useScenarioManager = ({
       return;
     }
 
-    const dataToExport = buildScenarioExportPayload(scenariosToExport);
-    const jsonString = JSON.stringify(dataToExport, null, 2);
+    const exportPayload = buildScenarioExportPayload(scenariosToExport);
+    const jsonString = JSON.stringify(exportPayload, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
     const date = new Date().toISOString().slice(0, 10);
     triggerDownload(createManagedObjectUrl(blob), `scenarios-export-${date}.json`);
@@ -144,13 +147,13 @@ export const useScenarioManager = ({
 
   const handleExportSingleScenario = useCallback(
     (scenario: SavedScenario) => {
-      const dataToExport = {
+      const exportPayload = {
         type: 'AllModelChat-Scenarios',
         version: 1,
         scenarios: [scenario],
       };
       const safeTitle = sanitizeFilename(scenario.title);
-      const jsonString = JSON.stringify(dataToExport, null, 2);
+      const jsonString = JSON.stringify(exportPayload, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
       triggerDownload(createManagedObjectUrl(blob), `scenario-${safeTitle}.json`);
       showFeedback('success', t('scenarios_feedback_exported'));
@@ -159,7 +162,7 @@ export const useScenarioManager = ({
   );
 
   const handleImportScenarios = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
 

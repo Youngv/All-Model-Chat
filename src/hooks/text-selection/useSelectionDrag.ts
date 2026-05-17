@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/immutability, react-hooks/exhaustive-deps */
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, type RefObject } from 'react';
 
 interface UseSelectionDragProps {
-  toolbarRef: React.RefObject<HTMLDivElement>;
+  toolbarRef: RefObject<HTMLDivElement>;
   position: { top: number; left: number } | null;
   onPositionChange: (pos: { top: number; left: number }) => void;
 }
@@ -11,6 +10,7 @@ export const useSelectionDrag = ({ toolbarRef, position, onPositionChange }: Use
   const isDragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number | null>(null);
+  const activeDragEndListenerRef = useRef<((event: MouseEvent) => void) | null>(null);
 
   const getClampedPosition = useCallback(
     (clientX: number, clientY: number) => {
@@ -61,7 +61,10 @@ export const useSelectionDrag = ({ toolbarRef, position, onPositionChange }: Use
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
       document.removeEventListener('mousemove', handleDragMove);
-      document.removeEventListener('mouseup', handleDragEnd);
+      if (activeDragEndListenerRef.current) {
+        document.removeEventListener('mouseup', activeDragEndListenerRef.current);
+        activeDragEndListenerRef.current = null;
+      }
 
       // Sync final position to React state
       const nextPosition = getClampedPosition(e.clientX, e.clientY);
@@ -76,7 +79,7 @@ export const useSelectionDrag = ({ toolbarRef, position, onPositionChange }: Use
         toolbarRef.current.style.transition = '';
       }
     },
-    [getClampedPosition, onPositionChange, handleDragMove],
+    [getClampedPosition, onPositionChange, handleDragMove, toolbarRef],
   );
 
   const handleDragStart = useCallback(
@@ -96,19 +99,23 @@ export const useSelectionDrag = ({ toolbarRef, position, onPositionChange }: Use
       };
 
       document.body.style.userSelect = 'none';
+      activeDragEndListenerRef.current = handleDragEnd;
       document.addEventListener('mousemove', handleDragMove);
       document.addEventListener('mouseup', handleDragEnd);
     },
-    [position, handleDragMove, handleDragEnd],
+    [position, handleDragMove, handleDragEnd, toolbarRef],
   );
 
   useEffect(() => {
     return () => {
       document.removeEventListener('mousemove', handleDragMove);
-      document.removeEventListener('mouseup', handleDragEnd);
+      if (activeDragEndListenerRef.current) {
+        document.removeEventListener('mouseup', activeDragEndListenerRef.current);
+        activeDragEndListenerRef.current = null;
+      }
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [handleDragMove, handleDragEnd]);
+  }, [handleDragMove]);
 
   return { handleDragStart, isDragging };
 };

@@ -82,7 +82,6 @@ export const CodeBlock: React.FC<CodeBlockProps> = (props) => {
     return extractTextFromNode(props.children);
   }, [codeElement, props.children, isPython]);
 
-  // Pyodide Execution Logic
   const { isRunning, output, image, files, error, hasRun, runCode, clearOutput, resetState } = usePyodide(
     props.cacheKey,
   );
@@ -92,15 +91,15 @@ export const CodeBlock: React.FC<CodeBlockProps> = (props) => {
   };
 
   const generatedFiles = useMemo(() => {
-    return files.map((f, i) => {
-      const dataUrl = `data:${f.type};base64,${f.data}`;
-      // Construct a temporary UploadedFile object for compatibility with FileDisplay
+    return files.map((file, fileIndex) => {
+      const dataUrl = `data:${file.type};base64,${file.data}`;
+      // Build a file-like wrapper so FileDisplay can render generated artifacts.
       return {
-        id: `generated-file-${i}`,
-        name: f.name,
-        type: f.type,
-        size: 0, // Size not critical here
-        dataUrl: dataUrl,
+        id: `generated-file-${fileIndex}`,
+        name: file.name,
+        type: file.type,
+        size: 0, // Size is unknown for generated artifacts.
+        dataUrl,
         uploadState: 'active' as const,
       };
     });

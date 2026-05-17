@@ -1,5 +1,12 @@
-import type { AppSettings, ChatMessage, ChatSettings, SavedChatSession, Theme, UploadedFile } from '@/types';
-import { MediaResolution } from '@/types';
+import {
+  MediaResolution,
+  type AppSettings,
+  type ChatMessage,
+  type ChatSettings,
+  type SavedChatSession,
+  type Theme,
+  type UploadedFile,
+} from '@/types';
 import { AVAILABLE_THEMES } from '@/constants/themeConstants';
 
 export const createChatSettings = (overrides: Partial<ChatSettings> = {}): ChatSettings => ({

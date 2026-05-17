@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { SlidersHorizontal, Globe, Check, Terminal, Link, X, Telescope, Calculator, AlertTriangle } from 'lucide-react';
 import { useI18n } from '@/contexts/I18nContext';
-import { IconPython } from '@/components/icons/CustomIcons';
+import { IconPython } from '@/components/icons';
 import { CHAT_INPUT_BUTTON_CLASS } from '@/constants/appConstants';
 import { usePortaledMenu } from '@/hooks/ui/usePortaledMenu';
 import { getCachedModelCapabilities } from '@/stores/modelCapabilitiesStore';

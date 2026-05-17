@@ -3,7 +3,7 @@ import { useI18n } from '@/contexts/I18nContext';
 import { type AppSettings, type ChatSettings, type ModelOption } from '@/types';
 import { Modal } from '@/components/shared/Modal';
 import { ConfirmationModal } from '@/components/modals/ConfirmationModal';
-import { useSettingsLogic } from '@/hooks/features/useSettingsLogic';
+import { useSettingsLogic } from '@/hooks/settings/useSettingsLogic';
 import { SettingsSidebar } from './SettingsSidebar';
 import { SettingsContent } from './SettingsContent';
 import { type SettingsTransferProps } from './settingsTypes';
@@ -157,6 +157,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         onClose={onClose}
         noPadding
         enterAnimationClassName=""
+        ariaLabel={t('settingsTitle')}
         contentClassName="w-full h-[100dvh] sm:h-[85vh] sm:max-h-[800px] sm:w-[90vw] max-w-6xl sm:rounded-xl overflow-hidden flex flex-col md:flex-row shadow-2xl bg-[var(--theme-bg-primary)] transition-all"
       >
         <SettingsSidebar tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} onClose={onClose} />

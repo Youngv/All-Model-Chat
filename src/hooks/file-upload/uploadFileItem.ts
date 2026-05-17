@@ -1,4 +1,4 @@
-import type React from 'react';
+import type { MutableRefObject } from 'react';
 import { type AppSettings, type UploadedFile, type MediaResolution } from '@/types';
 import { ALL_SUPPORTED_MIME_TYPES } from '@/constants/fileConstants';
 import { logService } from '@/services/logService';
@@ -12,7 +12,7 @@ import {
   getEffectiveMimeType,
   getUploadLifecycleForGeminiState,
   shouldUseFileApi,
-} from './utils';
+} from './fileUploadPolicy';
 import { getTranslator } from '@/i18n/translations';
 
 type Translator = ReturnType<typeof getTranslator>;
@@ -24,7 +24,7 @@ interface UploadFileItemParams {
   defaultResolution: MediaResolution | undefined;
   appSettings: AppSettings;
   setSelectedFiles: React.Dispatch<React.SetStateAction<UploadedFile[]>>;
-  uploadStatsRef: React.MutableRefObject<Map<string, { lastLoaded: number; lastTime: number }>>;
+  uploadStatsRef: MutableRefObject<Map<string, { lastLoaded: number; lastTime: number }>>;
   t?: Translator;
 }
 
@@ -98,7 +98,7 @@ export const uploadFileItem = async ({
       size: file.size,
       progress: 0,
       rawFile: file,
-      dataUrl: dataUrl, // Add local preview URL
+      dataUrl,
       transferStrategy: 'files-api',
       uploadState: 'uploading',
       abortController: controller,
@@ -132,15 +132,15 @@ export const uploadFileItem = async ({
       const percent = Math.round((loaded / total) * 100);
 
       setSelectedFiles((prev) =>
-        prev.map((f) => {
-          if (f.id === fileId) {
+        prev.map((selectedFile) => {
+          if (selectedFile.id === fileId) {
             return {
-              ...f,
+              ...selectedFile,
               progress: percent,
-              uploadSpeed: speedStr || f.uploadSpeed, // Keep old speed if not updated this tick
+              uploadSpeed: speedStr || selectedFile.uploadSpeed, // Keep old speed if not updated this tick
             };
           }
-          return f;
+          return selectedFile;
         }),
       );
     };
@@ -152,7 +152,7 @@ export const uploadFileItem = async ({
         effectiveMimeType,
         file.name,
         controller.signal,
-        handleProgress, // Pass progress callback
+        handleProgress,
       );
 
       logService.info(`File uploaded, initial state: ${uploadedFileInfo.state}`, { fileInfo: uploadedFileInfo });
@@ -160,22 +160,22 @@ export const uploadFileItem = async ({
       const { uploadState, isProcessing } = getUploadLifecycleForGeminiState(uploadedFileInfo.state);
 
       setSelectedFiles((prev) =>
-        prev.map((f) =>
-          f.id === fileId
+        prev.map((selectedFile) =>
+          selectedFile.id === fileId
             ? {
-                ...f,
+                ...selectedFile,
                 isProcessing,
                 progress: 100,
                 fileUri: uploadedFileInfo.uri,
                 fileApiName: uploadedFileInfo.name,
-                rawFile: file, // Preserve local file reference for preview
+                rawFile: file,
                 transferStrategy: 'files-api',
-                uploadState: uploadState,
-                error: uploadState === 'failed' ? t('upload_api_processing_failed') : f.error || undefined,
+                uploadState,
+                error: uploadState === 'failed' ? t('upload_api_processing_failed') : selectedFile.error || undefined,
                 abortController: undefined,
-                uploadSpeed: undefined, // Clear speed on complete
+                uploadSpeed: undefined,
               }
-            : f,
+            : selectedFile,
         ),
       );
     } catch (uploadError) {
@@ -197,10 +197,10 @@ export const uploadFileItem = async ({
       releaseManagedObjectUrl(dataUrl);
 
       setSelectedFiles((prev) =>
-        prev.map((f) =>
-          f.id === fileId
+        prev.map((selectedFile) =>
+          selectedFile.id === fileId
             ? {
-                ...f,
+                ...selectedFile,
                 isProcessing: false,
                 error: errorMsg,
                 uploadState: uploadStateUpdate,
@@ -209,7 +209,7 @@ export const uploadFileItem = async ({
                 dataUrl: undefined, // Clear dataUrl so UI renders fallback icon
                 rawFile: undefined, // Free memory
               }
-            : f,
+            : selectedFile,
         ),
       );
     } finally {
@@ -224,15 +224,18 @@ export const uploadFileItem = async ({
       size: file.size,
       progress: 0,
       rawFile: file,
-      dataUrl: dataUrl,
+      dataUrl,
       transferStrategy: 'inline',
       mediaResolution: defaultResolution,
     });
     setSelectedFiles((prev) => [...prev, initialFileState]);
 
-    // Mark active immediately
-    setSelectedFiles((p) =>
-      p.map((f) => (f.id === fileId ? { ...f, isProcessing: false, progress: 100, uploadState: 'active' } : f)),
+    setSelectedFiles((prev) =>
+      prev.map((selectedFile) =>
+        selectedFile.id === fileId
+          ? { ...selectedFile, isProcessing: false, progress: 100, uploadState: 'active' }
+          : selectedFile,
+      ),
     );
   }
 };

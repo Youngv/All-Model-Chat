@@ -7,8 +7,6 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { getTranslator } from '@/i18n/translations';
 
 export const useModels = () => {
-  useModelPreferencesStore.getState().hydrateLegacyModelPreferences();
-
   const language = useSettingsStore((state) => state.language);
   const t = useMemo(() => getTranslator(language), [language]);
   const customModels = useModelPreferencesStore((state) => state.customModels);
@@ -17,6 +15,10 @@ export const useModels = () => {
   const [isDefaultModelsLoading, setIsDefaultModelsLoading] = useState(() => !customModels?.length);
   const [modelsLoadingError, setModelsLoadingError] = useState<string | null>(null);
   const hasCustomModels = !!customModels?.length;
+
+  useEffect(() => {
+    useModelPreferencesStore.getState().hydrateLegacyModelPreferences();
+  }, []);
 
   useEffect(() => {
     if (hasCustomModels) {

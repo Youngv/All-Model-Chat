@@ -13,15 +13,14 @@ const compareVersions = (v1: string, v2: string) => {
   for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
     const p1 = parts1[i] || 0;
     const p2 = parts2[i] || 0;
-    if (p1 > p2) return 1; // v1 is greater
-    if (p1 < p2) return -1; // v2 is greater
+    if (p1 > p2) return 1;
+    if (p1 < p2) return -1;
   }
-  return 0; // Equal
+  return 0;
 };
 
 export const AboutSection: React.FC = () => {
-  const { t } = useI18n();
-  const { language } = useI18n();
+  const { t, language } = useI18n();
   const themeId = useSettingsStore((state) => state.currentTheme.id);
   const iconSize = useResponsiveValue(18, 20);
   const isCompactViewport = useResponsiveValue(true, false, 900);
@@ -85,7 +84,6 @@ export const AboutSection: React.FC = () => {
     };
   }, []);
 
-  // Comparison Logic: 1 = Remote is newer, -1 = Local is newer (Beta), 0 = Same
   const comparison = latestVersion ? compareVersions(latestVersion, currentVersion) : 0;
   const isUpdateAvailable = comparison === 1;
   const isBeta = comparison === -1;
@@ -115,7 +113,6 @@ export const AboutSection: React.FC = () => {
     <div
       className={`flex min-h-full flex-col items-center px-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500 ${isCompactViewport ? 'py-2.5' : 'py-3 sm:py-4 md:py-5'}`}
     >
-      {/* Logo Section with Glow */}
       <div className="relative group">
         <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
         <div className="relative">
@@ -127,12 +124,10 @@ export const AboutSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div
         className={`flex max-w-lg flex-col items-center ${isCompactViewport ? 'mt-2.5 space-y-3.5' : 'mt-3 space-y-4 sm:mt-4 sm:space-y-5'}`}
       >
         <div className="flex flex-wrap items-center justify-center gap-2">
-          {/* Redesigned Version Pill */}
           <a
             href="https://github.com/yeahhe365/AMC-WebUI/releases"
             target="_blank"
@@ -140,7 +135,6 @@ export const AboutSection: React.FC = () => {
             className="group relative inline-flex items-center justify-center overflow-hidden rounded-full p-[1px] transition-transform duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[var(--theme-border-focus)] focus:ring-offset-2 focus:ring-offset-[var(--theme-bg-primary)]"
             title={versionTooltip}
           >
-            {/* Gradient Border Background */}
             <span
               className={`absolute inset-0 transition-all duration-300 ${
                 isUpdateAvailable
@@ -155,7 +149,6 @@ export const AboutSection: React.FC = () => {
               } opacity-70 group-hover:opacity-100`}
             ></span>
 
-            {/* Inner Content */}
             <span
               className={`relative flex items-center gap-3 rounded-full bg-[var(--theme-bg-primary)] px-4 transition-all duration-75 ease-in group-hover:bg-opacity-[0.96] sm:px-5 ${isCompactViewport ? 'py-1' : 'py-1.5'}`}
             >
@@ -195,7 +188,6 @@ export const AboutSection: React.FC = () => {
         </p>
       </div>
 
-      {/* Actions */}
       <div
         className={`flex w-full flex-col items-stretch justify-center gap-2.5 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center ${isCompactViewport ? 'mt-3.5' : 'mt-4 sm:mt-5'}`}
       >

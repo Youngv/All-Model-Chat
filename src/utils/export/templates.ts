@@ -159,8 +159,8 @@ export const generateExportTxtTemplate = ({
       let text = `### ${roleTitle} [${timeStr}]\n`;
 
       if (msg.files && msg.files.length > 0) {
-        msg.files.forEach((f) => {
-          text += `[Attachment: ${f.name}]\n`;
+        msg.files.forEach((file) => {
+          text += `[Attachment: ${file.name}]\n`;
         });
       }
 

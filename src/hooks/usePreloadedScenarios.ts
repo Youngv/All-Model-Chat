@@ -38,7 +38,6 @@ export const usePreloadedScenarios = ({
         const storedScenarios = await dbService.getAllScenarios();
         const { userScenarios, didChange } = initializeScenarioState(storedScenarios, localStorage);
 
-        // Save if any changes were made
         if (didChange) {
           await dbService.setAllScenarios(userScenarios);
         }

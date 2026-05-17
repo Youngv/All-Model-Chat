@@ -143,9 +143,7 @@ export const useMessageListScroll = ({
       return;
     }
 
-    // Normal Logic: If message count increased within the SAME, STABLE session
     if (messages.length > prevMsgCount.current) {
-      // Find the index of the newly added Model message (placeholder)
       let targetIndex = -1;
       // Search backwards starting from the end of the previous message count
       for (let i = messages.length - 1; i >= Math.max(0, prevMsgCount.current - 1); i--) {
@@ -175,7 +173,6 @@ export const useMessageListScroll = ({
     prevMsgCount.current = messages.length;
   }, [messages, activeSessionId, clearAnchorTimeout]);
 
-  // Enhanced Navigation Logic: Search data array instead of DOM
   const scrollToPrevTurn = useCallback(() => {
     clearAnchorTimeout();
 
@@ -344,7 +341,6 @@ export const useMessageListScroll = ({
               virtuosoRef.current?.scrollTo({ top: savedSnapshot.scrollTop });
             }
           } else {
-            // Default to bottom for new/unvisited sessions
             virtuosoRef.current?.scrollToIndex({ index: 'LAST', align: 'end' });
           }
           // Mark restoration as complete for this session ID
