@@ -134,6 +134,25 @@ describe('project structure boundaries', () => {
     expect(liveApiSourceOffenders).toEqual([]);
   });
 
+  it('keeps UI hook filenames on the same Ui acronym casing as other local acronyms', () => {
+    const sourceFiles = listProjectSourceFiles('src').filter(
+      (relativePath) => relativePath !== 'src/test/architecture/projectStructureBoundaries.test.ts',
+    );
+    const coreHookFileNames = fs.readdirSync(path.join(projectRoot, 'src/hooks/core'));
+    const rootHookFileNames = fs.readdirSync(path.join(projectRoot, 'src/hooks'));
+
+    expect(coreHookFileNames).not.toContain('useAppUI.ts');
+    expect(rootHookFileNames).not.toContain('useMessageListUI.ts');
+    expect(coreHookFileNames).toContain('useAppUi.ts');
+    expect(rootHookFileNames).toContain('useMessageListUi.ts');
+
+    for (const relativePath of sourceFiles) {
+      const source = readProjectFile(relativePath);
+      expect(source, relativePath).not.toContain('useAppUI');
+      expect(source, relativePath).not.toContain('useMessageListUI');
+    }
+  });
+
   it('keeps local third-party declarations specific enough to avoid explicit any', () => {
     const turndownGfmDeclaration = readProjectFile('src/types/turndown-plugin-gfm.d.ts');
 

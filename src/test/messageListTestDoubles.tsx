@@ -30,7 +30,7 @@ type MessageListScrollMockResult = {
   scrollerRef: { current: null } | null;
 };
 
-type MessageListUIMockResult = {
+type MessageListUiMockResult = {
   previewFile: UploadedFile | null;
   isHtmlPreviewModalOpen: boolean;
   htmlToPreview: string | null;
@@ -127,8 +127,8 @@ export const createMessageListScrollMock = (overrides: Partial<MessageListScroll
   }),
 });
 
-export const createMessageListUIMock = (overrides: Partial<MessageListUIMockResult> = {}) => ({
-  useMessageListUI: (): MessageListUIMockResult => ({
+export const createMessageListUiMock = (overrides: Partial<MessageListUiMockResult> = {}) => ({
+  useMessageListUi: (): MessageListUiMockResult => ({
     previewFile: null,
     isHtmlPreviewModalOpen: false,
     htmlToPreview: null,

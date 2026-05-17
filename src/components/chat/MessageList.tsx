@@ -5,7 +5,7 @@ import { Message } from '@/components/message/Message';
 import { WelcomeScreen } from './message-list/WelcomeScreen';
 import { ScrollNavigation } from './message-list/ScrollNavigation';
 import { TextSelectionToolbar } from './message-list/TextSelectionToolbar';
-import { useMessageListUI } from '@/hooks/useMessageListUI';
+import { useMessageListUi } from '@/hooks/useMessageListUi';
 import { useMessageListScroll } from './message-list/hooks/useMessageListScroll';
 import { MessageListFooter } from './message-list/MessageListFooter';
 import { isGemini3Model } from '@/utils/modelHelpers';
@@ -102,7 +102,7 @@ const MessageListComponent: React.FC = () => {
     handleCloseHtmlPreview,
     handleConfigureFile,
     handleSaveFileConfig,
-  } = useMessageListUI({ messages: visibleMessages, onUpdateMessageFile });
+  } = useMessageListUi({ messages: visibleMessages, onUpdateMessageFile });
 
   const {
     virtuosoRef,

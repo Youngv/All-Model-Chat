@@ -6,7 +6,7 @@ const DESKTOP_BREAKPOINT = 768;
 const isSidebarElement = (target: EventTarget | null) =>
   target instanceof Element && target.closest('[data-history-sidebar-root="true"]') !== null;
 
-export const useAppUI = () => {
+export const useAppUi = () => {
   const isSettingsModalOpen = useUIStore((s) => s.isSettingsModalOpen);
   const isPreloadedMessagesModalOpen = useUIStore((s) => s.isPreloadedMessagesModalOpen);
   const isHistorySidebarOpen = useUIStore((s) => s.isHistorySidebarOpen);

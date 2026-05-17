@@ -76,9 +76,7 @@ export default tseslint.config(
   },
   {
     files: [
-      'src/components/icons/CustomIcons.tsx',
       'src/components/layout/chat-runtime/ChatRuntimeContext.tsx',
-      'src/components/shared/ModelPicker.tsx',
       'src/contexts/I18nContext.tsx',
       'src/contexts/WindowContext.tsx',
     ],

@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, expect } from 'vitest';
-import { MODELS_SUPPORTING_RAW_MODE } from './../constants/appConstants';
+import { MODELS_SUPPORTING_RAW_MODE } from '@/constants/appConstants';
 import {
   sortModels,
   isGemini3Model,
@@ -10,7 +10,7 @@ import {
   calculateTokenStats,
   resolveModelSwitchSettings,
 } from './modelHelpers';
-import { type ModelOption } from './../types';
+import { type ModelOption } from '@/types';
 import type { UsageMetadata } from '@google/genai';
 import { MediaResolution } from '@/types/settings';
 import { useModelPreferencesStore } from '@/stores/modelPreferencesStore';

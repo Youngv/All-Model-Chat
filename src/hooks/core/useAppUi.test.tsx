@@ -1,7 +1,7 @@
 import type React from 'react';
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useAppUI } from './useAppUI';
+import { useAppUi } from './useAppUi';
 import { useUIStore } from '@/stores/uiStore';
 import { renderHook } from '@/test/testUtils';
 
@@ -18,7 +18,7 @@ const flushRafCallbacks = () => {
   });
 };
 
-describe('useAppUI', () => {
+describe('useAppUi', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     localStorage.clear();
@@ -43,7 +43,7 @@ describe('useAppUI', () => {
 
   it('does not close the sidebar when a left swipe starts outside the sidebar', () => {
     useUIStore.setState({ isHistorySidebarOpen: true });
-    const { result, unmount } = renderHook(() => useAppUI());
+    const { result, unmount } = renderHook(() => useAppUi());
 
     const mainContent = document.createElement('div');
     document.body.appendChild(mainContent);
@@ -60,7 +60,7 @@ describe('useAppUI', () => {
 
   it('closes the sidebar when a left swipe starts inside the sidebar on mobile', () => {
     useUIStore.setState({ isHistorySidebarOpen: true });
-    const { result, unmount } = renderHook(() => useAppUI());
+    const { result, unmount } = renderHook(() => useAppUi());
 
     const sidebar = document.createElement('aside');
     sidebar.setAttribute('data-history-sidebar-root', 'true');
@@ -83,7 +83,7 @@ describe('useAppUI', () => {
       writable: true,
     });
     useUIStore.setState({ isHistorySidebarOpen: false });
-    const { result, unmount } = renderHook(() => useAppUI());
+    const { result, unmount } = renderHook(() => useAppUi());
 
     const edge = document.createElement('div');
     document.body.appendChild(edge);
@@ -104,7 +104,7 @@ describe('useAppUI', () => {
       desktopHistorySidebarOpen: false,
       mobileHistorySidebarOpen: true,
     });
-    const { unmount } = renderHook(() => useAppUI());
+    const { unmount } = renderHook(() => useAppUi());
 
     act(() => {
       window.innerWidth = 1024;
@@ -131,7 +131,7 @@ describe('useAppUI', () => {
       desktopHistorySidebarOpen: true,
       mobileHistorySidebarOpen: false,
     });
-    const { unmount } = renderHook(() => useAppUI());
+    const { unmount } = renderHook(() => useAppUi());
 
     act(() => {
       window.innerWidth = 375;

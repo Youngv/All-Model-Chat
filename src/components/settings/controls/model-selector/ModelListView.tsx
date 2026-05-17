@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Check } from 'lucide-react';
 import { type ApiMode, type ModelOption } from '@/types';
-import { getModelIcon } from '@/components/shared/ModelPicker';
+import { getModelIcon } from '@/components/shared/modelIcons';
 import { useI18n } from '@/contexts/I18nContext';
 import {
   buildModelCatalog,

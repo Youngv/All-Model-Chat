@@ -68,7 +68,8 @@ describe('code style boundaries', () => {
         const sourceDir = path.dirname(path.join(projectRoot, relativePath));
         return Array.from(source.matchAll(sourceImportSpecifierPattern)).some((match) => {
           const specifier = match[1] ?? match[2] ?? match[3];
-          if (!specifier || !specifier.startsWith('../')) return false;
+          const normalizedSpecifier = specifier?.replace(/^(?:\.\/)+/, '');
+          if (!normalizedSpecifier?.startsWith('../')) return false;
 
           const absoluteTarget = path.resolve(sourceDir, specifier);
           return absoluteTarget.startsWith(path.join(projectRoot, 'src') + path.sep);
@@ -76,6 +77,13 @@ describe('code style boundaries', () => {
       });
 
     expect(offenders).toEqual([]);
+  });
+
+  it('keeps ESLint exception paths aligned with files that still exist', () => {
+    const eslintConfig = readProjectFile('eslint.config.js');
+
+    expect(fs.existsSync(path.join(projectRoot, 'src/components/icons/CustomIcons.tsx'))).toBe(false);
+    expect(eslintConfig).not.toContain('src/components/icons/CustomIcons.tsx');
   });
 
   it('does not repeat static import declarations from the same module in production sources', () => {

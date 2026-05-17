@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_APP_SETTINGS } from './../constants/appConstants';
-import { type ChatSettings } from './../types';
+import { DEFAULT_APP_SETTINGS } from '@/constants/appConstants';
+import { type ChatSettings } from '@/types';
 import {
   getGeminiKeyForRequest,
   getKeyForRequest,
   isServerManagedApiEnabledForProxyRequests,
   SERVER_MANAGED_API_KEY,
 } from './apiUtils';
-import { logService } from './../services/logService';
+import { logService } from '@/services/logService';
 
-vi.mock('./../services/logService', async () => {
+vi.mock('@/services/logService', async () => {
   const { createLogServiceMockModule } = await import('@/test/moduleMockDoubles');
 
   return createLogServiceMockModule();

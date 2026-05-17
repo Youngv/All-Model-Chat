@@ -99,7 +99,7 @@ describe('codebase maintainability guardrails', () => {
   });
 
   it('routes preview and export plumbing through shared helpers', () => {
-    const messageListUiSource = readProjectFile('src/hooks/useMessageListUI.ts');
+    const messageListUiSource = readProjectFile('src/hooks/useMessageListUi.ts');
     const chatInputFileSource = readProjectFile('src/hooks/chat-input/useChatInputFile.ts');
     const useAppSource = readProjectFile('src/hooks/app/useApp.ts');
     const useAppPromptModesSource = readProjectFile('src/hooks/app/useAppPromptModes.ts');
@@ -386,6 +386,42 @@ describe('codebase maintainability guardrails', () => {
       expect(source, relativePath).not.toMatch(/lazy\(async \(\) => \{/);
       expect(source, relativePath).not.toMatch(/return\s+\{\s*default:\s*module\./);
     }
+  });
+
+  it('keeps model icon rendering separate from the ModelPicker component', () => {
+    const modelPickerSource = readProjectFile('src/components/shared/ModelPicker.tsx');
+    const modelListViewSource = readProjectFile('src/components/settings/controls/model-selector/ModelListView.tsx');
+    const modelListEditorRowSource = readProjectFile(
+      'src/components/settings/controls/model-selector/ModelListEditorRow.tsx',
+    );
+    const tokenCountModalSource = readProjectFile('src/components/modals/TokenCountModal.tsx');
+
+    expect(fs.existsSync(path.join(projectRoot, 'src/components/shared/modelIcons.tsx'))).toBe(true);
+    expect(modelPickerSource).toContain("from './modelIcons'");
+    expect(modelPickerSource).not.toContain('export const getModelIcon =');
+    expect(modelListViewSource).toContain("from '@/components/shared/modelIcons'");
+    expect(modelListEditorRowSource).toContain("from '@/components/shared/modelIcons'");
+    expect(tokenCountModalSource).toContain("from '@/components/shared/modelIcons'");
+  });
+
+  it('keeps PNG export color sanitizing separate from DOM export orchestration', () => {
+    const domExportSource = readProjectFile('src/utils/export/dom.ts');
+
+    expect(fs.existsSync(path.join(projectRoot, 'src/utils/export/cssColorSanitizer.ts'))).toBe(true);
+    expect(domExportSource).toContain("from './cssColorSanitizer'");
+    expect(domExportSource).not.toContain('parseOklchColor');
+    expect(domExportSource).not.toContain('convertColorMixToRgba');
+  });
+
+  it('keeps import-context ignore matching and security scanning in focused modules', () => {
+    const importContextBuilderSource = readProjectFile('src/utils/import-context/importContextBuilder.ts');
+
+    expect(fs.existsSync(path.join(projectRoot, 'src/utils/import-context/ignoreMatcher.ts'))).toBe(true);
+    expect(fs.existsSync(path.join(projectRoot, 'src/utils/import-context/securityScan.ts'))).toBe(true);
+    expect(importContextBuilderSource).toContain("from './ignoreMatcher'");
+    expect(importContextBuilderSource).toContain("from './securityScan'");
+    expect(importContextBuilderSource).not.toContain('const SECURITY_RULES');
+    expect(importContextBuilderSource).not.toContain('function createIgnoreMatcher');
   });
 
   it('isolates scoped chat runtime context from sidebar and modal prop assembly', () => {

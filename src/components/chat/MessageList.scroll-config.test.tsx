@@ -24,10 +24,10 @@ vi.mock('@/components/modals/FileConfigurationModal', async () => {
   return createNullComponentMock('FileConfigurationModal');
 });
 
-vi.mock('@/hooks/useMessageListUI', async () => {
-  const { createMessageListUIMock } = await import('@/test/messageListTestDoubles');
+vi.mock('@/hooks/useMessageListUi', async () => {
+  const { createMessageListUiMock } = await import('@/test/messageListTestDoubles');
 
-  return createMessageListUIMock();
+  return createMessageListUiMock();
 });
 
 vi.mock('./message-list/hooks/useMessageListScroll', async () => {

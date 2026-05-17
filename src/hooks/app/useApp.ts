@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppSettings } from '@/hooks/core/useAppSettings';
 import { useChat } from '@/hooks/chat/useChat';
-import { useAppUI } from '@/hooks/core/useAppUI';
+import { useAppUi } from '@/hooks/core/useAppUi';
 import { useAppEvents } from '@/hooks/core/useAppEvents';
 import { usePictureInPicture } from '@/hooks/core/usePictureInPicture';
 import { logService } from '@/services/logService';
@@ -51,7 +51,7 @@ export const useApp = () => {
     updateAndPersistGroups,
     updateAndPersistSessions,
   } = chatState;
-  const uiState = useAppUI();
+  const uiState = useAppUi();
   const setIsHistorySidebarOpenTransient = useUIStore((state) => state.setIsHistorySidebarOpenTransient);
   const setIsLogViewerOpen = useUIStore((state) => state.setIsLogViewerOpen);
 

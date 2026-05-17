@@ -107,8 +107,8 @@ vi.mock('@/constants/promptHelpers', () => ({
   loadHdGuideSystemPrompt: vi.fn(async () => 'guide prompt'),
 }));
 
-vi.mock('@/hooks/core/useAppUI', () => ({
-  useAppUI: () => ({}),
+vi.mock('@/hooks/core/useAppUi', () => ({
+  useAppUi: () => ({}),
 }));
 
 vi.mock('@/hooks/core/useAppEvents', () => ({

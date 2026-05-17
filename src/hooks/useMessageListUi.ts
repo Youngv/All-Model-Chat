@@ -3,7 +3,7 @@ import { type UploadedFile, type ChatMessage, type VideoMetadata } from '@/types
 import { type MediaResolution } from '@/types/settings';
 import { useFileModalState } from './ui/useFileModalState';
 
-interface UseMessageListUIProps {
+interface UseMessageListUiProps {
   messages: ChatMessage[];
   onUpdateMessageFile: (
     messageId: string,
@@ -12,7 +12,7 @@ interface UseMessageListUIProps {
   ) => void;
 }
 
-export const useMessageListUI = ({ messages, onUpdateMessageFile }: UseMessageListUIProps) => {
+export const useMessageListUi = ({ messages, onUpdateMessageFile }: UseMessageListUiProps) => {
   const [isHtmlPreviewModalOpen, setIsHtmlPreviewModalOpen] = useState(false);
   const [htmlToPreview, setHtmlToPreview] = useState<string | null>(null);
   const [initialTrueFullscreenRequest, setInitialTrueFullscreenRequest] = useState(false);

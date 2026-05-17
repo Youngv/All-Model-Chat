@@ -1,7 +1,8 @@
 import { logService } from '@/services/logService';
 import { triggerDownload } from './core';
 import { createManagedObjectUrl } from '@/services/objectUrlManager';
-import { createSnapshotContainer, createExportDOMHeader, sanitizeDocumentStylesForPngExport } from './dom';
+import { sanitizeDocumentStylesForPngExport } from './cssColorSanitizer';
+import { createSnapshotContainer, createExportDOMHeader } from './dom';
 
 export interface PngExportMessages {
   imageTooLarge: string;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeCssColorFunctionsForPngExport } from './dom';
+import { sanitizeCssColorFunctionsForPngExport } from './cssColorSanitizer';
 
 describe('sanitizeCssColorFunctionsForPngExport', () => {
   it('converts Tailwind oklch palette variables into rgba', () => {
