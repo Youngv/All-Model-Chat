@@ -22,6 +22,11 @@ describe('isGemini3Model', () => {
     expect(isGemini3Model('gemini-3-flash-preview')).toBe(true);
   });
 
+  it('returns true for stable gemini-3-flash IDs', () => {
+    expect(isGemini3Model('gemini-3-flash')).toBe(true);
+    expect(isGemini3Model('models/gemini-3-flash')).toBe(true);
+  });
+
   it('returns true for gemini-3-pro', () => {
     expect(isGemini3Model('gemini-3-pro-image-preview')).toBe(true);
   });
@@ -60,6 +65,13 @@ describe('getModelCapabilities', () => {
 
     expect(capabilities.supportsThinkingLevel).toBe(true);
     expect(capabilities.isGemini3).toBe(false);
+  });
+
+  it('marks stable Gemini 3 Flash as supporting thinking levels', () => {
+    const capabilities = getModelCapabilities('gemini-3-flash');
+
+    expect(capabilities.isGemini3).toBe(true);
+    expect(capabilities.supportsThinkingLevel).toBe(true);
   });
 
   it('exposes raw reasoning prefill support as a model capability', () => {

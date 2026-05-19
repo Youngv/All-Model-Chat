@@ -170,18 +170,18 @@ export const useChatStreamHandler = ({
               });
 
               // Finalize (mark loading false, set stats)
-              const finalizationResult = finalizeMessages(
-                updatedMessages,
+              const finalizationResult = finalizeMessages({
+                messages: updatedMessages,
                 generationStartTime,
                 newModelMessageIds,
                 currentChatSettings,
-                lang,
-                streamState.firstContentPartTime,
-                streamState.usage,
-                streamState.grounding,
-                streamState.urlContext,
-                abortController.signal.aborted,
-              );
+                language: lang,
+                firstContentPartTime: streamState.firstContentPartTime,
+                usageMetadata: streamState.usage,
+                groundingMetadata: streamState.grounding,
+                urlContextMetadata: streamState.urlContext,
+                isAborted: abortController.signal.aborted,
+              });
 
               if (finalizationResult.completedMessageForNotification) {
                 if (appSettings.isCompletionSoundEnabled) {

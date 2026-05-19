@@ -174,10 +174,10 @@ describe('chat input architecture guardrails', () => {
   });
 
   it('shares temporary processing file placeholders across upload flows', () => {
-    expect(fs.existsSync(path.join(projectRoot, 'src/hooks/file-upload/fileUploadPolicy.ts'))).toBe(true);
+    expect(fs.existsSync(path.join(projectRoot, 'src/utils/file-upload/fileUploadPolicy.ts'))).toBe(true);
     expect(fs.existsSync(path.join(projectRoot, 'src/hooks/file-upload/utils.ts'))).toBe(false);
 
-    const helperSource = readProjectFile('src/hooks/file-upload/fileUploadPolicy.ts');
+    const helperSource = readProjectFile('src/utils/file-upload/fileUploadPolicy.ts');
     expect(helperSource).toContain('createProcessingPlaceholderFile');
 
     for (const relativePath of [
@@ -185,7 +185,7 @@ describe('chat input architecture guardrails', () => {
       'src/hooks/chat-input/useFilePreProcessingEffects.ts',
       'src/hooks/file-upload/useFileDragDrop.ts',
       'src/hooks/file-upload/useFileIdAdder.ts',
-      'src/hooks/file-upload/uploadFileItem.ts',
+      'src/utils/file-upload/uploadFileItem.ts',
     ] as const) {
       const source = readProjectFile(relativePath);
       expect(source, relativePath).toContain('createProcessingPlaceholderFile');

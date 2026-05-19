@@ -61,6 +61,12 @@ describe('project documentation structure', () => {
     expect(nginxConfig).toMatch(/location\s+~\s+\\\.mjs\$[\s\S]*Cache-Control "no-cache"/);
   });
 
+  it('does not serve the SPA shell for missing hashed assets', () => {
+    const nginxConfig = readProjectFile('docker/nginx.conf');
+
+    expect(nginxConfig).toMatch(/location\s+\^~\s+\/assets\/[\s\S]*try_files\s+\$uri\s+=404/);
+  });
+
   it('describes local Python package loading precisely', () => {
     const zhReadme = readProjectFile('README.md');
     const enReadme = readProjectFile('README.en.md');

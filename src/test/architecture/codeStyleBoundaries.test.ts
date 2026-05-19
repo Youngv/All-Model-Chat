@@ -362,7 +362,7 @@ describe('code style boundaries', () => {
 
   it('uses descriptive callback parameter names in file collection updates', () => {
     const fileCollectionSources = [
-      'src/hooks/file-upload/uploadFileItem.ts',
+      'src/utils/file-upload/uploadFileItem.ts',
       'src/hooks/file-upload/useFilePolling.ts',
       'src/hooks/file-upload/useFileIdAdder.ts',
       'src/hooks/file-upload/useFilePreProcessing.ts',

@@ -4,7 +4,7 @@ import { float32ToPCM16Base64 } from '@/features/audio/audioProcessing';
 import { getLiveApiClient, LiveApiAuthConfigurationError } from '@/services/api/liveApiAuth';
 import { logService } from '@/services/logService';
 import type { AppSettings, LiveTranscriptHandler } from '@/types';
-import type { LiveErrorState } from './liveErrorState';
+import type { LiveErrorState } from '@/utils/live-api/liveErrorState';
 import { useStateWithRef } from '@/hooks/useStateWithRef';
 
 const MAX_RECONNECT_RETRIES = 5;

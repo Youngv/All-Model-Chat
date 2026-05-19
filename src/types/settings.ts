@@ -32,7 +32,10 @@ export enum MediaResolution {
 export type ImageOutputMode = 'IMAGE_TEXT' | 'IMAGE_ONLY';
 export type ImagePersonGeneration = 'ALLOW_ADULT' | 'ALLOW_ALL' | 'DONT_ALLOW';
 export type ApiMode = 'gemini-native' | 'openai-compatible';
-export type ThinkingLevel = 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH';
+
+/** All valid thinking levels — used for both type checking and runtime validation. */
+export const THINKING_LEVELS = ['MINIMAL', 'LOW', 'MEDIUM', 'HIGH'] as const;
+export type ThinkingLevel = (typeof THINKING_LEVELS)[number];
 export type LiveArtifactsPromptMode = 'inline' | 'full' | 'fullHtml';
 export type LiveArtifactsSystemPrompts = Record<LiveArtifactsPromptMode, string>;
 export type TranslationTargetLanguage =

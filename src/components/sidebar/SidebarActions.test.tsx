@@ -89,6 +89,41 @@ describe('SidebarActions', () => {
     expect(actionStack?.className).toContain('space-y-1');
   });
 
+  it('renders configured shortcuts as hover-revealed action row hints', () => {
+    const container = render(
+      <SidebarActions
+        onNewChat={vi.fn()}
+        onAddNewGroup={vi.fn()}
+        isSearching={false}
+        searchQuery=""
+        setIsSearching={vi.fn()}
+        setSearchQuery={vi.fn()}
+        newChatShortcut="⌘ + Shift + O"
+        searchChatsShortcut="⌘ + K"
+      />,
+    );
+
+    const shortcuts = Array.from(container.querySelectorAll('[data-testid="sidebar-action-shortcut"]'));
+    const actionRows = Array.from(container.querySelectorAll('a, button')).slice(0, 3);
+
+    expect(shortcuts.map((element) => element.textContent)).toEqual(['⇧ ⌘ O', '⌘ K']);
+    for (const shortcut of shortcuts) {
+      expect(shortcut.className).toContain('opacity-0');
+      expect(shortcut.className).toContain('group-hover:opacity-100');
+      expect(shortcut.className).toContain('group-focus-visible:opacity-100');
+      expect(shortcut.className).toContain('text-sm');
+      expect(shortcut.className).toContain('font-semibold');
+      expect(shortcut.className).toContain('tracking-normal');
+      expect(shortcut.className).not.toContain('border');
+    }
+    for (const actionRow of actionRows) {
+      expect(actionRow.className).toContain('h-8');
+      expect(actionRow.className).toContain('rounded-full');
+      expect(actionRow.className).not.toContain('hover:border');
+      expect(actionRow).not.toHaveAttribute('title');
+    }
+  });
+
   it('clears the search query when Escape closes the search input', () => {
     const container = render(<SidebarActionsHarness />);
 

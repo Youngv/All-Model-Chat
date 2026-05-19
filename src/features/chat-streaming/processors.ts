@@ -7,18 +7,34 @@ import { appendApiPart } from './messageStreamReducer';
 
 export { appendApiPart };
 
-export const finalizeMessages = (
-  messages: ChatMessage[],
-  generationStartTime: Date,
-  newModelMessageIds: Set<string>,
-  _currentChatSettings: ChatSettings,
-  language: 'en' | 'zh',
-  firstContentPartTime: Date | null,
-  usageMetadata?: UsageMetadata,
-  groundingMetadata?: unknown,
-  urlContextMetadata?: unknown,
-  isAborted?: boolean,
-): { updatedMessages: ChatMessage[]; completedMessageForNotification: ChatMessage | null } => {
+interface FinalizeMessagesOptions {
+  messages: ChatMessage[];
+  generationStartTime: Date;
+  newModelMessageIds: Set<string>;
+  currentChatSettings: ChatSettings;
+  language: 'en' | 'zh';
+  firstContentPartTime: Date | null;
+  usageMetadata?: UsageMetadata;
+  groundingMetadata?: unknown;
+  urlContextMetadata?: unknown;
+  isAborted?: boolean;
+}
+
+export const finalizeMessages = ({
+  messages,
+  generationStartTime,
+  newModelMessageIds,
+  currentChatSettings: _currentChatSettings,
+  language,
+  firstContentPartTime,
+  usageMetadata,
+  groundingMetadata,
+  urlContextMetadata,
+  isAborted,
+}: FinalizeMessagesOptions): {
+  updatedMessages: ChatMessage[];
+  completedMessageForNotification: ChatMessage | null;
+} => {
   const t = getTranslator(language);
   let cumulativeTotal =
     [...messages]

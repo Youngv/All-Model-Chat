@@ -6,7 +6,7 @@ import {
   SUPPORTED_AUDIO_MIME_TYPES,
   SUPPORTED_VIDEO_MIME_TYPES,
 } from '@/constants/fileConstants';
-import { type AppSettings, type UploadedFile } from '@/types';
+import { type AppSettings, type FilesApiConfig, type UploadedFile } from '@/types';
 import { CODE_EXECUTION_TEXT_FILE_LIMIT_BYTES, isServerCodeExecutionMode } from '@/utils/codeExecution';
 import { isTextFile } from '@/utils/fileTypeUtils';
 import { getTranslator } from '@/i18n/translations';
@@ -115,15 +115,15 @@ export const shouldUseFileApi = (file: File, appSettings: AppSettings): boolean 
   const isServerCodeExecutionEnabled = isServerCodeExecutionMode(appSettings);
   const isTextLike = isTextFile(file);
 
-  const userPrefersFileApi = SUPPORTED_IMAGE_MIME_TYPES.includes(effectiveMimeType)
-    ? appSettings.filesApiConfig.images
-    : SUPPORTED_PDF_MIME_TYPES.includes(effectiveMimeType)
-      ? appSettings.filesApiConfig.pdfs
-      : SUPPORTED_AUDIO_MIME_TYPES.includes(effectiveMimeType)
-        ? appSettings.filesApiConfig.audio
-        : SUPPORTED_VIDEO_MIME_TYPES.includes(effectiveMimeType)
-          ? appSettings.filesApiConfig.video
-          : appSettings.filesApiConfig.text;
+  const resolveFileApiConfigKey = (mimeType: string): keyof FilesApiConfig => {
+    if (SUPPORTED_IMAGE_MIME_TYPES.includes(mimeType)) return 'images';
+    if (SUPPORTED_PDF_MIME_TYPES.includes(mimeType)) return 'pdfs';
+    if (SUPPORTED_AUDIO_MIME_TYPES.includes(mimeType)) return 'audio';
+    if (SUPPORTED_VIDEO_MIME_TYPES.includes(mimeType)) return 'video';
+    return 'text';
+  };
+
+  const userPrefersFileApi = appSettings.filesApiConfig[resolveFileApiConfigKey(effectiveMimeType)];
 
   const inlineLimitBytes = SUPPORTED_PDF_MIME_TYPES.includes(effectiveMimeType)
     ? INLINE_MAX_PDF_PAYLOAD_BYTES

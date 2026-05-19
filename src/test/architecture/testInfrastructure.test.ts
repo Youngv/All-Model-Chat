@@ -25,7 +25,7 @@ describe('test infrastructure guardrails', () => {
       .split(/\s+/)
       .filter((token) => /^src\/.*\.test\.(ts|tsx)$/.test(token));
 
-    expect(targetedTestFiles).toContain('src/hooks/file-upload/fileUploadPolicy.test.ts');
+    expect(targetedTestFiles).toContain('src/utils/file-upload/fileUploadPolicy.test.ts');
 
     for (const relativePath of targetedTestFiles) {
       expect(fs.existsSync(path.join(projectRoot, relativePath)), relativePath).toBe(true);
