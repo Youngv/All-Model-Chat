@@ -31,6 +31,8 @@ describe('project documentation structure', () => {
 
     expect(zhReadme).not.toContain('Gemini / Pyodide / API / 日志等基础设施');
     expect(enReadme).not.toContain('Gemini, Pyodide, API, logging, and infrastructure services');
+    expect(zhReadme).not.toContain('utils/                  # 导出、会话、IndexedDB');
+    expect(enReadme).not.toContain('utils/                  # Export, session, IndexedDB');
   });
 
   it('distinguishes Docker runtime defaults from the static runtime-config template', () => {
@@ -41,6 +43,14 @@ describe('project documentation structure', () => {
     expect(zhReadme).toContain('public/runtime-config.js 模板');
     expect(enReadme).toContain('Docker default');
     expect(enReadme).toContain('public/runtime-config.js template');
+  });
+
+  it('documents the combined frontend and API build step for Docker Compose', () => {
+    const zhReadme = readProjectFile('README.md');
+    const enReadme = readProjectFile('README.en.md');
+
+    expect(zhReadme).toContain('npm run build:docker');
+    expect(enReadme).toContain('npm run build:docker');
   });
 
   it('serves module workers with a JavaScript MIME type in Docker', () => {

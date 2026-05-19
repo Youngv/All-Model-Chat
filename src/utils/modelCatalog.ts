@@ -1,5 +1,6 @@
 import type { ApiMode, ModelOption } from '@/types';
-import { getModelCapabilities, isGeminiRoboticsModel, sortModels } from './modelHelpers';
+import { getModelCapabilities, isGeminiRoboticsModel } from './modelCapabilities';
+import { sortModels } from './modelSorting';
 
 type ModelCatalogGroup = 'pinned' | 'standard';
 type ModelCatalogCategory = 'text' | 'live' | 'tts' | 'image' | 'robotics' | 'other';

@@ -5,7 +5,7 @@ vi.mock('@/utils/chat/ids', () => ({
   generateUniqueId: () => 'generated-id',
 }));
 
-vi.mock('@/utils/modelHelpers', () => ({
+vi.mock('@/utils/modelUsageStats', () => ({
   calculateTokenStats: () => ({
     promptTokens: 0,
     cachedPromptTokens: 0,

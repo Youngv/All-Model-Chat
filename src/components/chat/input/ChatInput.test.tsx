@@ -171,7 +171,7 @@ vi.mock('@/hooks/ui/useFileModalState', () => ({
   }),
 }));
 
-vi.mock('@/utils/modelHelpers', () => ({
+vi.mock('@/utils/modelCapabilities', () => ({
   getModelCapabilities: () => mockModelCapabilities.value,
   isGemini3Model: (modelId: string) => modelId.includes('gemini-3'),
 }));

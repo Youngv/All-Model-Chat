@@ -17,7 +17,7 @@ import { useAppInitialization } from './useAppInitialization';
 import { useAppTitle } from './useAppTitle';
 import { focusChatInput, useAppPromptModes } from './useAppPromptModes';
 import { DEFAULT_THINKING_BUDGET } from '@/constants/modelConstants';
-import { getModelCapabilities } from '@/utils/modelHelpers';
+import { getModelCapabilities } from '@/utils/modelCapabilities';
 
 const buildProviderAwareModels = (apiModels: ModelOption[]): ModelOption[] => {
   return apiModels.map((model) => ({ ...model, apiMode: 'gemini-native' as const }));

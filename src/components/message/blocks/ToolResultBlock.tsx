@@ -23,12 +23,10 @@ export const ToolResultBlock: React.FC<ToolResultBlockProps> = ({
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
-  // Try to find the pre element which contains the code/output
   const preElement = React.Children.toArray(children).find(
     (child) => React.isValidElement(child) && child.type === 'pre',
   );
 
-  // Extract raw text for download
   const rawCode = preElement
     ? extractTextFromNode(preElement)
     : extractTextFromNode(children)

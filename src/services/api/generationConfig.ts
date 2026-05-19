@@ -1,4 +1,10 @@
-import type { CountTokensConfig, FunctionDeclaration } from '@google/genai';
+import {
+  ThinkingLevel,
+  type CountTokensConfig,
+  type FunctionDeclaration,
+  type GenerateContentConfig,
+  type Tool,
+} from '@google/genai';
 import { loadDeepSearchSystemPrompt, loadLocalPythonSystemPrompt } from '@/constants/promptHelpers';
 import {
   MediaResolution,
@@ -9,53 +15,27 @@ import {
 } from '@/types/settings';
 import { logService } from '@/services/logService';
 import {
+  getModelCapabilities,
   isGemini3Model,
   isGeminiRoboticsModel,
   isGemmaModel,
-  getModelCapabilities,
   normalizeAspectRatioForModel,
   normalizeImageSizeForModel,
-} from '@/utils/modelHelpers';
+} from '@/utils/modelCapabilities';
+import { isServerCodeExecutionMode } from '@/utils/codeExecution';
 
-const IMAGE_TEXT_MODALITIES = ['IMAGE', 'TEXT'] as const;
-const IMAGE_ONLY_MODALITIES = ['IMAGE'] as const;
+const IMAGE_TEXT_MODALITIES = ['IMAGE', 'TEXT'];
+const IMAGE_ONLY_MODALITIES = ['IMAGE'];
+const THINKING_LEVEL_FOR_SDK = {
+  MINIMAL: ThinkingLevel.MINIMAL,
+  LOW: ThinkingLevel.LOW,
+  MEDIUM: ThinkingLevel.MEDIUM,
+  HIGH: ThinkingLevel.HIGH,
+} as const;
 
-type GenerationConfig = {
-  responseModalities?: ReadonlyArray<'IMAGE' | 'TEXT'>;
-  responseMimeType?: string;
-  responseSchema?: Record<string, unknown>;
-  imageConfig?: {
-    aspectRatio?: string;
-    imageSize?: string;
-  };
-  thinkingConfig?: {
-    includeThoughts: boolean;
-    thinkingLevel?: 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH';
-    thinkingBudget?: number;
-  };
-  tools?: Array<
-    | {
-        googleSearch: {
-          searchTypes?: {
-            webSearch?: Record<string, never>;
-            imageSearch?: Record<string, never>;
-          };
-        };
-      }
-    | { functionDeclarations: FunctionDeclaration[] }
-    | { codeExecution: Record<string, never> }
-    | { urlContext: Record<string, never> }
-  >;
-  toolConfig?: {
-    includeServerSideToolInvocations?: boolean;
-  };
-  temperature?: number;
-  topP?: number;
-  topK?: number;
-  systemInstruction?: string;
+type GenerationConfig = Omit<GenerateContentConfig, 'mediaResolution' | 'safetySettings'> & {
   safetySettings?: SafetySetting[];
   mediaResolution?: MediaResolution;
-  abortSignal?: AbortSignal;
 };
 
 type BuildGenerationConfigInput = Pick<
@@ -114,6 +94,23 @@ type InternalBuildGenerationConfigOptions = {
   personGeneration?: ImagePersonGeneration;
 };
 
+const buildGoogleSearchToolForModel = (modelId: string): Tool =>
+  modelId === 'gemini-3.1-flash-image-preview'
+    ? {
+        googleSearch: {
+          searchTypes: {
+            webSearch: {},
+            imageSearch: {},
+          },
+        },
+      }
+    : { googleSearch: {} };
+
+const toSdkThinkingLevel = (
+  thinkingLevel: InternalBuildGenerationConfigOptions['thinkingLevel'],
+  fallback: keyof typeof THINKING_LEVEL_FOR_SDK,
+) => THINKING_LEVEL_FOR_SDK[thinkingLevel ?? fallback];
+
 const toInternalBuildGenerationConfigOptions = (
   options: BuildGenerationConfigOptions,
 ): InternalBuildGenerationConfigOptions => {
@@ -165,17 +162,7 @@ async function buildGenerationConfigFromOptions({
 }: InternalBuildGenerationConfigOptions): Promise<GenerationConfig> {
   const normalizedAspectRatio = normalizeAspectRatioForModel(modelId, aspectRatio);
   const normalizedImageSize = normalizeImageSizeForModel(modelId, imageSize);
-  const googleSearchTool =
-    modelId === 'gemini-3.1-flash-image-preview'
-      ? {
-          googleSearch: {
-            searchTypes: {
-              webSearch: {},
-              imageSearch: {},
-            },
-          },
-        }
-      : { googleSearch: {} };
+  const googleSearchTool = buildGoogleSearchToolForModel(modelId);
 
   if (modelId === 'gemini-2.5-flash-image-preview' || modelId === 'gemini-2.5-flash-image') {
     const imageConfig: NonNullable<GenerationConfig['imageConfig']> = {};
@@ -208,7 +195,8 @@ async function buildGenerationConfigFromOptions({
     if (modelId === 'gemini-3.1-flash-image-preview') {
       generationConfig.thinkingConfig = {
         includeThoughts: true,
-        thinkingLevel: thinkingLevel === 'HIGH' ? 'HIGH' : 'MINIMAL',
+        // Gemini 3.1 Flash Image exposes only minimal/high thinking levels.
+        thinkingLevel: toSdkThinkingLevel(thinkingLevel === 'HIGH' ? 'HIGH' : 'MINIMAL', 'MINIMAL'),
       };
     }
 
@@ -268,12 +256,12 @@ async function buildGenerationConfigFromOptions({
     if (thinkingBudget > 0) {
       generationConfig.thinkingConfig.thinkingBudget = thinkingBudget;
     } else {
-      generationConfig.thinkingConfig.thinkingLevel = thinkingLevel || 'HIGH';
+      generationConfig.thinkingConfig.thinkingLevel = toSdkThinkingLevel(thinkingLevel, 'HIGH');
     }
   } else if (isGemma) {
     generationConfig.thinkingConfig = {
       includeThoughts: true,
-      thinkingLevel: gemmaThinkingLevel,
+      thinkingLevel: gemmaThinkingLevel ? toSdkThinkingLevel(gemmaThinkingLevel, 'MINIMAL') : undefined,
     };
   } else {
     const modelSupportsThinking = getModelCapabilities(modelId).supportsThinkingBudgetConfig;
@@ -290,7 +278,7 @@ async function buildGenerationConfigFromOptions({
   if (isGoogleSearchEnabled || isDeepSearchEnabled) {
     tools.push(googleSearchTool);
   }
-  if (!isGemma && isCodeExecutionEnabled && !isLocalPythonEnabled) {
+  if (!isGemma && isServerCodeExecutionMode({ isCodeExecutionEnabled, isLocalPythonEnabled })) {
     tools.push({ codeExecution: {} });
   }
   if (!isGemma && isUrlContextEnabled) {

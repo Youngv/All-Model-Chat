@@ -156,7 +156,6 @@ export const FileDisplay: React.FC<FileDisplayProps> = ({
     );
   }
 
-  // Render File Card for other types (or error states)
   const { Icon, colorClass, bgClass } = CATEGORY_STYLES[category] || CATEGORY_STYLES['code'];
 
   return (

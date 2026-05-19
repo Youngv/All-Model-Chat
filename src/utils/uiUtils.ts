@@ -1,5 +1,5 @@
 import { logService } from '@/services/logService';
-import React from 'react';
+import { isValidElement, type ElementType, type ReactNode } from 'react';
 import { type ThemeColors, type Theme } from '@/types/theme';
 import { type AppSettings, MediaResolution } from '@/types';
 import { AVAILABLE_THEMES } from '@/constants/themeConstants';
@@ -16,7 +16,6 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import type { FileCategory } from './fileTypeUtils';
-export { getFileTypeCategory } from './fileTypeUtils';
 
 type NotificationOptionsWithTag = NotificationOptions & {
   renotify?: boolean;
@@ -136,7 +135,7 @@ export const playCompletionSound = () => {
   }
 };
 
-export const CATEGORY_STYLES: Record<FileCategory, { Icon: React.ElementType; colorClass: string; bgClass: string }> = {
+export const CATEGORY_STYLES: Record<FileCategory, { Icon: ElementType; colorClass: string; bgClass: string }> = {
   image: {
     Icon: ImageIcon,
     colorClass: 'text-blue-500 dark:text-blue-400',
@@ -186,11 +185,11 @@ export const CATEGORY_STYLES: Record<FileCategory, { Icon: React.ElementType; co
   },
 };
 
-export const extractTextFromNode = (node: React.ReactNode): string => {
+export const extractTextFromNode = (node: ReactNode): string => {
   if (!node) return '';
   if (typeof node === 'string' || typeof node === 'number') return String(node);
   if (Array.isArray(node)) return node.map(extractTextFromNode).join('');
-  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+  if (isValidElement<{ children?: ReactNode }>(node)) {
     return extractTextFromNode(node.props.children);
   }
   return '';

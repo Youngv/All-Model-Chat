@@ -1,13 +1,5 @@
 import { type AppSettings, type FilesApiConfig, type ModelOption, type TranslationTargetLanguage } from '@/types';
 import { HarmCategory, HarmBlockThreshold, type SafetySetting, MediaResolution } from '@/types/settings';
-
-export * from './modelConstants';
-export * from './shortcuts';
-export * from './storageKeys';
-export * from './styleClasses';
-
-export const DEFAULT_SYSTEM_INSTRUCTION = '';
-
 import {
   DEFAULT_MODEL_ID,
   DEFAULT_TEMPERATURE,
@@ -23,6 +15,13 @@ import {
 import { getRuntimeConfigAppSettingsOverrides } from '@/runtime/runtimeConfig';
 import { DEFAULT_OPENAI_COMPATIBLE_BASE_URL } from '@/utils/apiProxyUrl';
 import { createEmptyLiveArtifactsSystemPrompts } from '@/utils/liveArtifactsPromptSettings';
+
+export * from './modelConstants';
+export * from './shortcuts';
+export * from './storageKeys';
+export * from './styleClasses';
+
+export const DEFAULT_SYSTEM_INSTRUCTION = '';
 
 const DEFAULT_IS_STREAMING_ENABLED = true;
 const DEFAULT_BASE_FONT_SIZE = 16;

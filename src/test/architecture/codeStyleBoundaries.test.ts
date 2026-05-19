@@ -79,6 +79,34 @@ describe('code style boundaries', () => {
     expect(offenders).toEqual([]);
   });
 
+  it('keeps same-directory source imports relative instead of using the app alias', () => {
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => !relativePath.includes('/test/architecture/'))
+      .flatMap((relativePath) => {
+        const source = readProjectFile(relativePath);
+        const sourceDir = path.dirname(path.join(projectRoot, relativePath));
+
+        return Array.from(source.matchAll(sourceImportSpecifierPattern))
+          .map((match) => match[1] ?? match[2] ?? match[3])
+          .filter((specifier): specifier is string => Boolean(specifier?.startsWith('@/')))
+          .filter((specifier) => {
+            const aliasTarget = path.join(projectRoot, specifier.replace('@/', 'src/'));
+            const candidateTargets = [
+              `${aliasTarget}.ts`,
+              `${aliasTarget}.tsx`,
+              path.join(aliasTarget, 'index.ts'),
+              path.join(aliasTarget, 'index.tsx'),
+            ];
+            return candidateTargets.some(
+              (candidateTarget) => path.dirname(candidateTarget) === sourceDir && fs.existsSync(candidateTarget),
+            );
+          })
+          .map((specifier) => `${relativePath}:${specifier}`);
+      });
+
+    expect(offenders).toEqual([]);
+  });
+
   it('keeps ESLint exception paths aligned with files that still exist', () => {
     const eslintConfig = readProjectFile('eslint.config.js');
 
@@ -86,9 +114,8 @@ describe('code style boundaries', () => {
     expect(eslintConfig).not.toContain('src/components/icons/CustomIcons.tsx');
   });
 
-  it('does not repeat static import declarations from the same module in production sources', () => {
+  it('does not repeat static import declarations from the same module', () => {
     const offenders = listProjectSourceFiles('src')
-      .filter((relativePath) => !relativePath.includes('.test.'))
       .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
       .flatMap((relativePath) => {
         const source = readProjectFile(relativePath);
@@ -102,6 +129,27 @@ describe('code style boundaries', () => {
         return Array.from(importCounts)
           .filter(([, count]) => count > 1)
           .map(([specifier]) => `${relativePath}:${specifier}`);
+      });
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('keeps static import declarations before exports', () => {
+    const offenders = listProjectSourceFiles('src')
+      .filter((relativePath) => relativePath !== 'src/test/architecture/codeStyleBoundaries.test.ts')
+      .flatMap((relativePath) => {
+        const lines = readProjectFile(relativePath).split('\n');
+        let sawExport = false;
+        const lateImports: string[] = [];
+
+        lines.forEach((line, index) => {
+          if (/^export\s/.test(line)) sawExport = true;
+          if (sawExport && /^import\s/.test(line)) {
+            lateImports.push(`${relativePath}:${index + 1}`);
+          }
+        });
+
+        return lateImports;
       });
 
     expect(offenders).toEqual([]);
@@ -130,7 +178,7 @@ describe('code style boundaries', () => {
     const prettierIgnore = readProjectFile('.prettierignore');
 
     expect(packageJson.scripts?.clean).toBe(
-      'rm -rf dist coverage playwright-report test-results tmp-live-artifact-demo .playwright-visible-demo-profile .codex-dev-server.*',
+      'rm -rf dist server/dist coverage playwright-report test-results tmp-live-artifact-demo .playwright-visible-demo-profile .codex-dev-server.*',
     );
 
     for (const ignoredPath of [
@@ -143,6 +191,16 @@ describe('code style boundaries', () => {
     ]) {
       expect(prettierIgnore).toContain(ignoredPath);
     }
+  });
+
+  it('keeps local script filenames on kebab-case command names', () => {
+    const packageJson = JSON.parse(readProjectFile('package.json')) as { scripts?: Record<string, string> };
+
+    expect(packageJson.scripts?.test).toBe('node scripts/run-vitest.mjs run');
+    expect(packageJson.scripts?.['test:watch']).toBe('node scripts/run-vitest.mjs');
+    expect(packageJson.scripts?.['build:docker']).toBe('npm run build && npm run build:api');
+    expect(fs.existsSync(path.join(projectRoot, 'scripts/runVitest.mjs'))).toBe(false);
+    expect(fs.existsSync(path.join(projectRoot, 'scripts/run-vitest.mjs'))).toBe(true);
   });
 
   it('keeps Vite configuration focused on assembly instead of local API internals', () => {

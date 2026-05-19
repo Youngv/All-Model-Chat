@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { act } from 'react';
+import React, { act, useState } from 'react';
 import { setupTestRenderer } from '@/test/testUtils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SidebarActions } from './SidebarActions';

@@ -5,25 +5,25 @@ import {
   type UploadedFile,
   type ChatSettings as IndividualChatSettings,
 } from '@/types';
-import { logService } from '@/services/logService';
-import { useChatStreamHandler } from '@/features/message-sender/useChatStreamHandler';
-import { useModelRequestRunner } from '@/features/message-sender/useModelRequestRunner';
-import { useMessageLifecycle } from '@/features/message-sender/useMessageLifecycle';
-import { sendImageEditMessage } from '@/features/message-sender/imageEditStrategy';
-import { sendStandardMessage } from '@/features/message-sender/standardChatStrategy';
-import { createSenderStoreActions } from '@/features/message-sender/senderStoreActions';
-import { sendTtsImagenMessage } from '@/features/message-sender/ttsImagenStrategy';
-import { ensureFilesApiReferences } from '@/features/message-sender/fileApiReference';
-import { prepareFilesForOpenAICompatibleMode } from '@/features/message-sender/openaiCompatibleFiles';
-import { formatMessageSenderText } from '@/features/message-sender/i18nFormat';
-import { getModelCapabilities } from '@/utils/modelHelpers';
 import { useI18n } from '@/contexts/I18nContext';
-import { getApiKeyErrorTranslationKey } from '@/utils/apiUtils';
+import { logService } from '@/services/logService';
 import type { ImageOutputMode, ImagePersonGeneration } from '@/types/settings';
+import { getApiKeyErrorTranslationKey } from '@/utils/apiUtils';
+import { CODE_EXECUTION_TEXT_FILE_LIMIT_BYTES, isServerCodeExecutionMode } from '@/utils/codeExecution';
 import { isImageMimeType, isPdfMimeType, isTextFile } from '@/utils/fileTypeUtils';
+import { getModelCapabilities } from '@/utils/modelCapabilities';
 import { isOpenAICompatibleApiActive } from '@/utils/openaiCompatibleMode';
 
-const CODE_EXECUTION_TEXT_FILE_SIZE_LIMIT_BYTES = 2 * 1024 * 1024;
+import { ensureFilesApiReferences } from './fileApiReference';
+import { formatMessageSenderText } from './i18nFormat';
+import { sendImageEditMessage } from './imageEditStrategy';
+import { prepareFilesForOpenAICompatibleMode } from './openaiCompatibleFiles';
+import { createSenderStoreActions } from './senderStoreActions';
+import { sendStandardMessage } from './standardChatStrategy';
+import { sendTtsImagenMessage } from './ttsImagenStrategy';
+import { useChatStreamHandler } from './useChatStreamHandler';
+import { useMessageLifecycle } from './useMessageLifecycle';
+import { useModelRequestRunner } from './useModelRequestRunner';
 
 interface MessageSenderProps {
   appSettings: AppSettings;
@@ -153,12 +153,11 @@ export const useMessageSender = (props: MessageSenderProps) => {
         return;
       }
 
-      const isServerCodeExecutionEnabled =
-        !!sessionToUpdate.isCodeExecutionEnabled && !sessionToUpdate.isLocalPythonEnabled;
+      const isServerCodeExecutionEnabled = isServerCodeExecutionMode(sessionToUpdate);
       if (isServerCodeExecutionEnabled) {
         const oversizedTextFile = filesToUse.find(
           (file) =>
-            file.uploadState === 'active' && isTextFile(file) && file.size > CODE_EXECUTION_TEXT_FILE_SIZE_LIMIT_BYTES,
+            file.uploadState === 'active' && isTextFile(file) && file.size > CODE_EXECUTION_TEXT_FILE_LIMIT_BYTES,
         );
 
         if (oversizedTextFile) {

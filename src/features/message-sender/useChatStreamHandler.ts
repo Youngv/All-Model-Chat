@@ -8,7 +8,7 @@ import {
 import type { Part, UsageMetadata } from '@google/genai';
 import { useApiErrorHandler } from './useApiErrorHandler';
 import { logService } from '@/services/logService';
-import { calculateTokenStats } from '@/utils/modelHelpers';
+import { calculateTokenStats } from '@/utils/modelUsageStats';
 import { showNotification, playCompletionSound } from '@/utils/uiUtils';
 import { finalizeMessages } from '@/features/chat-streaming/processors';
 import { streamingStore } from '@/services/streamingStore';

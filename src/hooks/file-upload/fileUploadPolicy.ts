@@ -7,6 +7,7 @@ import {
   SUPPORTED_VIDEO_MIME_TYPES,
 } from '@/constants/fileConstants';
 import { type AppSettings, type UploadedFile } from '@/types';
+import { CODE_EXECUTION_TEXT_FILE_LIMIT_BYTES, isServerCodeExecutionMode } from '@/utils/codeExecution';
 import { isTextFile } from '@/utils/fileTypeUtils';
 import { getTranslator } from '@/i18n/translations';
 
@@ -14,7 +15,6 @@ type Translator = ReturnType<typeof getTranslator>;
 
 const INLINE_MAX_REQUEST_PAYLOAD_BYTES = 100 * 1024 * 1024;
 const INLINE_MAX_PDF_PAYLOAD_BYTES = 50 * 1024 * 1024;
-const INLINE_MAX_CODE_EXECUTION_TEXT_PAYLOAD_BYTES = 2 * 1024 * 1024;
 const INLINE_PART_JSON_OVERHEAD_BYTES = 512;
 
 const getFileSignature = (file: Pick<File, 'name' | 'size'>) => `${file.name.toLowerCase()}::${file.size}`;
@@ -84,7 +84,7 @@ const estimateTextPayloadBytes = (rawBytes: number): number => {
 };
 
 const getEstimatedInlinePayloadBytes = (file: File, appSettings: AppSettings): number => {
-  const isServerCodeExecutionEnabled = !!appSettings.isCodeExecutionEnabled && !appSettings.isLocalPythonEnabled;
+  const isServerCodeExecutionEnabled = isServerCodeExecutionMode(appSettings);
   const textLike = isTextFile(file);
 
   if (textLike && !isServerCodeExecutionEnabled) {
@@ -112,7 +112,7 @@ export const getUploadLifecycleForGeminiState = (
 export const shouldUseFileApi = (file: File, appSettings: AppSettings): boolean => {
   const effectiveMimeType = getEffectiveMimeType(file);
   if (!ALL_SUPPORTED_MIME_TYPES.includes(effectiveMimeType)) return false;
-  const isServerCodeExecutionEnabled = !!appSettings.isCodeExecutionEnabled && !appSettings.isLocalPythonEnabled;
+  const isServerCodeExecutionEnabled = isServerCodeExecutionMode(appSettings);
   const isTextLike = isTextFile(file);
 
   const userPrefersFileApi = SUPPORTED_IMAGE_MIME_TYPES.includes(effectiveMimeType)
@@ -128,7 +128,7 @@ export const shouldUseFileApi = (file: File, appSettings: AppSettings): boolean 
   const inlineLimitBytes = SUPPORTED_PDF_MIME_TYPES.includes(effectiveMimeType)
     ? INLINE_MAX_PDF_PAYLOAD_BYTES
     : isServerCodeExecutionEnabled && isTextLike
-      ? INLINE_MAX_CODE_EXECUTION_TEXT_PAYLOAD_BYTES
+      ? CODE_EXECUTION_TEXT_FILE_LIMIT_BYTES
       : INLINE_MAX_REQUEST_PAYLOAD_BYTES;
 
   return userPrefersFileApi || getEstimatedInlinePayloadBytes(file, appSettings) > inlineLimitBytes;

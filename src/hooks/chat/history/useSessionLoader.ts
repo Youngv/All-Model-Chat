@@ -16,7 +16,7 @@ import {
 import { logService } from '@/services/logService';
 import { createNewSession, rehydrateSessionFiles } from '@/utils/chat/session';
 import { cleanupFilePreviewUrls } from '@/utils/fileHelpers';
-import { resolveSupportedModelId } from '@/utils/modelHelpers';
+import { resolveSupportedModelId } from '@/utils/modelSorting';
 import { dbService } from '@/services/db/dbService';
 import { useChatStore, type SetActiveSessionOptions } from '@/stores/chatStore';
 
