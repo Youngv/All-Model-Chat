@@ -153,11 +153,7 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({
         )}
       </div>
       <div>
-        <button
-          onClick={onAddNewGroup}
-          className={SIDEBAR_ACTION_ROW_CLASS}
-          aria-label={t('newGroup_aria')}
-        >
+        <button onClick={onAddNewGroup} className={SIDEBAR_ACTION_ROW_CLASS} aria-label={t('newGroup_aria')}>
           <IconNewGroup size={18} className="text-[var(--theme-icon-history)]" strokeWidth={2} />
           <span className="min-w-0 flex-1 truncate text-[var(--theme-text-primary)]">{t('newGroup_button')}</span>
         </button>

@@ -31,9 +31,7 @@ export const isStaleBuildError = (error: Error | null): boolean => {
   return STALE_BUILD_ERROR_PATTERNS.some((pattern) => pattern.test(message));
 };
 
-export const recoverFromStaleBuild = async (
-  target: StaleBuildRecoveryTarget = window,
-): Promise<void> => {
+export const recoverFromStaleBuild = async (target: StaleBuildRecoveryTarget = window): Promise<void> => {
   const registrations = await target.navigator?.serviceWorker?.getRegistrations?.().catch(() => []);
   await Promise.all(registrations?.map((registration) => registration.unregister().catch(ignoreRecoveryError)) ?? []);
 
